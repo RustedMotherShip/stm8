@@ -23,15 +23,15 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000001  s_SSEG                          
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
-     0000000F  l_CONST                         
      00000023  l_GSINIT                        
-     00000099  l_CODE                          
+     00000048  l_CONST                         
+     000000E8  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     0000803C  s_CODE                          
-     0000803C  s_INITIALIZER                   
+     00008075  s_CODE                          
+     00008075  s_INITIALIZER                   
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -74,7 +74,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    0000000F =          15. bytes (REL,CON)
+CONST                               0000802D    00000048 =          72. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -83,16 +83,16 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                0000803C    00000099 =         153. bytes (REL,CON)
+CODE                                00008075    000000E8 =         232. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000803C  _delay                             main
-     0000806A  _uart_write                        main
-     0000809A  _main                              main
-     000080C6  ___sdcc_external_startup           _startup
-     000080C8  _strlen                            _strlen
-
+     00008075  _delay                             main
+     000080A3  _uart_write_line                   main
+     000080D3  _uart_write_char                   main
+     000080E3  _main                              main
+     0000814E  ___sdcc_external_startup           _startup
+     00008150  _strlen                            _strlen
 ASxxxx Linker V03.00/V05.40 + sdld,  page 8.
 
 Files Linked                              [ module(s) ]
