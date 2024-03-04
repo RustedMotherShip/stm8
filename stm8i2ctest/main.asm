@@ -9,7 +9,7 @@
 ; Public variables in this module
 ;--------------------------------------------------------
 	.globl _main
-	.globl _uart_write_char
+	.globl _uart_write_int
 	.globl _uart_write_line
 	.globl _delay
 	.globl _strlen
@@ -166,18 +166,18 @@ _uart_write_line:
 ;	main.c: 17: }
 	addw	sp, #5
 	ret
-;	main.c: 19: void uart_write_char(char str_char) {
+;	main.c: 19: void uart_write_int(uint8_t rx_int) {
 ;	-----------------------------------------
-;	 function uart_write_char
+;	 function uart_write_int
 ;	-----------------------------------------
-_uart_write_char:
+_uart_write_int:
 	push	a
 	ld	(0x01, sp), a
 ;	main.c: 20: while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
 00101$:
 	ld	a, 0x5230
 	jrpl	00101$
-;	main.c: 21: UART1_DR = str_char;
+;	main.c: 21: UART1_DR = rx_int;
 	ldw	x, #0x5231
 	ld	a, (0x01, sp)
 	ld	(x), a
@@ -209,27 +209,25 @@ _main:
 	mov	0x521b+0, #0x50
 ;	main.c: 41: I2C_CCRH = 0x00;  // Обнуляем верхние биты делителя
 	mov	0x521c+0, #0x00
-;	main.c: 44: while(1) {
-00103$:
 ;	main.c: 45: uart_write_line("Start Scanning\n");
 	ldw	x, #(___str_0+0)
 	call	_uart_write_line
 ;	main.c: 47: for(char addr = 0x00; addr < 0xFF;addr++)
 	clr	(0x01, sp)
-00106$:
+00103$:
 	ld	a, (0x01, sp)
 	cp	a, #0xff
-	jrnc	00103$
+	jrnc	00101$
 ;	main.c: 50: uart_write_line("_______Start______\n");
 	ldw	x, #(___str_1+0)
 	call	_uart_write_line
-;	main.c: 51: uart_write_line("Dev -> ");
+;	main.c: 51: uart_write_line("Dev ->  ");
 	ldw	x, #(___str_2+0)
 	call	_uart_write_line
-;	main.c: 52: uart_write_char(addr);
+;	main.c: 52: uart_write_int(addr);
 	ld	a, (0x01, sp)
-	call	_uart_write_char
-;	main.c: 53: uart_write_line(" <-Dev\n");
+	call	_uart_write_int
+;	main.c: 53: uart_write_line("  <- Dev\n");
 	ldw	x, #(___str_3+0)
 	call	_uart_write_line
 ;	main.c: 56: I2C_DR = addr;
@@ -239,16 +237,13 @@ _main:
 ;	main.c: 61: uart_write_line("_______Stop_______\n");
 	ldw	x, #(___str_4+0)
 	call	_uart_write_line
-;	main.c: 62: delay(2000000L);
-	push	#0x80
-	push	#0x84
-	push	#0x1e
-	push	#0x00
-	call	_delay
 ;	main.c: 47: for(char addr = 0x00; addr < 0xFF;addr++)
 	inc	(0x01, sp)
-	jra	00106$
-;	main.c: 67: }
+	jra	00103$
+00101$:
+;	main.c: 67: return 0;
+	clrw	x
+;	main.c: 68: }
 	pop	a
 	ret
 	.area CODE
@@ -267,12 +262,12 @@ ___str_1:
 	.area CODE
 	.area CONST
 ___str_2:
-	.ascii "Dev -> "
+	.ascii "Dev ->  "
 	.db 0x00
 	.area CODE
 	.area CONST
 ___str_3:
-	.ascii " <-Dev"
+	.ascii "  <- Dev"
 	.db 0x0a
 	.db 0x00
 	.area CODE

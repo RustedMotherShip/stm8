@@ -1,10 +1,31 @@
 #include "stm8.h"
 #include <string.h>
 #include <stdint.h>
+char rx_int_chars[3]={0};
+
 /* Simple busy loop delay */
 void delay(unsigned long count) {
     while (count--)
         nop();
+}
+
+void convert_char_to_chars(int num) {
+    if (num > 99) {
+        // Если число имеет три цифры
+        rx_int_chars[0] = num / 100 + '0';
+        rx_int_chars[1] = num / 10 % 10 + '0';
+        rx_int_chars[2] = num % 10 + '0';
+    } else if (num > 9) {
+        // Если число имеет две цифры
+        rx_int_chars[0] = num / 10 + '0';
+        rx_int_chars[1] = num % 10 + '0';
+        rx_int_chars[2] = '\0'; // Заканчиваем строку символом конца строки
+    } else {
+        // Если число имеет одну цифру
+        rx_int_chars[0] = num + '0';
+        rx_int_chars[1] = '\0'; // Заканчиваем строку символом конца строки
+        rx_int_chars[2] = '\0'; // Заканчиваем строку символом конца строки
+    }
 }
 
 int uart_write_line(const char *str) {
@@ -16,9 +37,10 @@ int uart_write_line(const char *str) {
     return(i); // Bytes sent
 }
 
-void uart_write_char(char str_char) {
+void uart_write_int(uint8_t rx_int) {
+
     while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
-        UART1_DR = str_char;
+        UART1_DR = rx_int;
     }
 
 
@@ -44,12 +66,12 @@ int main(void)
     //while(1) {
         uart_write_line("Start Scanning\n");
 
-        for(char addr = 0x00; addr < 0xFF;addr++)
+        for(uint8_t addr = 0x00; addr < 0xFF;addr++)
         {
             //char buff[2] = {&addr, 0}
             uart_write_line("_______Start______\n");
             uart_write_line("Dev ->  ");
-            uart_write_char(addr);
+            uart_write_int(addr);
             uart_write_line("  <- Dev\n");
             //uart_write(&buff);
             //if(I2C_DR >> 7 == 1)
@@ -59,9 +81,12 @@ int main(void)
             //uart_write_line("Status 2 - " + I2C_SR2 + '\n\0');
             //uart_write_line("Status 3 - " + I2C_SR3 + '\n\0');
             uart_write_line("_______Stop_______\n");
-            delay(1000000L);
+            //delay(1000000L);
 
         }
         
     //}
+        return 0;
 }
+
+
