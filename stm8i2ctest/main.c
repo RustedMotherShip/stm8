@@ -1,7 +1,7 @@
 #include "stm8.h"
 #include <string.h>
 #include <stdint.h>
-char rx_int_chars[3]={0};
+#include <stdlib.h>
 
 /* Simple busy loop delay */
 void delay(unsigned long count) {
@@ -9,24 +9,39 @@ void delay(unsigned long count) {
         nop();
 }
 
-void convert_char_to_chars(int num) {
+void convert_int_to_chars(int num, char* rx_int_chars) {
     if (num > 99) {
         // Если число имеет три цифры
         rx_int_chars[0] = num / 100 + '0';
         rx_int_chars[1] = num / 10 % 10 + '0';
         rx_int_chars[2] = num % 10 + '0';
+        rx_int_chars[3] ='\0';
+
     } else if (num > 9) {
         // Если число имеет две цифры
         rx_int_chars[0] = num / 10 + '0';
         rx_int_chars[1] = num % 10 + '0';
-        rx_int_chars[2] = '\0'; // Заканчиваем строку символом конца строки
+        rx_int_chars[2] ='\0';
+
+        //rx_int_chars[3] = '\0'; // Заканчиваем строку символом конца строки
     } else {
         // Если число имеет одну цифру
         rx_int_chars[0] = num + '0';
-        rx_int_chars[1] = '\0'; // Заканчиваем строку символом конца строки
-        rx_int_chars[2] = '\0'; // Заканчиваем строку символом конца строки
+        rx_int_chars[1] ='\0';
     }
 }
+
+void convert_int_to_binary(int num, char* rx_binary_chars) {
+    // Проверяем каждый бит числа, начиная со старшего
+    for(int i = 7; i >= 0; i--) {
+        // Установка соответствующего бита в строке
+        rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
+    }
+    rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
+}
+
+
+
 
 int uart_write_line(const char *str) {
     char i;
@@ -37,11 +52,6 @@ int uart_write_line(const char *str) {
     return(i); // Bytes sent
 }
 
-void uart_write_int(uint8_t rx_int) {
-
-    while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
-        UART1_DR = rx_int;
-    }
 
 
 int main(void)
@@ -57,10 +67,17 @@ int main(void)
     UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
 
     // Включение I2C
-    I2C_CR1 = 0x01;  // включаем подключение к шине
-    I2C_FREQR = 0x01;  
-    I2C_CCRL = 0x50;  // Загружаем нижние 8 бит делителя для получения 100 кГц
-    I2C_CCRH = 0x00;  // Обнуляем верхние биты делителя
+    //----------- Setup I2C ------------------------
+    I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
+    I2C_FREQR= 16;                  // peripheral frequence =16MHz
+    I2C_CCRH = 0;                   // =0
+    I2C_CCRL = 80;                  // 100kHz for I2C
+    I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
+    I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
+    I2C_OARH = I2C_OARH | 0x40;     // see reference manual
+    I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
+
+    //------------- End Setup --------------------- // Обнуляем верхние биты делителя
 
 
     //while(1) {
@@ -71,13 +88,37 @@ int main(void)
             //char buff[2] = {&addr, 0}
             uart_write_line("_______Start______\n");
             uart_write_line("Dev ->  ");
-            uart_write_int(addr);
+            char rx_int_chars[4]={0};
+            char rx_binary_chars[9]={0};
+            convert_int_to_chars(addr, rx_int_chars);
+            uart_write_line(rx_int_chars);
             uart_write_line("  <- Dev\n");
             //uart_write(&buff);
             //if(I2C_DR >> 7 == 1)
+            I2C_CR2 |= (1 << 2); // Set ACK bit
+            I2C_CR2 |= (1 << 0); // START
+            while (!(I2C_SR1 & (1 << 0)));
+            I2C_SR1 = 0x00;
             I2C_DR = addr;
+            
+
+
             //uart_write_line("Status 1 - " + I2C_SR1 + "\n\0");
-            //uart_write_char(I2C_SR1)
+            convert_int_to_binary(I2C_SR1, rx_binary_chars);
+            uart_write_line("SR1 -> ");
+            uart_write_line(rx_binary_chars);
+            uart_write_line(" <-\n");
+            convert_int_to_binary(I2C_SR2, rx_binary_chars);
+            uart_write_line("SR2 -> ");
+            uart_write_line(rx_binary_chars);
+            uart_write_line(" <-\n");
+            convert_int_to_binary(I2C_SR3, rx_binary_chars);
+            uart_write_line("SR3 -> ");
+            uart_write_line(rx_binary_chars);
+            uart_write_line(" <-\n");
+            //while (!(I2C_SR1 & (1 << 1)));
+            I2C_SR1 = 0x00;
+            I2C_SR3 = 0x00;
             //uart_write_line("Status 2 - " + I2C_SR2 + '\n\0');
             //uart_write_line("Status 3 - " + I2C_SR3 + '\n\0');
             uart_write_line("_______Stop_______\n");

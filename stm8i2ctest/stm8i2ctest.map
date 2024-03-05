@@ -7,7 +7,7 @@ Area                                    Addr        Size        Decimal Bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000000  .__.ABS.                           _strlen
+     00000000  .__.ABS.                           
      00000000  l_CABS                          
      00000000  l_DABS                          
      00000000  l_DATA                          
@@ -24,14 +24,14 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     0000004B  l_CONST                         
-     000000DE  l_CODE                          
+     00000068  l_CONST                         
+     00000275  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     00008078  s_CODE                          
-     00008078  s_INITIALIZER                   
+     00008095  s_CODE                          
+     00008095  s_INITIALIZER                   
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -74,7 +74,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    0000004B =          75. bytes (REL,CON)
+CONST                               0000802D    00000068 =         104. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -83,16 +83,19 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008078    000000DE =         222. bytes (REL,CON)
+CODE                                00008095    00000275 =         629. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008078  _delay                             main
-     000080A6  _uart_write_line                   main
-     000080D6  _uart_write_int                    main
-     000080E6  _main                              main
-     00008147  ___sdcc_external_startup           _startup
-     00008149  _strlen                            _strlen
+     00008095  _delay                             main
+     000080C3  _convert_int_to_chars              main
+     00008148  _convert_int_to_binary             main
+     00008180  _uart_write_line                   main
+     000081B0  _main                              main
+     000082CC  ___sdcc_external_startup           _startup
+     000082CE  _strlen                            _strlen
+     000082DB  __modsint                          
+     000082F3  __divsint                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 8.
 
 Files Linked                              [ module(s) ]
@@ -104,6 +107,8 @@ Libraries Linked                          [ object file ]
 
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _strlen.rel ]
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _divsint.rel ]
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 9.
 
