@@ -24,14 +24,14 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     00000068  l_CONST                         
-     00000275  l_CODE                          
+     00000075  l_CONST                         
+     00000282  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     00008095  s_CODE                          
-     00008095  s_INITIALIZER                   
+     000080A2  s_CODE                          
+     000080A2  s_INITIALIZER                   
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -74,7 +74,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    00000068 =         104. bytes (REL,CON)
+CONST                               0000802D    00000075 =         117. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -83,19 +83,21 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008095    00000275 =         629. bytes (REL,CON)
+CODE                                000080A2    00000282 =         642. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008095  _delay                             main
-     000080C3  _convert_int_to_chars              main
-     00008148  _convert_int_to_binary             main
-     00008180  _uart_write_line                   main
-     000081B0  _main                              main
-     000082CC  ___sdcc_external_startup           _startup
-     000082CE  _strlen                            _strlen
-     000082DB  __modsint                          
-     000082F3  __divsint                          
+     000080A2  _delay                             main
+     000080D0  _convert_int_to_chars              main
+     00008155  _convert_int_to_binary             main
+     0000818D  _uart_write_line                   main
+     000081BD  _status_check                      main
+     0000822E  _main                              main
+     000082E6  ___sdcc_external_startup           _startup
+     000082E8  _strlen                            _strlen
+     000082F5  __modsint                          
+     0000830D  __divsint                          
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 8.
 
 Files Linked                              [ module(s) ]

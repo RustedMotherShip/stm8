@@ -52,7 +52,21 @@ int uart_write_line(const char *str) {
     return(i); // Bytes sent
 }
 
-
+void status_check(void){
+    char rx_binary_chars[9]={0};
+    convert_int_to_binary(I2C_SR1, rx_binary_chars);
+    uart_write_line("SR1 -> ");
+    uart_write_line(rx_binary_chars);
+    uart_write_line(" <-\n");
+    convert_int_to_binary(I2C_SR2, rx_binary_chars);
+    uart_write_line("SR2 -> ");
+    uart_write_line(rx_binary_chars);
+    uart_write_line(" <-\n");
+    convert_int_to_binary(I2C_SR3, rx_binary_chars);
+    uart_write_line("SR3 -> ");
+    uart_write_line(rx_binary_chars);
+    uart_write_line(" <-\n");
+}
 
 int main(void)
 {
@@ -89,36 +103,29 @@ int main(void)
             uart_write_line("_______Start______\n");
             uart_write_line("Dev ->  ");
             char rx_int_chars[4]={0};
-            char rx_binary_chars[9]={0};
+            
             convert_int_to_chars(addr, rx_int_chars);
             uart_write_line(rx_int_chars);
             uart_write_line("  <- Dev\n");
+            status_check();
             //uart_write(&buff);
             //if(I2C_DR >> 7 == 1)
-            I2C_CR2 |= (1 << 2); // Set ACK bit
-            I2C_CR2 |= (1 << 0); // START
+            I2C_CR2 = I2C_CR2 | (1 << 2); // Set ACK bit
+            I2C_CR2 = I2C_CR2 | (1 << 0); // START
+            uart_write_line("flag\n");
             while (!(I2C_SR1 & (1 << 0)));
-            I2C_SR1 = 0x00;
-            I2C_DR = addr;
-            
+            uart_write_line("flag1\n");
+            I2C_SR1 = I2C_SR1 | 0x00;
+            I2C_DR = I2C_DR | addr;
+            status_check();
 
 
             //uart_write_line("Status 1 - " + I2C_SR1 + "\n\0");
-            convert_int_to_binary(I2C_SR1, rx_binary_chars);
-            uart_write_line("SR1 -> ");
-            uart_write_line(rx_binary_chars);
-            uart_write_line(" <-\n");
-            convert_int_to_binary(I2C_SR2, rx_binary_chars);
-            uart_write_line("SR2 -> ");
-            uart_write_line(rx_binary_chars);
-            uart_write_line(" <-\n");
-            convert_int_to_binary(I2C_SR3, rx_binary_chars);
-            uart_write_line("SR3 -> ");
-            uart_write_line(rx_binary_chars);
-            uart_write_line(" <-\n");
+
             //while (!(I2C_SR1 & (1 << 1)));
             I2C_SR1 = 0x00;
             I2C_SR3 = 0x00;
+            status_check();
             //uart_write_line("Status 2 - " + I2C_SR2 + '\n\0');
             //uart_write_line("Status 3 - " + I2C_SR3 + '\n\0');
             uart_write_line("_______Stop_______\n");
