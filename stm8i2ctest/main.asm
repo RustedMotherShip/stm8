@@ -379,63 +379,97 @@ _status_check:
 ;	main.c: 68: uart_write_line(" <-\n");
 	ldw	x, #(___str_1+0)
 	call	_uart_write_line
-;	main.c: 69: }
+;	main.c: 69: convert_int_to_binary(I2C_CR1, rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	exgw	x, y
+	ld	a, 0x5210
+	clrw	x
+	pushw	y
+	ld	xl, a
+	call	_convert_int_to_binary
+;	main.c: 70: uart_write_line("CR1 -> ");
+	ldw	x, #(___str_4+0)
+	call	_uart_write_line
+;	main.c: 71: uart_write_line(rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	call	_uart_write_line
+;	main.c: 72: uart_write_line(" <-\n");
+	ldw	x, #(___str_1+0)
+	call	_uart_write_line
+;	main.c: 73: convert_int_to_binary(I2C_CR2, rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	exgw	x, y
+	ld	a, 0x5211
+	clrw	x
+	pushw	y
+	ld	xl, a
+	call	_convert_int_to_binary
+;	main.c: 74: uart_write_line("CR2 -> ");
+	ldw	x, #(___str_5+0)
+	call	_uart_write_line
+;	main.c: 75: uart_write_line(rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	call	_uart_write_line
+;	main.c: 76: uart_write_line(" <-\n");
+	ldw	x, #(___str_1+0)
+	call	_uart_write_line
+;	main.c: 77: }
 	addw	sp, #9
 	ret
-;	main.c: 71: int main(void)
+;	main.c: 79: int main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
 	sub	sp, #5
-;	main.c: 74: CLK_CKDIVR = 0;
+;	main.c: 82: CLK_CKDIVR = 0;
 	mov	0x50c6+0, #0x00
-;	main.c: 77: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
+;	main.c: 85: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
 	bset	0x5235, #3
-;	main.c: 79: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+;	main.c: 87: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
 	ld	a, 0x5236
 	and	a, #0xcf
 	ld	0x5236, a
-;	main.c: 81: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
+;	main.c: 89: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
 	mov	0x5233+0, #0x03
 	mov	0x5232+0, #0x68
-;	main.c: 85: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
+;	main.c: 93: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
 	bres	0x5210, #0
-;	main.c: 86: I2C_FREQR= 16;                  // peripheral frequence =16MHz
-	mov	0x5212+0, #0x10
-;	main.c: 87: I2C_CCRH = 0;                   // =0
-	mov	0x521c+0, #0x00
-;	main.c: 88: I2C_CCRL = 80;                  // 100kHz for I2C
-	mov	0x521b+0, #0x50
-;	main.c: 89: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
+;	main.c: 97: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
 	bres	0x521c, #7
-;	main.c: 90: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
+;	main.c: 98: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
 	bres	0x5214, #7
-;	main.c: 91: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
+;	main.c: 99: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
 	bset	0x5214, #6
-;	main.c: 92: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
+;	main.c: 100: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
 	bset	0x5210, #0
-;	main.c: 98: uart_write_line("Start Scanning\n");
-	ldw	x, #(___str_4+0)
+;	main.c: 101: status_check();
+	call	_status_check
+;	main.c: 106: uart_write_line("Start Scanning\n");
+	ldw	x, #(___str_6+0)
 	call	_uart_write_line
-;	main.c: 100: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
+;	main.c: 108: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
 	clr	(0x05, sp)
 00106$:
 	ld	a, (0x05, sp)
 	cp	a, #0xff
 	jrnc	00104$
-;	main.c: 103: uart_write_line("_______Start______\n");
-	ldw	x, #(___str_5+0)
+;	main.c: 111: uart_write_line("_______Start______\n");
+	ldw	x, #(___str_7+0)
 	call	_uart_write_line
-;	main.c: 104: uart_write_line("Dev ->  ");
-	ldw	x, #(___str_6+0)
+;	main.c: 112: uart_write_line("Dev ->  ");
+	ldw	x, #(___str_8+0)
 	call	_uart_write_line
-;	main.c: 105: char rx_int_chars[4]={0};
+;	main.c: 113: char rx_int_chars[4]={0};
 	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
 	clr	(0x04, sp)
-;	main.c: 107: convert_int_to_chars(addr, rx_int_chars);
+;	main.c: 115: convert_int_to_chars(addr, rx_int_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -444,52 +478,42 @@ _main:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_chars
-;	main.c: 108: uart_write_line(rx_int_chars);
+;	main.c: 116: uart_write_line(rx_int_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write_line
-;	main.c: 109: uart_write_line("  <- Dev\n");
-	ldw	x, #(___str_7+0)
-	call	_uart_write_line
-;	main.c: 110: status_check();
-	call	_status_check
-;	main.c: 113: I2C_CR2 = I2C_CR2 | (1 << 2); // Set ACK bit
-	bset	0x5211, #2
-;	main.c: 114: I2C_CR2 = I2C_CR2 | (1 << 0); // START
-	bset	0x5211, #0
-;	main.c: 115: uart_write_line("flag\n");
-	ldw	x, #(___str_8+0)
-	call	_uart_write_line
-;	main.c: 116: while (!(I2C_SR1 & (1 << 0)));
-00101$:
-	btjf	0x5217, #0, 00101$
-;	main.c: 117: uart_write_line("flag1\n");
+;	main.c: 117: uart_write_line("  <- Dev\n");
 	ldw	x, #(___str_9+0)
 	call	_uart_write_line
-;	main.c: 118: I2C_SR1 = I2C_SR1 | 0x00;
-	mov	0x5217, 0x5217
-;	main.c: 119: I2C_DR = I2C_DR | addr;
+;	main.c: 123: I2C_CR2 = I2C_CR2 | (1 << 2); // Set ACK bit
+	bset	0x5211, #2
+;	main.c: 126: I2C_CR2 = I2C_CR2 | (1 << 0); // START
+	bset	0x5211, #0
+;	main.c: 129: while (!(I2C_SR1 & (1 << 0)));
+00101$:
+	btjf	0x5217, #0, 00101$
+;	main.c: 133: I2C_DR = I2C_DR | addr;
 	ld	a, 0x5216
 	or	a, (0x05, sp)
 	ld	0x5216, a
-;	main.c: 120: status_check();
-	call	_status_check
-;	main.c: 126: I2C_SR1 = 0x00;
+;	main.c: 140: I2C_SR1 = 0x00;
 	mov	0x5217+0, #0x00
-;	main.c: 127: I2C_SR3 = 0x00;
+;	main.c: 141: I2C_SR3 = 0x00;
 	mov	0x5219+0, #0x00
-;	main.c: 128: status_check();
+;	main.c: 142: I2C_CR2 = I2C_CR2 | (1 << 1); // STOP
+	bset	0x5211, #1
+;	main.c: 143: status_check();
 	call	_status_check
-;	main.c: 131: uart_write_line("_______Stop_______\n");
+;	main.c: 146: uart_write_line("_______Stop_______\n");
 	ldw	x, #(___str_10+0)
 	call	_uart_write_line
-;	main.c: 100: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
+;	main.c: 108: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
 	inc	(0x05, sp)
 	jra	00106$
 00104$:
-;	main.c: 137: return 0;
+;	main.c: 152: return 0;
 	clrw	x
-;	main.c: 138: }
+;	main.c: 153: }
 	addw	sp, #5
 	ret
 	.area CODE
@@ -517,36 +541,34 @@ ___str_3:
 	.area CODE
 	.area CONST
 ___str_4:
+	.ascii "CR1 -> "
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_5:
+	.ascii "CR2 -> "
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_6:
 	.ascii "Start Scanning"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
-___str_5:
+___str_7:
 	.ascii "_______Start______"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
-___str_6:
+___str_8:
 	.ascii "Dev ->  "
 	.db 0x00
 	.area CODE
 	.area CONST
-___str_7:
-	.ascii "  <- Dev"
-	.db 0x0a
-	.db 0x00
-	.area CODE
-	.area CONST
-___str_8:
-	.ascii "flag"
-	.db 0x0a
-	.db 0x00
-	.area CODE
-	.area CONST
 ___str_9:
-	.ascii "flag1"
+	.ascii "  <- Dev"
 	.db 0x0a
 	.db 0x00
 	.area CODE

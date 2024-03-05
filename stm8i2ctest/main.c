@@ -66,6 +66,14 @@ void status_check(void){
     uart_write_line("SR3 -> ");
     uart_write_line(rx_binary_chars);
     uart_write_line(" <-\n");
+    convert_int_to_binary(I2C_CR1, rx_binary_chars);
+    uart_write_line("CR1 -> ");
+    uart_write_line(rx_binary_chars);
+    uart_write_line(" <-\n");
+    convert_int_to_binary(I2C_CR2, rx_binary_chars);
+    uart_write_line("CR2 -> ");
+    uart_write_line(rx_binary_chars);
+    uart_write_line(" <-\n");
 }
 
 int main(void)
@@ -83,17 +91,17 @@ int main(void)
     // Включение I2C
     //----------- Setup I2C ------------------------
     I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
-    I2C_FREQR= 16;                  // peripheral frequence =16MHz
-    I2C_CCRH = 0;                   // =0
-    I2C_CCRL = 80;                  // 100kHz for I2C
+    //I2C_FREQR= 16;                  // peripheral frequence =16MHz
+    //I2C_CCRH = 0;                   // =0
+    //I2C_CCRL = 80;                  // 100kHz for I2C
     I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
     I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
     I2C_OARH = I2C_OARH | 0x40;     // see reference manual
     I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
-
+    status_check();
     //------------- End Setup --------------------- // Обнуляем верхние биты делителя
 
-
+    //
     //while(1) {
         uart_write_line("Start Scanning\n");
 
@@ -107,24 +115,31 @@ int main(void)
             convert_int_to_chars(addr, rx_int_chars);
             uart_write_line(rx_int_chars);
             uart_write_line("  <- Dev\n");
-            status_check();
+            //status_check();
             //uart_write(&buff);
             //if(I2C_DR >> 7 == 1)
+            //uart_write_line("flag-2\n");
+            //status_check();
             I2C_CR2 = I2C_CR2 | (1 << 2); // Set ACK bit
+            //uart_write_line("flag-1\n");
+            //status_check();
             I2C_CR2 = I2C_CR2 | (1 << 0); // START
-            uart_write_line("flag\n");
+            //uart_write_line("flag0\n");
+            //status_check();
             while (!(I2C_SR1 & (1 << 0)));
-            uart_write_line("flag1\n");
-            I2C_SR1 = I2C_SR1 | 0x00;
-            I2C_DR = I2C_DR | addr;
-            status_check();
+            //uart_write_line("flag1\n");
 
+            //I2C_SR1 = I2C_SR1 | 0x00;
+            I2C_DR = I2C_DR | addr;
+            //status_check();
+            //uart_write_line("flag2\n");
 
             //uart_write_line("Status 1 - " + I2C_SR1 + "\n\0");
 
             //while (!(I2C_SR1 & (1 << 1)));
             I2C_SR1 = 0x00;
             I2C_SR3 = 0x00;
+            I2C_CR2 = I2C_CR2 | (1 << 1); // STOP
             status_check();
             //uart_write_line("Status 2 - " + I2C_SR2 + '\n\0');
             //uart_write_line("Status 3 - " + I2C_SR3 + '\n\0');

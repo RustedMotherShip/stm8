@@ -10,14 +10,14 @@ Symbol Table
     ___sdcc_external_startup                                       ****** GX
   8 ___str_0                                                       000000 R
   8 ___str_1                                                       000008 R
-  8 ___str_10                                                      000061 R
+  8 ___str_10                                                      000064 R
   8 ___str_2                                                       00000D R
   8 ___str_3                                                       000015 R
   8 ___str_4                                                       00001D R
-  8 ___str_5                                                       00002D R
-  8 ___str_6                                                       000041 R
-  8 ___str_7                                                       00004A R
-  8 ___str_8                                                       000054 R
+  8 ___str_5                                                       000025 R
+  8 ___str_6                                                       00002D R
+  8 ___str_7                                                       00003D R
+  8 ___str_8                                                       000051 R
   8 ___str_9                                                       00005A R
     __divsint                                                      ****** GX
   5 __interrupt_vect                                               000000 R
@@ -28,7 +28,7 @@ Symbol Table
   A _convert_int_to_binary                                         0000B3 GR
   A _convert_int_to_chars                                          00002E GR
   A _delay                                                         000000 GR
-  A _main                                                          00018C GR
+  A _main                                                          0001C8 GR
   A _status_check                                                  00011B GR
     _strlen                                                        ****** GX
   A _uart_write_line                                               0000EB GR
@@ -53,8 +53,8 @@ Area Table
    5 HOME                                       size      7   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
-   8 CONST                                      size     75   flags    0
+   8 CONST                                      size     78   flags    0
    9 INITIALIZER                                size      0   flags    0
-   A CODE                                       size    244   flags    0
+   A CODE                                       size    264   flags    0
    B CABS                                       size      0   flags    8
 
