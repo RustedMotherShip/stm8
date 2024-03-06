@@ -9,581 +9,694 @@
                                       9 ; Public variables in this module
                                      10 ;--------------------------------------------------------
                                      11 	.globl _main
-                                     12 	.globl _status_check
-                                     13 	.globl _uart_write_line
-                                     14 	.globl _convert_int_to_binary
-                                     15 	.globl _convert_int_to_chars
-                                     16 	.globl _delay
-                                     17 	.globl _strlen
-                                     18 ;--------------------------------------------------------
-                                     19 ; ram data
-                                     20 ;--------------------------------------------------------
-                                     21 	.area DATA
-                                     22 ;--------------------------------------------------------
-                                     23 ; ram data
+                                     12 	.globl _i2c_scan
+                                     13 	.globl _i2c_stop
+                                     14 	.globl _i2c_send_address
+                                     15 	.globl _i2c_start
+                                     16 	.globl _i2c_init
+                                     17 	.globl _uart_init
+                                     18 	.globl _status_check
+                                     19 	.globl _convert_int_to_binary
+                                     20 	.globl _convert_int_to_chars
+                                     21 	.globl _uart_write
+                                     22 	.globl _delay
+                                     23 	.globl _strlen
                                      24 ;--------------------------------------------------------
-                                     25 	.area INITIALIZED
+                                     25 ; ram data
                                      26 ;--------------------------------------------------------
-                                     27 ; Stack segment in internal ram
+                                     27 	.area DATA
                                      28 ;--------------------------------------------------------
-                                     29 	.area SSEG
-      000000                         30 __start__stack:
-      000000                         31 	.ds	1
-                                     32 
-                                     33 ;--------------------------------------------------------
-                                     34 ; absolute external ram data
-                                     35 ;--------------------------------------------------------
-                                     36 	.area DABS (ABS)
-                                     37 
-                                     38 ; default segment ordering for linker
-                                     39 	.area HOME
-                                     40 	.area GSINIT
-                                     41 	.area GSFINAL
-                                     42 	.area CONST
-                                     43 	.area INITIALIZER
-                                     44 	.area CODE
-                                     45 
-                                     46 ;--------------------------------------------------------
-                                     47 ; interrupt vector
-                                     48 ;--------------------------------------------------------
-                                     49 	.area HOME
-      000000                         50 __interrupt_vect:
-      000000 82v00u00u00             51 	int s_GSINIT ; reset
+                                     29 ; ram data
+                                     30 ;--------------------------------------------------------
+                                     31 	.area INITIALIZED
+                                     32 ;--------------------------------------------------------
+                                     33 ; Stack segment in internal ram
+                                     34 ;--------------------------------------------------------
+                                     35 	.area SSEG
+      000000                         36 __start__stack:
+      000000                         37 	.ds	1
+                                     38 
+                                     39 ;--------------------------------------------------------
+                                     40 ; absolute external ram data
+                                     41 ;--------------------------------------------------------
+                                     42 	.area DABS (ABS)
+                                     43 
+                                     44 ; default segment ordering for linker
+                                     45 	.area HOME
+                                     46 	.area GSINIT
+                                     47 	.area GSFINAL
+                                     48 	.area CONST
+                                     49 	.area INITIALIZER
+                                     50 	.area CODE
+                                     51 
                                      52 ;--------------------------------------------------------
-                                     53 ; global & static initialisations
+                                     53 ; interrupt vector
                                      54 ;--------------------------------------------------------
                                      55 	.area HOME
-                                     56 	.area GSINIT
-                                     57 	.area GSFINAL
-                                     58 	.area GSINIT
-      000000 CDr00r00         [ 4]   59 	call	___sdcc_external_startup
-      000003 4D               [ 1]   60 	tnz	a
-      000004 27 03            [ 1]   61 	jreq	__sdcc_init_data
-      000006 CCr00r04         [ 2]   62 	jp	__sdcc_program_startup
-      000009                         63 __sdcc_init_data:
-                                     64 ; stm8_genXINIT() start
-      000009 AEr00r00         [ 2]   65 	ldw x, #l_DATA
-      00000C 27 07            [ 1]   66 	jreq	00002$
-      00000E                         67 00001$:
-      00000E 72 4FuFFuFF      [ 1]   68 	clr (s_DATA - 1, x)
-      000012 5A               [ 2]   69 	decw x
-      000013 26 F9            [ 1]   70 	jrne	00001$
-      000015                         71 00002$:
-      000015 AEr00r00         [ 2]   72 	ldw	x, #l_INITIALIZER
-      000018 27 09            [ 1]   73 	jreq	00004$
-      00001A                         74 00003$:
-      00001A D6uFFuFF         [ 1]   75 	ld	a, (s_INITIALIZER - 1, x)
-      00001D D7uFFuFF         [ 1]   76 	ld	(s_INITIALIZED - 1, x), a
-      000020 5A               [ 2]   77 	decw	x
-      000021 26 F7            [ 1]   78 	jrne	00003$
-      000023                         79 00004$:
-                                     80 ; stm8_genXINIT() end
-                                     81 	.area GSFINAL
-      000000 CCr00r04         [ 2]   82 	jp	__sdcc_program_startup
-                                     83 ;--------------------------------------------------------
-                                     84 ; Home
-                                     85 ;--------------------------------------------------------
-                                     86 	.area HOME
-                                     87 	.area HOME
-      000004                         88 __sdcc_program_startup:
-      000004 CCr01rC8         [ 2]   89 	jp	_main
-                                     90 ;	return from main will return to caller
+      000000                         56 __interrupt_vect:
+      000000 82v00u00u00             57 	int s_GSINIT ; reset
+                                     58 ;--------------------------------------------------------
+                                     59 ; global & static initialisations
+                                     60 ;--------------------------------------------------------
+                                     61 	.area HOME
+                                     62 	.area GSINIT
+                                     63 	.area GSFINAL
+                                     64 	.area GSINIT
+      000000 CDr00r00         [ 4]   65 	call	___sdcc_external_startup
+      000003 4D               [ 1]   66 	tnz	a
+      000004 27 03            [ 1]   67 	jreq	__sdcc_init_data
+      000006 CCr00r04         [ 2]   68 	jp	__sdcc_program_startup
+      000009                         69 __sdcc_init_data:
+                                     70 ; stm8_genXINIT() start
+      000009 AEr00r00         [ 2]   71 	ldw x, #l_DATA
+      00000C 27 07            [ 1]   72 	jreq	00002$
+      00000E                         73 00001$:
+      00000E 72 4FuFFuFF      [ 1]   74 	clr (s_DATA - 1, x)
+      000012 5A               [ 2]   75 	decw x
+      000013 26 F9            [ 1]   76 	jrne	00001$
+      000015                         77 00002$:
+      000015 AEr00r00         [ 2]   78 	ldw	x, #l_INITIALIZER
+      000018 27 09            [ 1]   79 	jreq	00004$
+      00001A                         80 00003$:
+      00001A D6uFFuFF         [ 1]   81 	ld	a, (s_INITIALIZER - 1, x)
+      00001D D7uFFuFF         [ 1]   82 	ld	(s_INITIALIZED - 1, x), a
+      000020 5A               [ 2]   83 	decw	x
+      000021 26 F7            [ 1]   84 	jrne	00003$
+      000023                         85 00004$:
+                                     86 ; stm8_genXINIT() end
+                                     87 	.area GSFINAL
+      000000 CCr00r04         [ 2]   88 	jp	__sdcc_program_startup
+                                     89 ;--------------------------------------------------------
+                                     90 ; Home
                                      91 ;--------------------------------------------------------
-                                     92 ; code
-                                     93 ;--------------------------------------------------------
-                                     94 	.area CODE
-                                     95 ;	main.c: 7: void delay(unsigned long count) {
-                                     96 ;	-----------------------------------------
-                                     97 ;	 function delay
-                                     98 ;	-----------------------------------------
-      000000                         99 _delay:
-      000000 52 08            [ 2]  100 	sub	sp, #8
-                                    101 ;	main.c: 8: while (count--)
-      000002 16 0D            [ 2]  102 	ldw	y, (0x0d, sp)
-      000004 17 07            [ 2]  103 	ldw	(0x07, sp), y
-      000006 1E 0B            [ 2]  104 	ldw	x, (0x0b, sp)
-      000008                        105 00101$:
-      000008 1F 01            [ 2]  106 	ldw	(0x01, sp), x
-      00000A 7B 07            [ 1]  107 	ld	a, (0x07, sp)
-      00000C 6B 03            [ 1]  108 	ld	(0x03, sp), a
-      00000E 7B 08            [ 1]  109 	ld	a, (0x08, sp)
-      000010 16 07            [ 2]  110 	ldw	y, (0x07, sp)
-      000012 72 A2 00 01      [ 2]  111 	subw	y, #0x0001
-      000016 17 07            [ 2]  112 	ldw	(0x07, sp), y
-      000018 24 01            [ 1]  113 	jrnc	00117$
-      00001A 5A               [ 2]  114 	decw	x
-      00001B                        115 00117$:
-      00001B 4D               [ 1]  116 	tnz	a
-      00001C 26 08            [ 1]  117 	jrne	00118$
-      00001E 16 02            [ 2]  118 	ldw	y, (0x02, sp)
-      000020 26 04            [ 1]  119 	jrne	00118$
-      000022 0D 01            [ 1]  120 	tnz	(0x01, sp)
-      000024 27 03            [ 1]  121 	jreq	00104$
-      000026                        122 00118$:
-                                    123 ;	main.c: 9: nop();
-      000026 9D               [ 1]  124 	nop
-      000027 20 DF            [ 2]  125 	jra	00101$
-      000029                        126 00104$:
-                                    127 ;	main.c: 10: }
-      000029 1E 09            [ 2]  128 	ldw	x, (9, sp)
-      00002B 5B 0E            [ 2]  129 	addw	sp, #14
-      00002D FC               [ 2]  130 	jp	(x)
-                                    131 ;	main.c: 12: void convert_int_to_chars(int num, char* rx_int_chars) {
-                                    132 ;	-----------------------------------------
-                                    133 ;	 function convert_int_to_chars
-                                    134 ;	-----------------------------------------
-      00002E                        135 _convert_int_to_chars:
-      00002E 52 0B            [ 2]  136 	sub	sp, #11
-      000030 1F 0A            [ 2]  137 	ldw	(0x0a, sp), x
-                                    138 ;	main.c: 15: rx_int_chars[0] = num / 100 + '0';
-      000032 16 0E            [ 2]  139 	ldw	y, (0x0e, sp)
-      000034 17 01            [ 2]  140 	ldw	(0x01, sp), y
-                                    141 ;	main.c: 16: rx_int_chars[1] = num / 10 % 10 + '0';
-      000036 4B 0A            [ 1]  142 	push	#0x0a
-      000038 4B 00            [ 1]  143 	push	#0x00
-      00003A 1E 0C            [ 2]  144 	ldw	x, (0x0c, sp)
-                                    145 ;	main.c: 17: rx_int_chars[2] = num % 10 + '0';
-      00003C CDr00r00         [ 4]  146 	call	__divsint
-      00003F 1F 03            [ 2]  147 	ldw	(0x03, sp), x
-      000041 4B 0A            [ 1]  148 	push	#0x0a
-      000043 4B 00            [ 1]  149 	push	#0x00
-      000045 1E 0C            [ 2]  150 	ldw	x, (0x0c, sp)
-                                    151 ;	main.c: 16: rx_int_chars[1] = num / 10 % 10 + '0';
-      000047 CDr00r00         [ 4]  152 	call	__modsint
-      00004A 90 93            [ 1]  153 	ldw	y, x
-      00004C 9F               [ 1]  154 	ld	a, xl
-      00004D 1E 01            [ 2]  155 	ldw	x, (0x01, sp)
-      00004F 5C               [ 1]  156 	incw	x
-      000050 1F 05            [ 2]  157 	ldw	(0x05, sp), x
-                                    158 ;	main.c: 17: rx_int_chars[2] = num % 10 + '0';
-      000052 1E 01            [ 2]  159 	ldw	x, (0x01, sp)
-      000054 5C               [ 1]  160 	incw	x
-      000055 5C               [ 1]  161 	incw	x
-      000056 1F 07            [ 2]  162 	ldw	(0x07, sp), x
-      000058 AB 30            [ 1]  163 	add	a, #0x30
-      00005A 6B 09            [ 1]  164 	ld	(0x09, sp), a
-                                    165 ;	main.c: 13: if (num > 99) {
-      00005C 1E 0A            [ 2]  166 	ldw	x, (0x0a, sp)
-      00005E A3 00 63         [ 2]  167 	cpw	x, #0x0063
-      000061 2D 29            [ 1]  168 	jrsle	00105$
-                                    169 ;	main.c: 15: rx_int_chars[0] = num / 100 + '0';
-      000063 4B 64            [ 1]  170 	push	#0x64
-      000065 4B 00            [ 1]  171 	push	#0x00
-      000067 1E 0C            [ 2]  172 	ldw	x, (0x0c, sp)
-      000069 CDr00r00         [ 4]  173 	call	__divsint
-      00006C 9F               [ 1]  174 	ld	a, xl
-      00006D AB 30            [ 1]  175 	add	a, #0x30
-      00006F 1E 01            [ 2]  176 	ldw	x, (0x01, sp)
-      000071 F7               [ 1]  177 	ld	(x), a
-                                    178 ;	main.c: 16: rx_int_chars[1] = num / 10 % 10 + '0';
-      000072 4B 0A            [ 1]  179 	push	#0x0a
-      000074 4B 00            [ 1]  180 	push	#0x00
-      000076 1E 05            [ 2]  181 	ldw	x, (0x05, sp)
-      000078 CDr00r00         [ 4]  182 	call	__modsint
-      00007B 9F               [ 1]  183 	ld	a, xl
-      00007C AB 30            [ 1]  184 	add	a, #0x30
-      00007E 1E 05            [ 2]  185 	ldw	x, (0x05, sp)
-      000080 F7               [ 1]  186 	ld	(x), a
-                                    187 ;	main.c: 17: rx_int_chars[2] = num % 10 + '0';
-      000081 1E 07            [ 2]  188 	ldw	x, (0x07, sp)
-      000083 7B 09            [ 1]  189 	ld	a, (0x09, sp)
-      000085 F7               [ 1]  190 	ld	(x), a
-                                    191 ;	main.c: 18: rx_int_chars[3] ='\0';
-      000086 1E 01            [ 2]  192 	ldw	x, (0x01, sp)
-      000088 6F 03            [ 1]  193 	clr	(0x0003, x)
-      00008A 20 22            [ 2]  194 	jra	00107$
-      00008C                        195 00105$:
-                                    196 ;	main.c: 20: } else if (num > 9) {
-      00008C 1E 0A            [ 2]  197 	ldw	x, (0x0a, sp)
-      00008E A3 00 09         [ 2]  198 	cpw	x, #0x0009
-      000091 2D 11            [ 1]  199 	jrsle	00102$
-                                    200 ;	main.c: 22: rx_int_chars[0] = num / 10 + '0';
-      000093 7B 04            [ 1]  201 	ld	a, (0x04, sp)
-      000095 AB 30            [ 1]  202 	add	a, #0x30
-      000097 1E 01            [ 2]  203 	ldw	x, (0x01, sp)
-      000099 F7               [ 1]  204 	ld	(x), a
-                                    205 ;	main.c: 23: rx_int_chars[1] = num % 10 + '0';
-      00009A 1E 05            [ 2]  206 	ldw	x, (0x05, sp)
-      00009C 7B 09            [ 1]  207 	ld	a, (0x09, sp)
-      00009E F7               [ 1]  208 	ld	(x), a
-                                    209 ;	main.c: 24: rx_int_chars[2] ='\0';
-      00009F 1E 07            [ 2]  210 	ldw	x, (0x07, sp)
-      0000A1 7F               [ 1]  211 	clr	(x)
-      0000A2 20 0A            [ 2]  212 	jra	00107$
-      0000A4                        213 00102$:
-                                    214 ;	main.c: 29: rx_int_chars[0] = num + '0';
-      0000A4 7B 0B            [ 1]  215 	ld	a, (0x0b, sp)
-      0000A6 AB 30            [ 1]  216 	add	a, #0x30
-      0000A8 1E 01            [ 2]  217 	ldw	x, (0x01, sp)
-      0000AA F7               [ 1]  218 	ld	(x), a
-                                    219 ;	main.c: 30: rx_int_chars[1] ='\0';
-      0000AB 1E 05            [ 2]  220 	ldw	x, (0x05, sp)
-      0000AD 7F               [ 1]  221 	clr	(x)
-      0000AE                        222 00107$:
-                                    223 ;	main.c: 32: }
-      0000AE 1E 0C            [ 2]  224 	ldw	x, (12, sp)
-      0000B0 5B 0F            [ 2]  225 	addw	sp, #15
-      0000B2 FC               [ 2]  226 	jp	(x)
-                                    227 ;	main.c: 34: void convert_int_to_binary(int num, char* rx_binary_chars) {
-                                    228 ;	-----------------------------------------
-                                    229 ;	 function convert_int_to_binary
-                                    230 ;	-----------------------------------------
-      0000B3                        231 _convert_int_to_binary:
-      0000B3 52 04            [ 2]  232 	sub	sp, #4
-      0000B5 1F 01            [ 2]  233 	ldw	(0x01, sp), x
-                                    234 ;	main.c: 36: for(int i = 7; i >= 0; i--) {
-      0000B7 AE 00 07         [ 2]  235 	ldw	x, #0x0007
-      0000BA 1F 03            [ 2]  236 	ldw	(0x03, sp), x
-      0000BC                        237 00103$:
-      0000BC 0D 03            [ 1]  238 	tnz	(0x03, sp)
-      0000BE 2B 22            [ 1]  239 	jrmi	00101$
-                                    240 ;	main.c: 38: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
-      0000C0 AE 00 07         [ 2]  241 	ldw	x, #0x0007
-      0000C3 72 F0 03         [ 2]  242 	subw	x, (0x03, sp)
-      0000C6 72 FB 07         [ 2]  243 	addw	x, (0x07, sp)
-      0000C9 16 01            [ 2]  244 	ldw	y, (0x01, sp)
-      0000CB 7B 04            [ 1]  245 	ld	a, (0x04, sp)
-      0000CD 27 05            [ 1]  246 	jreq	00120$
-      0000CF                        247 00119$:
-      0000CF 90 57            [ 2]  248 	sraw	y
-      0000D1 4A               [ 1]  249 	dec	a
-      0000D2 26 FB            [ 1]  250 	jrne	00119$
-      0000D4                        251 00120$:
-      0000D4 90 9F            [ 1]  252 	ld	a, yl
-      0000D6 A4 01            [ 1]  253 	and	a, #0x01
-      0000D8 AB 30            [ 1]  254 	add	a, #0x30
-      0000DA F7               [ 1]  255 	ld	(x), a
-                                    256 ;	main.c: 36: for(int i = 7; i >= 0; i--) {
-      0000DB 1E 03            [ 2]  257 	ldw	x, (0x03, sp)
-      0000DD 5A               [ 2]  258 	decw	x
-      0000DE 1F 03            [ 2]  259 	ldw	(0x03, sp), x
-      0000E0 20 DA            [ 2]  260 	jra	00103$
-      0000E2                        261 00101$:
-                                    262 ;	main.c: 40: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
-      0000E2 1E 07            [ 2]  263 	ldw	x, (0x07, sp)
-      0000E4 6F 08            [ 1]  264 	clr	(0x0008, x)
-                                    265 ;	main.c: 41: }
-      0000E6 1E 05            [ 2]  266 	ldw	x, (5, sp)
-      0000E8 5B 08            [ 2]  267 	addw	sp, #8
-      0000EA FC               [ 2]  268 	jp	(x)
-                                    269 ;	main.c: 46: int uart_write_line(const char *str) {
-                                    270 ;	-----------------------------------------
-                                    271 ;	 function uart_write_line
-                                    272 ;	-----------------------------------------
-      0000EB                        273 _uart_write_line:
-      0000EB 52 05            [ 2]  274 	sub	sp, #5
-      0000ED 1F 03            [ 2]  275 	ldw	(0x03, sp), x
-                                    276 ;	main.c: 48: for(i = 0; i < strlen(str); i++) {
-      0000EF 0F 05            [ 1]  277 	clr	(0x05, sp)
-      0000F1                        278 00106$:
-      0000F1 1E 03            [ 2]  279 	ldw	x, (0x03, sp)
-      0000F3 CDr00r00         [ 4]  280 	call	_strlen
-      0000F6 1F 01            [ 2]  281 	ldw	(0x01, sp), x
-      0000F8 5F               [ 1]  282 	clrw	x
-      0000F9 7B 05            [ 1]  283 	ld	a, (0x05, sp)
-      0000FB 97               [ 1]  284 	ld	xl, a
-      0000FC 13 01            [ 2]  285 	cpw	x, (0x01, sp)
-      0000FE 24 14            [ 1]  286 	jrnc	00104$
-                                    287 ;	main.c: 49: while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
-      000100                        288 00101$:
-      000100 C6 52 30         [ 1]  289 	ld	a, 0x5230
-      000103 2A FB            [ 1]  290 	jrpl	00101$
-                                    291 ;	main.c: 50: UART1_DR = str[i];
-      000105 5F               [ 1]  292 	clrw	x
-      000106 7B 05            [ 1]  293 	ld	a, (0x05, sp)
-      000108 97               [ 1]  294 	ld	xl, a
-      000109 72 FB 03         [ 2]  295 	addw	x, (0x03, sp)
-      00010C F6               [ 1]  296 	ld	a, (x)
-      00010D C7 52 31         [ 1]  297 	ld	0x5231, a
-                                    298 ;	main.c: 48: for(i = 0; i < strlen(str); i++) {
-      000110 0C 05            [ 1]  299 	inc	(0x05, sp)
-      000112 20 DD            [ 2]  300 	jra	00106$
-      000114                        301 00104$:
-                                    302 ;	main.c: 52: return(i); // Bytes sent
-      000114 7B 05            [ 1]  303 	ld	a, (0x05, sp)
-      000116 5F               [ 1]  304 	clrw	x
-      000117 97               [ 1]  305 	ld	xl, a
-                                    306 ;	main.c: 53: }
-      000118 5B 05            [ 2]  307 	addw	sp, #5
-      00011A 81               [ 4]  308 	ret
-                                    309 ;	main.c: 55: void status_check(void){
-                                    310 ;	-----------------------------------------
-                                    311 ;	 function status_check
-                                    312 ;	-----------------------------------------
-      00011B                        313 _status_check:
-      00011B 52 09            [ 2]  314 	sub	sp, #9
-                                    315 ;	main.c: 56: char rx_binary_chars[9]={0};
-      00011D 0F 01            [ 1]  316 	clr	(0x01, sp)
-      00011F 0F 02            [ 1]  317 	clr	(0x02, sp)
-      000121 0F 03            [ 1]  318 	clr	(0x03, sp)
-      000123 0F 04            [ 1]  319 	clr	(0x04, sp)
-      000125 0F 05            [ 1]  320 	clr	(0x05, sp)
-      000127 0F 06            [ 1]  321 	clr	(0x06, sp)
-      000129 0F 07            [ 1]  322 	clr	(0x07, sp)
-      00012B 0F 08            [ 1]  323 	clr	(0x08, sp)
-      00012D 0F 09            [ 1]  324 	clr	(0x09, sp)
-                                    325 ;	main.c: 57: convert_int_to_binary(I2C_SR1, rx_binary_chars);
-      00012F 96               [ 1]  326 	ldw	x, sp
-      000130 5C               [ 1]  327 	incw	x
-      000131 51               [ 1]  328 	exgw	x, y
-      000132 C6 52 17         [ 1]  329 	ld	a, 0x5217
-      000135 5F               [ 1]  330 	clrw	x
-      000136 90 89            [ 2]  331 	pushw	y
-      000138 97               [ 1]  332 	ld	xl, a
-      000139 CDr00rB3         [ 4]  333 	call	_convert_int_to_binary
-                                    334 ;	main.c: 58: uart_write_line("SR1 -> ");
-      00013C AEr00r00         [ 2]  335 	ldw	x, #(___str_0+0)
-      00013F CDr00rEB         [ 4]  336 	call	_uart_write_line
-                                    337 ;	main.c: 59: uart_write_line(rx_binary_chars);
-      000142 96               [ 1]  338 	ldw	x, sp
-      000143 5C               [ 1]  339 	incw	x
-      000144 CDr00rEB         [ 4]  340 	call	_uart_write_line
-                                    341 ;	main.c: 60: uart_write_line(" <-\n");
-      000147 AEr00r08         [ 2]  342 	ldw	x, #(___str_1+0)
-      00014A CDr00rEB         [ 4]  343 	call	_uart_write_line
-                                    344 ;	main.c: 61: convert_int_to_binary(I2C_SR2, rx_binary_chars);
-      00014D 96               [ 1]  345 	ldw	x, sp
-      00014E 5C               [ 1]  346 	incw	x
-      00014F 51               [ 1]  347 	exgw	x, y
-      000150 C6 52 18         [ 1]  348 	ld	a, 0x5218
-      000153 5F               [ 1]  349 	clrw	x
-      000154 90 89            [ 2]  350 	pushw	y
-      000156 97               [ 1]  351 	ld	xl, a
-      000157 CDr00rB3         [ 4]  352 	call	_convert_int_to_binary
-                                    353 ;	main.c: 62: uart_write_line("SR2 -> ");
-      00015A AEr00r0D         [ 2]  354 	ldw	x, #(___str_2+0)
-      00015D CDr00rEB         [ 4]  355 	call	_uart_write_line
-                                    356 ;	main.c: 63: uart_write_line(rx_binary_chars);
-      000160 96               [ 1]  357 	ldw	x, sp
-      000161 5C               [ 1]  358 	incw	x
-      000162 CDr00rEB         [ 4]  359 	call	_uart_write_line
-                                    360 ;	main.c: 64: uart_write_line(" <-\n");
-      000165 AEr00r08         [ 2]  361 	ldw	x, #(___str_1+0)
-      000168 CDr00rEB         [ 4]  362 	call	_uart_write_line
-                                    363 ;	main.c: 65: convert_int_to_binary(I2C_SR3, rx_binary_chars);
-      00016B 96               [ 1]  364 	ldw	x, sp
-      00016C 5C               [ 1]  365 	incw	x
-      00016D 51               [ 1]  366 	exgw	x, y
-      00016E C6 52 19         [ 1]  367 	ld	a, 0x5219
-      000171 5F               [ 1]  368 	clrw	x
-      000172 90 89            [ 2]  369 	pushw	y
-      000174 97               [ 1]  370 	ld	xl, a
-      000175 CDr00rB3         [ 4]  371 	call	_convert_int_to_binary
-                                    372 ;	main.c: 66: uart_write_line("SR3 -> ");
-      000178 AEr00r15         [ 2]  373 	ldw	x, #(___str_3+0)
-      00017B CDr00rEB         [ 4]  374 	call	_uart_write_line
-                                    375 ;	main.c: 67: uart_write_line(rx_binary_chars);
-      00017E 96               [ 1]  376 	ldw	x, sp
-      00017F 5C               [ 1]  377 	incw	x
-      000180 CDr00rEB         [ 4]  378 	call	_uart_write_line
-                                    379 ;	main.c: 68: uart_write_line(" <-\n");
-      000183 AEr00r08         [ 2]  380 	ldw	x, #(___str_1+0)
-      000186 CDr00rEB         [ 4]  381 	call	_uart_write_line
-                                    382 ;	main.c: 69: convert_int_to_binary(I2C_CR1, rx_binary_chars);
-      000189 96               [ 1]  383 	ldw	x, sp
-      00018A 5C               [ 1]  384 	incw	x
-      00018B 51               [ 1]  385 	exgw	x, y
-      00018C C6 52 10         [ 1]  386 	ld	a, 0x5210
-      00018F 5F               [ 1]  387 	clrw	x
-      000190 90 89            [ 2]  388 	pushw	y
-      000192 97               [ 1]  389 	ld	xl, a
-      000193 CDr00rB3         [ 4]  390 	call	_convert_int_to_binary
-                                    391 ;	main.c: 70: uart_write_line("CR1 -> ");
-      000196 AEr00r1D         [ 2]  392 	ldw	x, #(___str_4+0)
-      000199 CDr00rEB         [ 4]  393 	call	_uart_write_line
-                                    394 ;	main.c: 71: uart_write_line(rx_binary_chars);
-      00019C 96               [ 1]  395 	ldw	x, sp
-      00019D 5C               [ 1]  396 	incw	x
-      00019E CDr00rEB         [ 4]  397 	call	_uart_write_line
-                                    398 ;	main.c: 72: uart_write_line(" <-\n");
-      0001A1 AEr00r08         [ 2]  399 	ldw	x, #(___str_1+0)
-      0001A4 CDr00rEB         [ 4]  400 	call	_uart_write_line
-                                    401 ;	main.c: 73: convert_int_to_binary(I2C_CR2, rx_binary_chars);
-      0001A7 96               [ 1]  402 	ldw	x, sp
-      0001A8 5C               [ 1]  403 	incw	x
-      0001A9 51               [ 1]  404 	exgw	x, y
-      0001AA C6 52 11         [ 1]  405 	ld	a, 0x5211
-      0001AD 5F               [ 1]  406 	clrw	x
-      0001AE 90 89            [ 2]  407 	pushw	y
-      0001B0 97               [ 1]  408 	ld	xl, a
-      0001B1 CDr00rB3         [ 4]  409 	call	_convert_int_to_binary
-                                    410 ;	main.c: 74: uart_write_line("CR2 -> ");
-      0001B4 AEr00r25         [ 2]  411 	ldw	x, #(___str_5+0)
-      0001B7 CDr00rEB         [ 4]  412 	call	_uart_write_line
-                                    413 ;	main.c: 75: uart_write_line(rx_binary_chars);
-      0001BA 96               [ 1]  414 	ldw	x, sp
-      0001BB 5C               [ 1]  415 	incw	x
-      0001BC CDr00rEB         [ 4]  416 	call	_uart_write_line
-                                    417 ;	main.c: 76: uart_write_line(" <-\n");
-      0001BF AEr00r08         [ 2]  418 	ldw	x, #(___str_1+0)
-      0001C2 CDr00rEB         [ 4]  419 	call	_uart_write_line
-                                    420 ;	main.c: 77: }
-      0001C5 5B 09            [ 2]  421 	addw	sp, #9
-      0001C7 81               [ 4]  422 	ret
-                                    423 ;	main.c: 79: int main(void)
-                                    424 ;	-----------------------------------------
-                                    425 ;	 function main
-                                    426 ;	-----------------------------------------
-      0001C8                        427 _main:
-      0001C8 52 05            [ 2]  428 	sub	sp, #5
-                                    429 ;	main.c: 82: CLK_CKDIVR = 0;
-      0001CA 35 00 50 C6      [ 1]  430 	mov	0x50c6+0, #0x00
-                                    431 ;	main.c: 85: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
-      0001CE 72 16 52 35      [ 1]  432 	bset	0x5235, #3
-                                    433 ;	main.c: 87: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
-      0001D2 C6 52 36         [ 1]  434 	ld	a, 0x5236
-      0001D5 A4 CF            [ 1]  435 	and	a, #0xcf
-      0001D7 C7 52 36         [ 1]  436 	ld	0x5236, a
-                                    437 ;	main.c: 89: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
-      0001DA 35 03 52 33      [ 1]  438 	mov	0x5233+0, #0x03
-      0001DE 35 68 52 32      [ 1]  439 	mov	0x5232+0, #0x68
-                                    440 ;	main.c: 93: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
-      0001E2 72 11 52 10      [ 1]  441 	bres	0x5210, #0
-                                    442 ;	main.c: 97: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
-      0001E6 72 1F 52 1C      [ 1]  443 	bres	0x521c, #7
-                                    444 ;	main.c: 98: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
-      0001EA 72 1F 52 14      [ 1]  445 	bres	0x5214, #7
-                                    446 ;	main.c: 99: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
-      0001EE 72 1C 52 14      [ 1]  447 	bset	0x5214, #6
-                                    448 ;	main.c: 100: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
-      0001F2 72 10 52 10      [ 1]  449 	bset	0x5210, #0
-                                    450 ;	main.c: 101: status_check();
-      0001F6 CDr01r1B         [ 4]  451 	call	_status_check
-                                    452 ;	main.c: 106: uart_write_line("Start Scanning\n");
-      0001F9 AEr00r2D         [ 2]  453 	ldw	x, #(___str_6+0)
-      0001FC CDr00rEB         [ 4]  454 	call	_uart_write_line
-                                    455 ;	main.c: 108: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
-      0001FF 0F 05            [ 1]  456 	clr	(0x05, sp)
-      000201                        457 00106$:
-      000201 7B 05            [ 1]  458 	ld	a, (0x05, sp)
-      000203 A1 FF            [ 1]  459 	cp	a, #0xff
-      000205 24 59            [ 1]  460 	jrnc	00104$
-                                    461 ;	main.c: 111: uart_write_line("_______Start______\n");
-      000207 AEr00r3D         [ 2]  462 	ldw	x, #(___str_7+0)
-      00020A CDr00rEB         [ 4]  463 	call	_uart_write_line
-                                    464 ;	main.c: 112: uart_write_line("Dev ->  ");
-      00020D AEr00r51         [ 2]  465 	ldw	x, #(___str_8+0)
-      000210 CDr00rEB         [ 4]  466 	call	_uart_write_line
-                                    467 ;	main.c: 113: char rx_int_chars[4]={0};
-      000213 0F 01            [ 1]  468 	clr	(0x01, sp)
-      000215 0F 02            [ 1]  469 	clr	(0x02, sp)
-      000217 0F 03            [ 1]  470 	clr	(0x03, sp)
-      000219 0F 04            [ 1]  471 	clr	(0x04, sp)
-                                    472 ;	main.c: 115: convert_int_to_chars(addr, rx_int_chars);
-      00021B 96               [ 1]  473 	ldw	x, sp
-      00021C 5C               [ 1]  474 	incw	x
-      00021D 51               [ 1]  475 	exgw	x, y
-      00021E 7B 05            [ 1]  476 	ld	a, (0x05, sp)
-      000220 5F               [ 1]  477 	clrw	x
-      000221 90 89            [ 2]  478 	pushw	y
-      000223 97               [ 1]  479 	ld	xl, a
-      000224 CDr00r2E         [ 4]  480 	call	_convert_int_to_chars
-                                    481 ;	main.c: 116: uart_write_line(rx_int_chars);
-      000227 96               [ 1]  482 	ldw	x, sp
-      000228 5C               [ 1]  483 	incw	x
-      000229 CDr00rEB         [ 4]  484 	call	_uart_write_line
-                                    485 ;	main.c: 117: uart_write_line("  <- Dev\n");
-      00022C AEr00r5A         [ 2]  486 	ldw	x, #(___str_9+0)
-      00022F CDr00rEB         [ 4]  487 	call	_uart_write_line
-                                    488 ;	main.c: 123: I2C_CR2 = I2C_CR2 | (1 << 2); // Set ACK bit
-      000232 72 14 52 11      [ 1]  489 	bset	0x5211, #2
-                                    490 ;	main.c: 126: I2C_CR2 = I2C_CR2 | (1 << 0); // START
-      000236 72 10 52 11      [ 1]  491 	bset	0x5211, #0
-                                    492 ;	main.c: 129: while (!(I2C_SR1 & (1 << 0)));
-      00023A                        493 00101$:
-      00023A 72 01 52 17 FB   [ 2]  494 	btjf	0x5217, #0, 00101$
-                                    495 ;	main.c: 133: I2C_DR = I2C_DR | addr;
-      00023F C6 52 16         [ 1]  496 	ld	a, 0x5216
-      000242 1A 05            [ 1]  497 	or	a, (0x05, sp)
-      000244 C7 52 16         [ 1]  498 	ld	0x5216, a
-                                    499 ;	main.c: 140: I2C_SR1 = 0x00;
-      000247 35 00 52 17      [ 1]  500 	mov	0x5217+0, #0x00
-                                    501 ;	main.c: 141: I2C_SR3 = 0x00;
-      00024B 35 00 52 19      [ 1]  502 	mov	0x5219+0, #0x00
-                                    503 ;	main.c: 142: I2C_CR2 = I2C_CR2 | (1 << 1); // STOP
-      00024F 72 12 52 11      [ 1]  504 	bset	0x5211, #1
-                                    505 ;	main.c: 143: status_check();
-      000253 CDr01r1B         [ 4]  506 	call	_status_check
-                                    507 ;	main.c: 146: uart_write_line("_______Stop_______\n");
-      000256 AEr00r64         [ 2]  508 	ldw	x, #(___str_10+0)
-      000259 CDr00rEB         [ 4]  509 	call	_uart_write_line
-                                    510 ;	main.c: 108: for(uint8_t addr = 0x00; addr < 0xFF;addr++)
-      00025C 0C 05            [ 1]  511 	inc	(0x05, sp)
-      00025E 20 A1            [ 2]  512 	jra	00106$
-      000260                        513 00104$:
-                                    514 ;	main.c: 152: return 0;
-      000260 5F               [ 1]  515 	clrw	x
-                                    516 ;	main.c: 153: }
-      000261 5B 05            [ 2]  517 	addw	sp, #5
-      000263 81               [ 4]  518 	ret
-                                    519 	.area CODE
-                                    520 	.area CONST
-                                    521 	.area CONST
-      000000                        522 ___str_0:
-      000000 53 52 31 20 2D 3E 20   523 	.ascii "SR1 -> "
-      000007 00                     524 	.db 0x00
-                                    525 	.area CODE
-                                    526 	.area CONST
-      000008                        527 ___str_1:
-      000008 20 3C 2D               528 	.ascii " <-"
-      00000B 0A                     529 	.db 0x0a
-      00000C 00                     530 	.db 0x00
-                                    531 	.area CODE
-                                    532 	.area CONST
-      00000D                        533 ___str_2:
-      00000D 53 52 32 20 2D 3E 20   534 	.ascii "SR2 -> "
-      000014 00                     535 	.db 0x00
-                                    536 	.area CODE
-                                    537 	.area CONST
-      000015                        538 ___str_3:
-      000015 53 52 33 20 2D 3E 20   539 	.ascii "SR3 -> "
-      00001C 00                     540 	.db 0x00
-                                    541 	.area CODE
-                                    542 	.area CONST
-      00001D                        543 ___str_4:
-      00001D 43 52 31 20 2D 3E 20   544 	.ascii "CR1 -> "
-      000024 00                     545 	.db 0x00
-                                    546 	.area CODE
-                                    547 	.area CONST
-      000025                        548 ___str_5:
-      000025 43 52 32 20 2D 3E 20   549 	.ascii "CR2 -> "
-      00002C 00                     550 	.db 0x00
-                                    551 	.area CODE
-                                    552 	.area CONST
-      00002D                        553 ___str_6:
-      00002D 53 74 61 72 74 20 53   554 	.ascii "Start Scanning"
+                                     92 	.area HOME
+                                     93 	.area HOME
+      000004                         94 __sdcc_program_startup:
+      000004 CCr02rA3         [ 2]   95 	jp	_main
+                                     96 ;	return from main will return to caller
+                                     97 ;--------------------------------------------------------
+                                     98 ; code
+                                     99 ;--------------------------------------------------------
+                                    100 	.area CODE
+                                    101 ;	main.c: 7: void delay(unsigned long count) {
+                                    102 ;	-----------------------------------------
+                                    103 ;	 function delay
+                                    104 ;	-----------------------------------------
+      000000                        105 _delay:
+      000000 52 08            [ 2]  106 	sub	sp, #8
+                                    107 ;	main.c: 8: while (count--)
+      000002 16 0D            [ 2]  108 	ldw	y, (0x0d, sp)
+      000004 17 07            [ 2]  109 	ldw	(0x07, sp), y
+      000006 1E 0B            [ 2]  110 	ldw	x, (0x0b, sp)
+      000008                        111 00101$:
+      000008 1F 01            [ 2]  112 	ldw	(0x01, sp), x
+      00000A 7B 07            [ 1]  113 	ld	a, (0x07, sp)
+      00000C 6B 03            [ 1]  114 	ld	(0x03, sp), a
+      00000E 7B 08            [ 1]  115 	ld	a, (0x08, sp)
+      000010 16 07            [ 2]  116 	ldw	y, (0x07, sp)
+      000012 72 A2 00 01      [ 2]  117 	subw	y, #0x0001
+      000016 17 07            [ 2]  118 	ldw	(0x07, sp), y
+      000018 24 01            [ 1]  119 	jrnc	00117$
+      00001A 5A               [ 2]  120 	decw	x
+      00001B                        121 00117$:
+      00001B 4D               [ 1]  122 	tnz	a
+      00001C 26 08            [ 1]  123 	jrne	00118$
+      00001E 16 02            [ 2]  124 	ldw	y, (0x02, sp)
+      000020 26 04            [ 1]  125 	jrne	00118$
+      000022 0D 01            [ 1]  126 	tnz	(0x01, sp)
+      000024 27 03            [ 1]  127 	jreq	00104$
+      000026                        128 00118$:
+                                    129 ;	main.c: 9: nop();
+      000026 9D               [ 1]  130 	nop
+      000027 20 DF            [ 2]  131 	jra	00101$
+      000029                        132 00104$:
+                                    133 ;	main.c: 10: }
+      000029 1E 09            [ 2]  134 	ldw	x, (9, sp)
+      00002B 5B 0E            [ 2]  135 	addw	sp, #14
+      00002D FC               [ 2]  136 	jp	(x)
+                                    137 ;	main.c: 12: int uart_write(const char *str) {
+                                    138 ;	-----------------------------------------
+                                    139 ;	 function uart_write
+                                    140 ;	-----------------------------------------
+      00002E                        141 _uart_write:
+      00002E 52 05            [ 2]  142 	sub	sp, #5
+      000030 1F 03            [ 2]  143 	ldw	(0x03, sp), x
+                                    144 ;	main.c: 14: for(i = 0; i < strlen(str); i++) {
+      000032 0F 05            [ 1]  145 	clr	(0x05, sp)
+      000034                        146 00106$:
+      000034 1E 03            [ 2]  147 	ldw	x, (0x03, sp)
+      000036 CDr00r00         [ 4]  148 	call	_strlen
+      000039 1F 01            [ 2]  149 	ldw	(0x01, sp), x
+      00003B 5F               [ 1]  150 	clrw	x
+      00003C 7B 05            [ 1]  151 	ld	a, (0x05, sp)
+      00003E 97               [ 1]  152 	ld	xl, a
+      00003F 13 01            [ 2]  153 	cpw	x, (0x01, sp)
+      000041 24 14            [ 1]  154 	jrnc	00104$
+                                    155 ;	main.c: 15: while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
+      000043                        156 00101$:
+      000043 C6 52 30         [ 1]  157 	ld	a, 0x5230
+      000046 2A FB            [ 1]  158 	jrpl	00101$
+                                    159 ;	main.c: 16: UART1_DR = str[i];
+      000048 5F               [ 1]  160 	clrw	x
+      000049 7B 05            [ 1]  161 	ld	a, (0x05, sp)
+      00004B 97               [ 1]  162 	ld	xl, a
+      00004C 72 FB 03         [ 2]  163 	addw	x, (0x03, sp)
+      00004F F6               [ 1]  164 	ld	a, (x)
+      000050 C7 52 31         [ 1]  165 	ld	0x5231, a
+                                    166 ;	main.c: 14: for(i = 0; i < strlen(str); i++) {
+      000053 0C 05            [ 1]  167 	inc	(0x05, sp)
+      000055 20 DD            [ 2]  168 	jra	00106$
+      000057                        169 00104$:
+                                    170 ;	main.c: 18: return(i); // Bytes sent
+      000057 7B 05            [ 1]  171 	ld	a, (0x05, sp)
+      000059 5F               [ 1]  172 	clrw	x
+      00005A 97               [ 1]  173 	ld	xl, a
+                                    174 ;	main.c: 19: }
+      00005B 5B 05            [ 2]  175 	addw	sp, #5
+      00005D 81               [ 4]  176 	ret
+                                    177 ;	main.c: 21: void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
+                                    178 ;	-----------------------------------------
+                                    179 ;	 function convert_int_to_chars
+                                    180 ;	-----------------------------------------
+      00005E                        181 _convert_int_to_chars:
+      00005E 52 0D            [ 2]  182 	sub	sp, #13
+      000060 6B 0D            [ 1]  183 	ld	(0x0d, sp), a
+      000062 1F 0B            [ 2]  184 	ldw	(0x0b, sp), x
+                                    185 ;	main.c: 24: rx_int_chars[0] = num / 100 + '0';
+      000064 7B 0D            [ 1]  186 	ld	a, (0x0d, sp)
+      000066 6B 02            [ 1]  187 	ld	(0x02, sp), a
+      000068 0F 01            [ 1]  188 	clr	(0x01, sp)
+                                    189 ;	main.c: 25: rx_int_chars[1] = num / 10 % 10 + '0';
+      00006A 1E 0B            [ 2]  190 	ldw	x, (0x0b, sp)
+      00006C 5C               [ 1]  191 	incw	x
+      00006D 1F 03            [ 2]  192 	ldw	(0x03, sp), x
+                                    193 ;	main.c: 26: rx_int_chars[2] = num % 10 + '0';
+      00006F 1E 0B            [ 2]  194 	ldw	x, (0x0b, sp)
+      000071 5C               [ 1]  195 	incw	x
+      000072 5C               [ 1]  196 	incw	x
+      000073 1F 05            [ 2]  197 	ldw	(0x05, sp), x
+                                    198 ;	main.c: 25: rx_int_chars[1] = num / 10 % 10 + '0';
+      000075 4B 0A            [ 1]  199 	push	#0x0a
+      000077 4B 00            [ 1]  200 	push	#0x00
+      000079 1E 03            [ 2]  201 	ldw	x, (0x03, sp)
+                                    202 ;	main.c: 26: rx_int_chars[2] = num % 10 + '0';
+      00007B CDr00r00         [ 4]  203 	call	__divsint
+      00007E 1F 07            [ 2]  204 	ldw	(0x07, sp), x
+      000080 4B 0A            [ 1]  205 	push	#0x0a
+      000082 4B 00            [ 1]  206 	push	#0x00
+      000084 1E 03            [ 2]  207 	ldw	x, (0x03, sp)
+      000086 CDr00r00         [ 4]  208 	call	__modsint
+      000089 9F               [ 1]  209 	ld	a, xl
+      00008A AB 30            [ 1]  210 	add	a, #0x30
+      00008C 6B 09            [ 1]  211 	ld	(0x09, sp), a
+                                    212 ;	main.c: 22: if (num > 99) {
+      00008E 7B 0D            [ 1]  213 	ld	a, (0x0d, sp)
+      000090 A1 63            [ 1]  214 	cp	a, #0x63
+      000092 23 29            [ 2]  215 	jrule	00105$
+                                    216 ;	main.c: 24: rx_int_chars[0] = num / 100 + '0';
+      000094 4B 64            [ 1]  217 	push	#0x64
+      000096 4B 00            [ 1]  218 	push	#0x00
+      000098 1E 03            [ 2]  219 	ldw	x, (0x03, sp)
+      00009A CDr00r00         [ 4]  220 	call	__divsint
+      00009D 9F               [ 1]  221 	ld	a, xl
+      00009E AB 30            [ 1]  222 	add	a, #0x30
+      0000A0 1E 0B            [ 2]  223 	ldw	x, (0x0b, sp)
+      0000A2 F7               [ 1]  224 	ld	(x), a
+                                    225 ;	main.c: 25: rx_int_chars[1] = num / 10 % 10 + '0';
+      0000A3 4B 0A            [ 1]  226 	push	#0x0a
+      0000A5 4B 00            [ 1]  227 	push	#0x00
+      0000A7 1E 09            [ 2]  228 	ldw	x, (0x09, sp)
+      0000A9 CDr00r00         [ 4]  229 	call	__modsint
+      0000AC 9F               [ 1]  230 	ld	a, xl
+      0000AD AB 30            [ 1]  231 	add	a, #0x30
+      0000AF 1E 03            [ 2]  232 	ldw	x, (0x03, sp)
+      0000B1 F7               [ 1]  233 	ld	(x), a
+                                    234 ;	main.c: 26: rx_int_chars[2] = num % 10 + '0';
+      0000B2 1E 05            [ 2]  235 	ldw	x, (0x05, sp)
+      0000B4 7B 09            [ 1]  236 	ld	a, (0x09, sp)
+      0000B6 F7               [ 1]  237 	ld	(x), a
+                                    238 ;	main.c: 27: rx_int_chars[3] ='\0';
+      0000B7 1E 0B            [ 2]  239 	ldw	x, (0x0b, sp)
+      0000B9 6F 03            [ 1]  240 	clr	(0x0003, x)
+      0000BB 20 23            [ 2]  241 	jra	00107$
+      0000BD                        242 00105$:
+                                    243 ;	main.c: 29: } else if (num > 9) {
+      0000BD 7B 0D            [ 1]  244 	ld	a, (0x0d, sp)
+      0000BF A1 09            [ 1]  245 	cp	a, #0x09
+      0000C1 23 13            [ 2]  246 	jrule	00102$
+                                    247 ;	main.c: 31: rx_int_chars[0] = num / 10 + '0';
+      0000C3 7B 08            [ 1]  248 	ld	a, (0x08, sp)
+      0000C5 6B 0A            [ 1]  249 	ld	(0x0a, sp), a
+      0000C7 AB 30            [ 1]  250 	add	a, #0x30
+      0000C9 1E 0B            [ 2]  251 	ldw	x, (0x0b, sp)
+      0000CB F7               [ 1]  252 	ld	(x), a
+                                    253 ;	main.c: 32: rx_int_chars[1] = num % 10 + '0';
+      0000CC 1E 03            [ 2]  254 	ldw	x, (0x03, sp)
+      0000CE 7B 09            [ 1]  255 	ld	a, (0x09, sp)
+      0000D0 F7               [ 1]  256 	ld	(x), a
+                                    257 ;	main.c: 33: rx_int_chars[2] ='\0';
+      0000D1 1E 05            [ 2]  258 	ldw	x, (0x05, sp)
+      0000D3 7F               [ 1]  259 	clr	(x)
+      0000D4 20 0A            [ 2]  260 	jra	00107$
+      0000D6                        261 00102$:
+                                    262 ;	main.c: 38: rx_int_chars[0] = num + '0';
+      0000D6 7B 0D            [ 1]  263 	ld	a, (0x0d, sp)
+      0000D8 AB 30            [ 1]  264 	add	a, #0x30
+      0000DA 1E 0B            [ 2]  265 	ldw	x, (0x0b, sp)
+      0000DC F7               [ 1]  266 	ld	(x), a
+                                    267 ;	main.c: 39: rx_int_chars[1] ='\0';
+      0000DD 1E 03            [ 2]  268 	ldw	x, (0x03, sp)
+      0000DF 7F               [ 1]  269 	clr	(x)
+      0000E0                        270 00107$:
+                                    271 ;	main.c: 41: }
+      0000E0 5B 0D            [ 2]  272 	addw	sp, #13
+      0000E2 81               [ 4]  273 	ret
+                                    274 ;	main.c: 43: void convert_int_to_binary(int num, char* rx_binary_chars) {
+                                    275 ;	-----------------------------------------
+                                    276 ;	 function convert_int_to_binary
+                                    277 ;	-----------------------------------------
+      0000E3                        278 _convert_int_to_binary:
+      0000E3 52 04            [ 2]  279 	sub	sp, #4
+      0000E5 1F 01            [ 2]  280 	ldw	(0x01, sp), x
+                                    281 ;	main.c: 45: for(int i = 7; i >= 0; i--) {
+      0000E7 AE 00 07         [ 2]  282 	ldw	x, #0x0007
+      0000EA 1F 03            [ 2]  283 	ldw	(0x03, sp), x
+      0000EC                        284 00103$:
+      0000EC 0D 03            [ 1]  285 	tnz	(0x03, sp)
+      0000EE 2B 22            [ 1]  286 	jrmi	00101$
+                                    287 ;	main.c: 47: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
+      0000F0 AE 00 07         [ 2]  288 	ldw	x, #0x0007
+      0000F3 72 F0 03         [ 2]  289 	subw	x, (0x03, sp)
+      0000F6 72 FB 07         [ 2]  290 	addw	x, (0x07, sp)
+      0000F9 16 01            [ 2]  291 	ldw	y, (0x01, sp)
+      0000FB 7B 04            [ 1]  292 	ld	a, (0x04, sp)
+      0000FD 27 05            [ 1]  293 	jreq	00120$
+      0000FF                        294 00119$:
+      0000FF 90 57            [ 2]  295 	sraw	y
+      000101 4A               [ 1]  296 	dec	a
+      000102 26 FB            [ 1]  297 	jrne	00119$
+      000104                        298 00120$:
+      000104 90 9F            [ 1]  299 	ld	a, yl
+      000106 A4 01            [ 1]  300 	and	a, #0x01
+      000108 AB 30            [ 1]  301 	add	a, #0x30
+      00010A F7               [ 1]  302 	ld	(x), a
+                                    303 ;	main.c: 45: for(int i = 7; i >= 0; i--) {
+      00010B 1E 03            [ 2]  304 	ldw	x, (0x03, sp)
+      00010D 5A               [ 2]  305 	decw	x
+      00010E 1F 03            [ 2]  306 	ldw	(0x03, sp), x
+      000110 20 DA            [ 2]  307 	jra	00103$
+      000112                        308 00101$:
+                                    309 ;	main.c: 49: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
+      000112 1E 07            [ 2]  310 	ldw	x, (0x07, sp)
+      000114 6F 08            [ 1]  311 	clr	(0x0008, x)
+                                    312 ;	main.c: 50: }
+      000116 1E 05            [ 2]  313 	ldw	x, (5, sp)
+      000118 5B 08            [ 2]  314 	addw	sp, #8
+      00011A FC               [ 2]  315 	jp	(x)
+                                    316 ;	main.c: 52: void status_check(void){
+                                    317 ;	-----------------------------------------
+                                    318 ;	 function status_check
+                                    319 ;	-----------------------------------------
+      00011B                        320 _status_check:
+      00011B 52 09            [ 2]  321 	sub	sp, #9
+                                    322 ;	main.c: 53: char rx_binary_chars[9]={0};
+      00011D 0F 01            [ 1]  323 	clr	(0x01, sp)
+      00011F 0F 02            [ 1]  324 	clr	(0x02, sp)
+      000121 0F 03            [ 1]  325 	clr	(0x03, sp)
+      000123 0F 04            [ 1]  326 	clr	(0x04, sp)
+      000125 0F 05            [ 1]  327 	clr	(0x05, sp)
+      000127 0F 06            [ 1]  328 	clr	(0x06, sp)
+      000129 0F 07            [ 1]  329 	clr	(0x07, sp)
+      00012B 0F 08            [ 1]  330 	clr	(0x08, sp)
+      00012D 0F 09            [ 1]  331 	clr	(0x09, sp)
+                                    332 ;	main.c: 54: convert_int_to_binary(I2C_SR1, rx_binary_chars);
+      00012F 96               [ 1]  333 	ldw	x, sp
+      000130 5C               [ 1]  334 	incw	x
+      000131 51               [ 1]  335 	exgw	x, y
+      000132 C6 52 17         [ 1]  336 	ld	a, 0x5217
+      000135 5F               [ 1]  337 	clrw	x
+      000136 90 89            [ 2]  338 	pushw	y
+      000138 97               [ 1]  339 	ld	xl, a
+      000139 CDr00rE3         [ 4]  340 	call	_convert_int_to_binary
+                                    341 ;	main.c: 55: uart_write("\nSR1 -> ");
+      00013C AEr00r00         [ 2]  342 	ldw	x, #(___str_0+0)
+      00013F CDr00r2E         [ 4]  343 	call	_uart_write
+                                    344 ;	main.c: 56: uart_write(rx_binary_chars);
+      000142 96               [ 1]  345 	ldw	x, sp
+      000143 5C               [ 1]  346 	incw	x
+      000144 CDr00r2E         [ 4]  347 	call	_uart_write
+                                    348 ;	main.c: 57: uart_write(" <-\n");
+      000147 AEr00r09         [ 2]  349 	ldw	x, #(___str_1+0)
+      00014A CDr00r2E         [ 4]  350 	call	_uart_write
+                                    351 ;	main.c: 58: convert_int_to_binary(I2C_SR2, rx_binary_chars);
+      00014D 96               [ 1]  352 	ldw	x, sp
+      00014E 5C               [ 1]  353 	incw	x
+      00014F 51               [ 1]  354 	exgw	x, y
+      000150 C6 52 18         [ 1]  355 	ld	a, 0x5218
+      000153 5F               [ 1]  356 	clrw	x
+      000154 90 89            [ 2]  357 	pushw	y
+      000156 97               [ 1]  358 	ld	xl, a
+      000157 CDr00rE3         [ 4]  359 	call	_convert_int_to_binary
+                                    360 ;	main.c: 59: uart_write("SR2 -> ");
+      00015A AEr00r0E         [ 2]  361 	ldw	x, #(___str_2+0)
+      00015D CDr00r2E         [ 4]  362 	call	_uart_write
+                                    363 ;	main.c: 60: uart_write(rx_binary_chars);
+      000160 96               [ 1]  364 	ldw	x, sp
+      000161 5C               [ 1]  365 	incw	x
+      000162 CDr00r2E         [ 4]  366 	call	_uart_write
+                                    367 ;	main.c: 61: uart_write(" <-\n");
+      000165 AEr00r09         [ 2]  368 	ldw	x, #(___str_1+0)
+      000168 CDr00r2E         [ 4]  369 	call	_uart_write
+                                    370 ;	main.c: 62: convert_int_to_binary(I2C_SR3, rx_binary_chars);
+      00016B 96               [ 1]  371 	ldw	x, sp
+      00016C 5C               [ 1]  372 	incw	x
+      00016D 51               [ 1]  373 	exgw	x, y
+      00016E C6 52 19         [ 1]  374 	ld	a, 0x5219
+      000171 5F               [ 1]  375 	clrw	x
+      000172 90 89            [ 2]  376 	pushw	y
+      000174 97               [ 1]  377 	ld	xl, a
+      000175 CDr00rE3         [ 4]  378 	call	_convert_int_to_binary
+                                    379 ;	main.c: 63: uart_write("SR3 -> ");
+      000178 AEr00r16         [ 2]  380 	ldw	x, #(___str_3+0)
+      00017B CDr00r2E         [ 4]  381 	call	_uart_write
+                                    382 ;	main.c: 64: uart_write(rx_binary_chars);
+      00017E 96               [ 1]  383 	ldw	x, sp
+      00017F 5C               [ 1]  384 	incw	x
+      000180 CDr00r2E         [ 4]  385 	call	_uart_write
+                                    386 ;	main.c: 65: uart_write(" <-\n");
+      000183 AEr00r09         [ 2]  387 	ldw	x, #(___str_1+0)
+      000186 CDr00r2E         [ 4]  388 	call	_uart_write
+                                    389 ;	main.c: 66: convert_int_to_binary(I2C_CR1, rx_binary_chars);
+      000189 96               [ 1]  390 	ldw	x, sp
+      00018A 5C               [ 1]  391 	incw	x
+      00018B 51               [ 1]  392 	exgw	x, y
+      00018C C6 52 10         [ 1]  393 	ld	a, 0x5210
+      00018F 5F               [ 1]  394 	clrw	x
+      000190 90 89            [ 2]  395 	pushw	y
+      000192 97               [ 1]  396 	ld	xl, a
+      000193 CDr00rE3         [ 4]  397 	call	_convert_int_to_binary
+                                    398 ;	main.c: 67: uart_write("CR1 -> ");
+      000196 AEr00r1E         [ 2]  399 	ldw	x, #(___str_4+0)
+      000199 CDr00r2E         [ 4]  400 	call	_uart_write
+                                    401 ;	main.c: 68: uart_write(rx_binary_chars);
+      00019C 96               [ 1]  402 	ldw	x, sp
+      00019D 5C               [ 1]  403 	incw	x
+      00019E CDr00r2E         [ 4]  404 	call	_uart_write
+                                    405 ;	main.c: 69: uart_write(" <-\n");
+      0001A1 AEr00r09         [ 2]  406 	ldw	x, #(___str_1+0)
+      0001A4 CDr00r2E         [ 4]  407 	call	_uart_write
+                                    408 ;	main.c: 70: convert_int_to_binary(I2C_CR2, rx_binary_chars);
+      0001A7 96               [ 1]  409 	ldw	x, sp
+      0001A8 5C               [ 1]  410 	incw	x
+      0001A9 51               [ 1]  411 	exgw	x, y
+      0001AA C6 52 11         [ 1]  412 	ld	a, 0x5211
+      0001AD 5F               [ 1]  413 	clrw	x
+      0001AE 90 89            [ 2]  414 	pushw	y
+      0001B0 97               [ 1]  415 	ld	xl, a
+      0001B1 CDr00rE3         [ 4]  416 	call	_convert_int_to_binary
+                                    417 ;	main.c: 71: uart_write("CR2 -> ");
+      0001B4 AEr00r26         [ 2]  418 	ldw	x, #(___str_5+0)
+      0001B7 CDr00r2E         [ 4]  419 	call	_uart_write
+                                    420 ;	main.c: 72: uart_write(rx_binary_chars);
+      0001BA 96               [ 1]  421 	ldw	x, sp
+      0001BB 5C               [ 1]  422 	incw	x
+      0001BC CDr00r2E         [ 4]  423 	call	_uart_write
+                                    424 ;	main.c: 73: uart_write(" <-\n");
+      0001BF AEr00r09         [ 2]  425 	ldw	x, #(___str_1+0)
+      0001C2 CDr00r2E         [ 4]  426 	call	_uart_write
+                                    427 ;	main.c: 74: convert_int_to_binary(I2C_DR, rx_binary_chars);
+      0001C5 96               [ 1]  428 	ldw	x, sp
+      0001C6 5C               [ 1]  429 	incw	x
+      0001C7 51               [ 1]  430 	exgw	x, y
+      0001C8 C6 52 16         [ 1]  431 	ld	a, 0x5216
+      0001CB 5F               [ 1]  432 	clrw	x
+      0001CC 90 89            [ 2]  433 	pushw	y
+      0001CE 97               [ 1]  434 	ld	xl, a
+      0001CF CDr00rE3         [ 4]  435 	call	_convert_int_to_binary
+                                    436 ;	main.c: 75: uart_write("DR -> ");
+      0001D2 AEr00r2E         [ 2]  437 	ldw	x, #(___str_6+0)
+      0001D5 CDr00r2E         [ 4]  438 	call	_uart_write
+                                    439 ;	main.c: 76: uart_write(rx_binary_chars);
+      0001D8 96               [ 1]  440 	ldw	x, sp
+      0001D9 5C               [ 1]  441 	incw	x
+      0001DA CDr00r2E         [ 4]  442 	call	_uart_write
+                                    443 ;	main.c: 77: uart_write(" <-\n");
+      0001DD AEr00r09         [ 2]  444 	ldw	x, #(___str_1+0)
+      0001E0 CDr00r2E         [ 4]  445 	call	_uart_write
+                                    446 ;	main.c: 78: }
+      0001E3 5B 09            [ 2]  447 	addw	sp, #9
+      0001E5 81               [ 4]  448 	ret
+                                    449 ;	main.c: 80: void uart_init(void){
+                                    450 ;	-----------------------------------------
+                                    451 ;	 function uart_init
+                                    452 ;	-----------------------------------------
+      0001E6                        453 _uart_init:
+                                    454 ;	main.c: 81: CLK_CKDIVR = 0;
+      0001E6 35 00 50 C6      [ 1]  455 	mov	0x50c6+0, #0x00
+                                    456 ;	main.c: 84: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
+      0001EA 72 16 52 35      [ 1]  457 	bset	0x5235, #3
+                                    458 ;	main.c: 86: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+      0001EE C6 52 36         [ 1]  459 	ld	a, 0x5236
+      0001F1 A4 CF            [ 1]  460 	and	a, #0xcf
+      0001F3 C7 52 36         [ 1]  461 	ld	0x5236, a
+                                    462 ;	main.c: 88: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
+      0001F6 35 03 52 33      [ 1]  463 	mov	0x5233+0, #0x03
+      0001FA 35 68 52 32      [ 1]  464 	mov	0x5232+0, #0x68
+                                    465 ;	main.c: 89: }
+      0001FE 81               [ 4]  466 	ret
+                                    467 ;	main.c: 93: void i2c_init(void) {
+                                    468 ;	-----------------------------------------
+                                    469 ;	 function i2c_init
+                                    470 ;	-----------------------------------------
+      0001FF                        471 _i2c_init:
+                                    472 ;	main.c: 99: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
+      0001FF 72 11 52 10      [ 1]  473 	bres	0x5210, #0
+                                    474 ;	main.c: 100: I2C_FREQR= 16;                  // peripheral frequence =16MHz
+      000203 35 10 52 12      [ 1]  475 	mov	0x5212+0, #0x10
+                                    476 ;	main.c: 101: I2C_CCRH = 0;                   // =0
+      000207 35 00 52 1C      [ 1]  477 	mov	0x521c+0, #0x00
+                                    478 ;	main.c: 102: I2C_CCRL = 80;                  // 100kHz for I2C
+      00020B 35 50 52 1B      [ 1]  479 	mov	0x521b+0, #0x50
+                                    480 ;	main.c: 103: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
+      00020F 72 1F 52 1C      [ 1]  481 	bres	0x521c, #7
+                                    482 ;	main.c: 104: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
+      000213 72 1F 52 14      [ 1]  483 	bres	0x5214, #7
+                                    484 ;	main.c: 105: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
+      000217 72 1C 52 14      [ 1]  485 	bset	0x5214, #6
+                                    486 ;	main.c: 106: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
+      00021B 72 10 52 10      [ 1]  487 	bset	0x5210, #0
+                                    488 ;	main.c: 107: }
+      00021F 81               [ 4]  489 	ret
+                                    490 ;	main.c: 111: void i2c_start(void) {
+                                    491 ;	-----------------------------------------
+                                    492 ;	 function i2c_start
+                                    493 ;	-----------------------------------------
+      000220                        494 _i2c_start:
+                                    495 ;	main.c: 112: I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
+      000220 72 10 52 11      [ 1]  496 	bset	0x5211, #0
+                                    497 ;	main.c: 113: while(!(I2C_SR1 & (1 << 0)));
+      000224                        498 00101$:
+      000224 C6 52 17         [ 1]  499 	ld	a, 0x5217
+      000227 44               [ 1]  500 	srl	a
+      000228 24 FA            [ 1]  501 	jrnc	00101$
+                                    502 ;	main.c: 114: uart_write("Start generated\n"); // Ожидание отправки стартового сигнала
+      00022A AEr00r35         [ 2]  503 	ldw	x, #(___str_7+0)
+                                    504 ;	main.c: 115: }
+      00022D CCr00r2E         [ 2]  505 	jp	_uart_write
+                                    506 ;	main.c: 117: void i2c_send_address(uint8_t address) {
+                                    507 ;	-----------------------------------------
+                                    508 ;	 function i2c_send_address
+                                    509 ;	-----------------------------------------
+      000230                        510 _i2c_send_address:
+                                    511 ;	main.c: 118: I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
+      000230 48               [ 1]  512 	sll	a
+      000231 C7 52 16         [ 1]  513 	ld	0x5216, a
+                                    514 ;	main.c: 119: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      000234                        515 00102$:
+      000234 C6 52 17         [ 1]  516 	ld	a, 0x5217
+      000237 A5 02            [ 1]  517 	bcp	a, #0x02
+      000239 26 07            [ 1]  518 	jrne	00104$
+      00023B C6 52 18         [ 1]  519 	ld	a, 0x5218
+      00023E A5 04            [ 1]  520 	bcp	a, #0x04
+      000240 27 F2            [ 1]  521 	jreq	00102$
+      000242                        522 00104$:
+                                    523 ;	main.c: 125: uart_write("Addr send\n"); // Ожидание подтверждения адреса
+      000242 AEr00r46         [ 2]  524 	ldw	x, #(___str_8+0)
+                                    525 ;	main.c: 126: }
+      000245 CCr00r2E         [ 2]  526 	jp	_uart_write
+                                    527 ;	main.c: 128: void i2c_stop(void) {
+                                    528 ;	-----------------------------------------
+                                    529 ;	 function i2c_stop
+                                    530 ;	-----------------------------------------
+      000248                        531 _i2c_stop:
+                                    532 ;	main.c: 129: I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
+      000248 C6 52 11         [ 1]  533 	ld	a, 0x5211
+      00024B AA 02            [ 1]  534 	or	a, #0x02
+      00024D C7 52 11         [ 1]  535 	ld	0x5211, a
+                                    536 ;	main.c: 130: uart_write("Stop generated\n");
+      000250 AEr00r51         [ 2]  537 	ldw	x, #(___str_9+0)
+                                    538 ;	main.c: 131: }
+      000253 CCr00r2E         [ 2]  539 	jp	_uart_write
+                                    540 ;	main.c: 133: void i2c_scan(void) {
+                                    541 ;	-----------------------------------------
+                                    542 ;	 function i2c_scan
+                                    543 ;	-----------------------------------------
+      000256                        544 _i2c_scan:
+      000256 52 05            [ 2]  545 	sub	sp, #5
+                                    546 ;	main.c: 134: for (uint8_t addr = 1; addr < 127; addr++) {
+      000258 A6 01            [ 1]  547 	ld	a, #0x01
+      00025A 6B 05            [ 1]  548 	ld	(0x05, sp), a
+      00025C                        549 00105$:
+      00025C 7B 05            [ 1]  550 	ld	a, (0x05, sp)
+      00025E A1 7F            [ 1]  551 	cp	a, #0x7f
+      000260 24 38            [ 1]  552 	jrnc	00103$
+                                    553 ;	main.c: 135: i2c_start();
+      000262 CDr02r20         [ 4]  554 	call	_i2c_start
+                                    555 ;	main.c: 136: i2c_send_address(addr);
+      000265 7B 05            [ 1]  556 	ld	a, (0x05, sp)
+      000267 CDr02r30         [ 4]  557 	call	_i2c_send_address
+                                    558 ;	main.c: 137: if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
+      00026A 72 04 52 18 17   [ 2]  559 	btjt	0x5218, #2, 00102$
+                                    560 ;	main.c: 139: uart_write("Device found at: ");
+      00026F AEr00r61         [ 2]  561 	ldw	x, #(___str_10+0)
+      000272 CDr00r2E         [ 4]  562 	call	_uart_write
+                                    563 ;	main.c: 140: char rx_int_chars[4]={0};
+      000275 0F 01            [ 1]  564 	clr	(0x01, sp)
+      000277 0F 02            [ 1]  565 	clr	(0x02, sp)
+      000279 0F 03            [ 1]  566 	clr	(0x03, sp)
+      00027B 0F 04            [ 1]  567 	clr	(0x04, sp)
+                                    568 ;	main.c: 143: uart_write("\r\n");
+      00027D AEr00r73         [ 2]  569 	ldw	x, #(___str_11+0)
+      000280 CDr00r2E         [ 4]  570 	call	_uart_write
+                                    571 ;	main.c: 144: status_check();
+      000283 CDr01r1B         [ 4]  572 	call	_status_check
+      000286                        573 00102$:
+                                    574 ;	main.c: 146: i2c_stop();
+      000286 CDr02r48         [ 4]  575 	call	_i2c_stop
+                                    576 ;	main.c: 147: I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
+      000289 72 15 52 18      [ 1]  577 	bres	0x5218, #2
+                                    578 ;	main.c: 148: delay(10000L); // Небольшая задержка для стабилизации шины
+      00028D 4B 10            [ 1]  579 	push	#0x10
+      00028F 4B 27            [ 1]  580 	push	#0x27
+      000291 5F               [ 1]  581 	clrw	x
+      000292 89               [ 2]  582 	pushw	x
+      000293 CDr00r00         [ 4]  583 	call	_delay
+                                    584 ;	main.c: 134: for (uint8_t addr = 1; addr < 127; addr++) {
+      000296 0C 05            [ 1]  585 	inc	(0x05, sp)
+      000298 20 C2            [ 2]  586 	jra	00105$
+      00029A                        587 00103$:
+                                    588 ;	main.c: 150: uart_write("Devs Not Found");
+      00029A AEr00r76         [ 2]  589 	ldw	x, #(___str_12+0)
+      00029D CDr00r2E         [ 4]  590 	call	_uart_write
+                                    591 ;	main.c: 151: }
+      0002A0 5B 05            [ 2]  592 	addw	sp, #5
+      0002A2 81               [ 4]  593 	ret
+                                    594 ;	main.c: 157: int main(void)
+                                    595 ;	-----------------------------------------
+                                    596 ;	 function main
+                                    597 ;	-----------------------------------------
+      0002A3                        598 _main:
+                                    599 ;	main.c: 159: uart_init();
+      0002A3 CDr01rE6         [ 4]  600 	call	_uart_init
+                                    601 ;	main.c: 160: uart_write("Start Scanning\n");
+      0002A6 AEr00r85         [ 2]  602 	ldw	x, #(___str_13+0)
+      0002A9 CDr00r2E         [ 4]  603 	call	_uart_write
+                                    604 ;	main.c: 161: i2c_init();
+      0002AC CDr01rFF         [ 4]  605 	call	_i2c_init
+                                    606 ;	main.c: 162: status_check();
+      0002AF CDr01r1B         [ 4]  607 	call	_status_check
+                                    608 ;	main.c: 165: i2c_scan(); 
+      0002B2 CDr02r56         [ 4]  609 	call	_i2c_scan
+                                    610 ;	main.c: 167: return 0;
+      0002B5 5F               [ 1]  611 	clrw	x
+                                    612 ;	main.c: 168: }
+      0002B6 81               [ 4]  613 	ret
+                                    614 	.area CODE
+                                    615 	.area CONST
+                                    616 	.area CONST
+      000000                        617 ___str_0:
+      000000 0A                     618 	.db 0x0a
+      000001 53 52 31 20 2D 3E 20   619 	.ascii "SR1 -> "
+      000008 00                     620 	.db 0x00
+                                    621 	.area CODE
+                                    622 	.area CONST
+      000009                        623 ___str_1:
+      000009 20 3C 2D               624 	.ascii " <-"
+      00000C 0A                     625 	.db 0x0a
+      00000D 00                     626 	.db 0x00
+                                    627 	.area CODE
+                                    628 	.area CONST
+      00000E                        629 ___str_2:
+      00000E 53 52 32 20 2D 3E 20   630 	.ascii "SR2 -> "
+      000015 00                     631 	.db 0x00
+                                    632 	.area CODE
+                                    633 	.area CONST
+      000016                        634 ___str_3:
+      000016 53 52 33 20 2D 3E 20   635 	.ascii "SR3 -> "
+      00001D 00                     636 	.db 0x00
+                                    637 	.area CODE
+                                    638 	.area CONST
+      00001E                        639 ___str_4:
+      00001E 43 52 31 20 2D 3E 20   640 	.ascii "CR1 -> "
+      000025 00                     641 	.db 0x00
+                                    642 	.area CODE
+                                    643 	.area CONST
+      000026                        644 ___str_5:
+      000026 43 52 32 20 2D 3E 20   645 	.ascii "CR2 -> "
+      00002D 00                     646 	.db 0x00
+                                    647 	.area CODE
+                                    648 	.area CONST
+      00002E                        649 ___str_6:
+      00002E 44 52 20 2D 3E 20      650 	.ascii "DR -> "
+      000034 00                     651 	.db 0x00
+                                    652 	.area CODE
+                                    653 	.area CONST
+      000035                        654 ___str_7:
+      000035 53 74 61 72 74 20 67   655 	.ascii "Start generated"
+             65 6E 65 72 61 74 65
+             64
+      000044 0A                     656 	.db 0x0a
+      000045 00                     657 	.db 0x00
+                                    658 	.area CODE
+                                    659 	.area CONST
+      000046                        660 ___str_8:
+      000046 41 64 64 72 20 73 65   661 	.ascii "Addr send"
+             6E 64
+      00004F 0A                     662 	.db 0x0a
+      000050 00                     663 	.db 0x00
+                                    664 	.area CODE
+                                    665 	.area CONST
+      000051                        666 ___str_9:
+      000051 53 74 6F 70 20 67 65   667 	.ascii "Stop generated"
+             6E 65 72 61 74 65 64
+      00005F 0A                     668 	.db 0x0a
+      000060 00                     669 	.db 0x00
+                                    670 	.area CODE
+                                    671 	.area CONST
+      000061                        672 ___str_10:
+      000061 44 65 76 69 63 65 20   673 	.ascii "Device found at: "
+             66 6F 75 6E 64 20 61
+             74 3A 20
+      000072 00                     674 	.db 0x00
+                                    675 	.area CODE
+                                    676 	.area CONST
+      000073                        677 ___str_11:
+      000073 0D                     678 	.db 0x0d
+      000074 0A                     679 	.db 0x0a
+      000075 00                     680 	.db 0x00
+                                    681 	.area CODE
+                                    682 	.area CONST
+      000076                        683 ___str_12:
+      000076 44 65 76 73 20 4E 6F   684 	.ascii "Devs Not Found"
+             74 20 46 6F 75 6E 64
+      000084 00                     685 	.db 0x00
+                                    686 	.area CODE
+                                    687 	.area CONST
+      000085                        688 ___str_13:
+      000085 53 74 61 72 74 20 53   689 	.ascii "Start Scanning"
              63 61 6E 6E 69 6E 67
-      00003B 0A                     555 	.db 0x0a
-      00003C 00                     556 	.db 0x00
-                                    557 	.area CODE
-                                    558 	.area CONST
-      00003D                        559 ___str_7:
-      00003D 5F 5F 5F 5F 5F 5F 5F   560 	.ascii "_______Start______"
-             53 74 61 72 74 5F 5F
-             5F 5F 5F 5F
-      00004F 0A                     561 	.db 0x0a
-      000050 00                     562 	.db 0x00
-                                    563 	.area CODE
-                                    564 	.area CONST
-      000051                        565 ___str_8:
-      000051 44 65 76 20 2D 3E 20   566 	.ascii "Dev ->  "
-             20
-      000059 00                     567 	.db 0x00
-                                    568 	.area CODE
-                                    569 	.area CONST
-      00005A                        570 ___str_9:
-      00005A 20 20 3C 2D 20 44 65   571 	.ascii "  <- Dev"
-             76
-      000062 0A                     572 	.db 0x0a
-      000063 00                     573 	.db 0x00
-                                    574 	.area CODE
-                                    575 	.area CONST
-      000064                        576 ___str_10:
-      000064 5F 5F 5F 5F 5F 5F 5F   577 	.ascii "_______Stop_______"
-             53 74 6F 70 5F 5F 5F
-             5F 5F 5F 5F
-      000076 0A                     578 	.db 0x0a
-      000077 00                     579 	.db 0x00
-                                    580 	.area CODE
-                                    581 	.area INITIALIZER
-                                    582 	.area CABS (ABS)
+      000093 0A                     690 	.db 0x0a
+      000094 00                     691 	.db 0x00
+                                    692 	.area CODE
+                                    693 	.area INITIALIZER
+                                    694 	.area CABS (ABS)

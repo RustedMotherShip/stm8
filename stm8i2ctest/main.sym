@@ -9,29 +9,38 @@ Symbol Table
     .__.H$L.                                                    =  000001 L
     ___sdcc_external_startup                                       ****** GX
   8 ___str_0                                                       000000 R
-  8 ___str_1                                                       000008 R
-  8 ___str_10                                                      000064 R
-  8 ___str_2                                                       00000D R
-  8 ___str_3                                                       000015 R
-  8 ___str_4                                                       00001D R
-  8 ___str_5                                                       000025 R
-  8 ___str_6                                                       00002D R
-  8 ___str_7                                                       00003D R
-  8 ___str_8                                                       000051 R
-  8 ___str_9                                                       00005A R
+  8 ___str_1                                                       000009 R
+  8 ___str_10                                                      000061 R
+  8 ___str_11                                                      000073 R
+  8 ___str_12                                                      000076 R
+  8 ___str_13                                                      000085 R
+  8 ___str_2                                                       00000E R
+  8 ___str_3                                                       000016 R
+  8 ___str_4                                                       00001E R
+  8 ___str_5                                                       000026 R
+  8 ___str_6                                                       00002E R
+  8 ___str_7                                                       000035 R
+  8 ___str_8                                                       000046 R
+  8 ___str_9                                                       000051 R
     __divsint                                                      ****** GX
   5 __interrupt_vect                                               000000 R
     __modsint                                                      ****** GX
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000004 R
   3 __start__stack                                                 000000 R
-  A _convert_int_to_binary                                         0000B3 GR
-  A _convert_int_to_chars                                          00002E GR
+  A _convert_int_to_binary                                         0000E3 GR
+  A _convert_int_to_chars                                          00005E GR
   A _delay                                                         000000 GR
-  A _main                                                          0001C8 GR
+  A _i2c_init                                                      0001FF GR
+  A _i2c_scan                                                      000256 GR
+  A _i2c_send_address                                              000230 GR
+  A _i2c_start                                                     000220 GR
+  A _i2c_stop                                                      000248 GR
+  A _main                                                          0002A3 GR
   A _status_check                                                  00011B GR
     _strlen                                                        ****** GX
-  A _uart_write_line                                               0000EB GR
+  A _uart_init                                                     0001E6 GR
+  A _uart_write                                                    00002E GR
     l_DATA                                                         ****** GX
     l_INITIALIZER                                                  ****** GX
     s_DATA                                                         ****** GX
@@ -53,8 +62,8 @@ Area Table
    5 HOME                                       size      7   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
-   8 CONST                                      size     78   flags    0
+   8 CONST                                      size     95   flags    0
    9 INITIALIZER                                size      0   flags    0
-   A CODE                                       size    264   flags    0
+   A CODE                                       size    2B7   flags    0
    B CABS                                       size      0   flags    8
 

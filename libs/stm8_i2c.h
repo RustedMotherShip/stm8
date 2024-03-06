@@ -137,7 +137,7 @@ static inline void i2c_enable(I2C_TypeDef *i2c)
  */
 static inline void i2c_disable(I2C_TypeDef *i2c)
 {
-    i2c->CR1 &= ~I2C_CR1_PI;
+    i2c->CR1 &= ~I2C_CR1_PE;
 }
 
 /**
@@ -305,10 +305,9 @@ static inline int i2c_start_is_enabled(const I2C_TypeDef *i2c)
  */
 static inline void i2c_set_frequency(I2C_TypeDef *i2c, uint8_t freq_mhz)
 {
-    assert(freq_mhz > 0);
-    assert(freq_mhz <= 24);
-
-    i2c->FREQ = freq_mhz;
+    if(freq_mhz > 0)
+    if(freq_mhz <= 24)
+    i2c->FREQR = freq_mhz;
 }
 
 /**
@@ -320,7 +319,7 @@ static inline void i2c_set_frequency(I2C_TypeDef *i2c, uint8_t freq_mhz)
  */
 static inline uint8_t i2c_get_frequency(const I2C_TypeDef *i2c)
 {
-    return i2c->FREQ;
+    return i2c->FREQR;
 }
 
 /**
@@ -331,7 +330,7 @@ static inline uint8_t i2c_get_frequency(const I2C_TypeDef *i2c)
  */
 static inline void i2c_set_addr7(I2C_TypeDef *i2c, uint8_t addr)
 {
-    assert(addr < (1 << 7));
+    if(addr < (1 << 7));
 
     i2c->OARL = (addr << 1);
     i2c->OARL = I2C_OARH_ADDCONF;
@@ -357,10 +356,12 @@ static inline uint8_t i2c_get_addr7(const I2C_TypeDef *i2c)
  */
 static inline void i2c_set_addr10(I2C_TypeDef *i2c, uint16_t addr)
 {
-    assert(addr < (1 << 10));
+    if(addr < (1 << 10)){
+        i2c->OARL = (addr & 0x7f);
+        i2c->OARH = ((addr >> 7) & 0x03) | I2C_OARH_ADDMODE | I2C_OARH_ADDCONF;
+    }
 
-    i2c->OARL = (addr & 0x7f);
-    i2c->OARH = ((addr >> 7) & 0x03) | I2C_OARH_ADDMODE | I2C_OARH_ADDCONF;
+    
 }
 
 /**
