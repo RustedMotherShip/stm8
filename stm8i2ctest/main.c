@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+char buffer[256] = {0};
+uint8_t current_dev = 0;
 /* Simple busy loop delay */
 void delay(unsigned long count) {
     while (count--)
@@ -17,6 +18,8 @@ int uart_write(const char *str) {
     }
     return(i); // Bytes sent
 }
+
+
 
 void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
     if (num > 99) {
@@ -82,7 +85,7 @@ void uart_init(void){
 
     // Setup UART1 (TX=D5)
     UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
-    // UART1_CR2 |= UART_CR2_REN; // Receiver enable
+    UART1_CR2 |= UART_CR2_REN; // Receiver enable
     UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
     // 9600 baud: UART_DIV = 16000000/9600 ~ 1667 = 0x0683
     UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
@@ -111,24 +114,20 @@ void i2c_init(void) {
 void i2c_start(void) {
     I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
     while(!(I2C_SR1 & (1 << 0)));
-    uart_write("Start generated\n"); // Ожидание отправки стартового сигнала
+    //uart_write("Start generated\n"); // Ожидание отправки стартового сигнала
 }
 
 void i2c_send_address(uint8_t address) {
     I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
     while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-    // if (I2C_SR1 & (1 << 1)) {
-    //     I2C_SR1 &= ~I2C_SR1_ADDR; // Очистка флага адреса, если он был установлен
-    // }
-    //while (!(I2C_SR1 & I2C_SR1_ADDR) ); 
-     
-    uart_write("Addr send\n"); // Ожидание подтверждения адреса
 }
 
 void i2c_stop(void) {
     I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
-    uart_write("Stop generated\n");
+    //uart_write("Stop generated\n");
 }
+
+
 
 void i2c_scan(void) {
     for (uint8_t addr = 1; addr < 127; addr++) {
@@ -136,30 +135,53 @@ void i2c_scan(void) {
         i2c_send_address(addr);
         if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
             // Адрес подтвержден, устройство найдено
-            uart_write("Device found at: ");
+            uart_write("SM ");
             char rx_int_chars[4]={0};
-            //convert_int_to_chars(addr, rx_int_chars);
-            //uart_write(rx_int_chars); 
+            convert_int_to_chars(addr, rx_int_chars);
+            uart_write(rx_int_chars); 
             uart_write("\r\n");
+            current_dev = addr;
             status_check();
         }
         i2c_stop();
         I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
-        delay(10000L); // Небольшая задержка для стабилизации шины
+        //delay(10000); // Небольшая задержка для стабилизации шины
     }
-    uart_write("Devs Not Found");
+    //uart_write("Devs Not Found");
 }
 
 
-
+int uart_read(void)
+{
+    for(int i = 0; i < sizeof(buffer); i++)
+    {
+        buffer[i] = 0;
+    }
+    for(int i = 0; i < sizeof(buffer); i++) {
+        uart_write("flag1");
+        while(!(UART1_SR & UART_SR_RXNE)); // !Transmit data register empty
+        uart_write("flag2");
+        buffer[i] = UART1_DR;
+        if(buffer[i] == '\n')
+        {
+            uart_write("flag_S");
+            return 1;
+        }
+        
+    }
+    status_check();
+    return 0;
+}
 
 
 int main(void)
 {
     uart_init();
-    uart_write("Start Scanning\n");
+    uart_write("SS\n");
+
+    while(uart_read()); 
     i2c_init();
-    status_check();
+    //status_check();
 
     //while (1) {
         i2c_scan(); 
