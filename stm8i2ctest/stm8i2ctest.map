@@ -21,17 +21,17 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     00000063  l_CONST                         
+     000000CA  l_CONST                         
      00000101  l_INITIALIZED                   
      00000101  l_INITIALIZER                   
      00000102  s_SSEG                          
-     0000039A  l_CODE                          
+     000004C2  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     00008090  s_INITIALIZER                   
-     00008191  s_CODE                          
+     000080F7  s_INITIALIZER                   
+     000081F8  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -86,7 +86,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    00000063 =          99. bytes (REL,CON)
+CONST                               0000802D    000000CA =         202. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -95,7 +95,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         00008090    00000101 =         257. bytes (REL,CON)
+INITIALIZER                         000080F7    00000101 =         257. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -104,27 +104,27 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008191    0000039A =         922. bytes (REL,CON)
+CODE                                000081F8    000004C2 =        1218. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008191  _delay                             main
-     000081BF  _uart_write                        main
-     000081EF  _convert_int_to_chars              main
-     00008274  _convert_int_to_binary             main
-     000082AC  _status_check                      main
-     00008377  _uart_init                         main
-     00008394  _i2c_init                          main
-     000083B5  _i2c_start                         main
-     000083BF  _i2c_send_address                  main
-     000083CF  _i2c_stop                          main
-     000083D4  _i2c_scan                          main
-     00008423  _uart_read                         main
-     000084D6  _main                              main
-     000084ED  ___sdcc_external_startup           _startup
-     000084EF  _strlen                            _strlen
-     000084FC  __modsint                          
-     00008514  __divsint                          
+     000081F8  _delay                             main
+     00008226  _uart_write                        main
+     00008256  _convert_int_to_chars              main
+     000082DB  _convert_int_to_binary             main
+     00008313  _status_check                      main
+     00008534  _uart_init                         main
+     00008551  _i2c_init                          main
+     00008572  _i2c_start                         main
+     0000857C  _i2c_send_address                  main
+     0000858C  _i2c_stop                          main
+     00008591  _i2c_scan                          main
+     000085E0  _uart_read                         main
+     0000863C  _main                              main
+     0000867C  ___sdcc_external_startup           _startup
+     0000867E  _strlen                            _strlen
+     0000868B  __modsint                          
+     000086A3  __divsint                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
