@@ -153,6 +153,7 @@ void i2c_scan(void) {
 
 int uart_read(void)
 {
+    char rx_binary_chars[9]={0};
     for(int i = 0; i < sizeof(buffer); i++)
     {
         buffer[i] = 0;
@@ -161,8 +162,16 @@ int uart_read(void)
         uart_write("flag1");
         while(!(UART1_SR & UART_SR_RXNE)); // !Transmit data register empty
         uart_write("flag2");
+        convert_int_to_binary(UART1_DR, rx_binary_chars);
+        uart_write("DRS -> ");
+        uart_write(rx_binary_chars);
+        uart_write(" <-\n");
         buffer[i] = UART1_DR;
-        if(buffer[i] == '\n')
+        convert_int_to_binary(UART1_DR, rx_binary_chars);
+        uart_write("DRE -> ");
+        uart_write(rx_binary_chars);
+        uart_write(" <-\n");
+        if(buffer[i] == '\n' || buffer[i] == '\0')
         {
             uart_write("flag_S");
             return 1;

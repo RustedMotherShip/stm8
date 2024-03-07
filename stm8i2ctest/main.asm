@@ -595,82 +595,147 @@ _i2c_scan:
 ;	 function uart_read
 ;	-----------------------------------------
 _uart_read:
-;	main.c: 156: for(int i = 0; i < sizeof(buffer); i++)
+	sub	sp, #13
+;	main.c: 156: char rx_binary_chars[9]={0};
+	clr	(0x01, sp)
+	clr	(0x02, sp)
+	clr	(0x03, sp)
+	clr	(0x04, sp)
+	clr	(0x05, sp)
+	clr	(0x06, sp)
+	clr	(0x07, sp)
+	clr	(0x08, sp)
+	clr	(0x09, sp)
+;	main.c: 157: for(int i = 0; i < sizeof(buffer); i++)
 	clrw	x
-00109$:
+00110$:
 	cpw	x, #0x0100
 	jrsge	00101$
-;	main.c: 158: buffer[i] = 0;
-	ldw	y, x
-	clr	((_buffer+0), y)
-;	main.c: 156: for(int i = 0; i < sizeof(buffer); i++)
+;	main.c: 159: buffer[i] = 0;
+	ld	a, xl
+	add	a, #<(_buffer+0)
+	push	a
+	ld	a, xh
+	adc	a, #((_buffer+0) >> 8)
+	ld	yh, a
+	pop	a
+	ld	yl, a
+	clr	(y)
+;	main.c: 157: for(int i = 0; i < sizeof(buffer); i++)
 	incw	x
-	jra	00109$
+	jra	00110$
 00101$:
-;	main.c: 160: for(int i = 0; i < sizeof(buffer); i++) {
+;	main.c: 161: for(int i = 0; i < sizeof(buffer); i++) {
 	clrw	x
-00112$:
+	ldw	(0x0c, sp), x
+00113$:
+	ldw	x, (0x0c, sp)
 	cpw	x, #0x0100
-	jrsge	00107$
-;	main.c: 161: uart_write("flag1");
-	pushw	x
+	jrsge	00108$
+;	main.c: 162: uart_write("flag1");
 	ldw	x, #(___str_9+0)
 	call	_uart_write
-	popw	x
-;	main.c: 162: while(!(UART1_SR & UART_SR_RXNE)); // !Transmit data register empty
+;	main.c: 163: while(!(UART1_SR & UART_SR_RXNE)); // !Transmit data register empty
 00102$:
 	btjf	0x5230, #5, 00102$
-;	main.c: 163: uart_write("flag2");
-	pushw	x
+;	main.c: 164: uart_write("flag2");
 	ldw	x, #(___str_10+0)
 	call	_uart_write
-	popw	x
-;	main.c: 164: buffer[i] = UART1_DR;
+;	main.c: 165: convert_int_to_binary(UART1_DR, rx_binary_chars);
 	ld	a, 0x5231
-	ld	((_buffer+0), x), a
-;	main.c: 165: if(buffer[i] == '\n')
-	cp	a, #0x0a
-	jrne	00113$
-;	main.c: 167: uart_write("flag_S");
+	clrw	x
+	ldw	y, sp
+	incw	y
+	pushw	y
+	ld	xl, a
+	call	_convert_int_to_binary
+;	main.c: 166: uart_write("DRS -> ");
 	ldw	x, #(___str_11+0)
 	call	_uart_write
-;	main.c: 168: return 1;
+;	main.c: 167: uart_write(rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	call	_uart_write
+;	main.c: 168: uart_write(" <-\n");
+	ldw	x, #(___str_1+0)
+	call	_uart_write
+;	main.c: 169: buffer[i] = UART1_DR;
+	ldw	x, (0x0c, sp)
+	addw	x, #(_buffer+0)
+	ldw	(0x0a, sp), x
+	ld	a, 0x5231
+	ldw	x, (0x0a, sp)
+	ld	(x), a
+;	main.c: 170: convert_int_to_binary(UART1_DR, rx_binary_chars);
+	ld	a, 0x5231
+	clrw	x
+	ldw	y, sp
+	incw	y
+	pushw	y
+	ld	xl, a
+	call	_convert_int_to_binary
+;	main.c: 171: uart_write("DRE -> ");
+	ldw	x, #(___str_12+0)
+	call	_uart_write
+;	main.c: 172: uart_write(rx_binary_chars);
+	ldw	x, sp
+	incw	x
+	call	_uart_write
+;	main.c: 173: uart_write(" <-\n");
+	ldw	x, #(___str_1+0)
+	call	_uart_write
+;	main.c: 174: if(buffer[i] == '\n' || buffer[i] == '\0')
+	ldw	x, (0x0a, sp)
+	ld	a, (x)
+	cp	a, #0x0a
+	jreq	00105$
+	tnz	a
+	jrne	00114$
+00105$:
+;	main.c: 176: uart_write("flag_S");
+	ldw	x, #(___str_13+0)
+	call	_uart_write
+;	main.c: 177: return 1;
 	clrw	x
 	incw	x
-	ret
-00113$:
-;	main.c: 160: for(int i = 0; i < sizeof(buffer); i++) {
+	jra	00115$
+00114$:
+;	main.c: 161: for(int i = 0; i < sizeof(buffer); i++) {
+	ldw	x, (0x0c, sp)
 	incw	x
-	jra	00112$
-00107$:
-;	main.c: 172: status_check();
+	ldw	(0x0c, sp), x
+	jra	00113$
+00108$:
+;	main.c: 181: status_check();
 	call	_status_check
-;	main.c: 173: return 0;
+;	main.c: 182: return 0;
 	clrw	x
-;	main.c: 174: }
+00115$:
+;	main.c: 183: }
+	addw	sp, #13
 	ret
-;	main.c: 177: int main(void)
+;	main.c: 186: int main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	main.c: 179: uart_init();
+;	main.c: 188: uart_init();
 	call	_uart_init
-;	main.c: 180: uart_write("SS\n");
-	ldw	x, #(___str_12+0)
+;	main.c: 189: uart_write("SS\n");
+	ldw	x, #(___str_14+0)
 	call	_uart_write
-;	main.c: 182: while(uart_read()); 
+;	main.c: 191: while(uart_read()); 
 00101$:
 	call	_uart_read
 	tnzw	x
 	jrne	00101$
-;	main.c: 183: i2c_init();
+;	main.c: 192: i2c_init();
 	call	_i2c_init
-;	main.c: 187: i2c_scan(); 
+;	main.c: 196: i2c_scan(); 
 	call	_i2c_scan
-;	main.c: 189: return 0;
+;	main.c: 198: return 0;
 	clrw	x
-;	main.c: 190: }
+;	main.c: 199: }
 	ret
 	.area CODE
 	.area CONST
@@ -734,11 +799,21 @@ ___str_10:
 	.area CODE
 	.area CONST
 ___str_11:
-	.ascii "flag_S"
+	.ascii "DRS -> "
 	.db 0x00
 	.area CODE
 	.area CONST
 ___str_12:
+	.ascii "DRE -> "
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_13:
+	.ascii "flag_S"
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_14:
 	.ascii "SS"
 	.db 0x0a
 	.db 0x00
