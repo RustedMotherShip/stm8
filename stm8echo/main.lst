@@ -1,0 +1,954 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.3.0 #14184 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module main
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _uart_read
+                                     13 	.globl _uart_init
+                                     14 	.globl _status_check
+                                     15 	.globl _convert_int_to_binary
+                                     16 	.globl _uart_write
+                                     17 	.globl _UART_RX
+                                     18 	.globl _UART_TX
+                                     19 	.globl _delay
+                                     20 	.globl _strlen
+                                     21 ;--------------------------------------------------------
+                                     22 ; ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area DATA
+                                     25 ;--------------------------------------------------------
+                                     26 ; ram data
+                                     27 ;--------------------------------------------------------
+                                     28 	.area INITIALIZED
+                                     29 ;--------------------------------------------------------
+                                     30 ; Stack segment in internal ram
+                                     31 ;--------------------------------------------------------
+                                     32 	.area SSEG
+      000000                         33 __start__stack:
+      000000                         34 	.ds	1
+                                     35 
+                                     36 ;--------------------------------------------------------
+                                     37 ; absolute external ram data
+                                     38 ;--------------------------------------------------------
+                                     39 	.area DABS (ABS)
+                                     40 
+                                     41 ; default segment ordering for linker
+                                     42 	.area HOME
+                                     43 	.area GSINIT
+                                     44 	.area GSFINAL
+                                     45 	.area CONST
+                                     46 	.area INITIALIZER
+                                     47 	.area CODE
+                                     48 
+                                     49 ;--------------------------------------------------------
+                                     50 ; interrupt vector
+                                     51 ;--------------------------------------------------------
+                                     52 	.area HOME
+      000000                         53 __interrupt_vect:
+      000000 82v00u00u00             54 	int s_GSINIT ; reset
+                                     55 ;--------------------------------------------------------
+                                     56 ; global & static initialisations
+                                     57 ;--------------------------------------------------------
+                                     58 	.area HOME
+                                     59 	.area GSINIT
+                                     60 	.area GSFINAL
+                                     61 	.area GSINIT
+      000000 CDr00r00         [ 4]   62 	call	___sdcc_external_startup
+      000003 4D               [ 1]   63 	tnz	a
+      000004 27 03            [ 1]   64 	jreq	__sdcc_init_data
+      000006 CCr00r04         [ 2]   65 	jp	__sdcc_program_startup
+      000009                         66 __sdcc_init_data:
+                                     67 ; stm8_genXINIT() start
+      000009 AEr00r00         [ 2]   68 	ldw x, #l_DATA
+      00000C 27 07            [ 1]   69 	jreq	00002$
+      00000E                         70 00001$:
+      00000E 72 4FuFFuFF      [ 1]   71 	clr (s_DATA - 1, x)
+      000012 5A               [ 2]   72 	decw x
+      000013 26 F9            [ 1]   73 	jrne	00001$
+      000015                         74 00002$:
+      000015 AEr00r00         [ 2]   75 	ldw	x, #l_INITIALIZER
+      000018 27 09            [ 1]   76 	jreq	00004$
+      00001A                         77 00003$:
+      00001A D6uFFuFF         [ 1]   78 	ld	a, (s_INITIALIZER - 1, x)
+      00001D D7uFFuFF         [ 1]   79 	ld	(s_INITIALIZED - 1, x), a
+      000020 5A               [ 2]   80 	decw	x
+      000021 26 F7            [ 1]   81 	jrne	00003$
+      000023                         82 00004$:
+                                     83 ; stm8_genXINIT() end
+                                     84 	.area GSFINAL
+      000000 CCr00r04         [ 2]   85 	jp	__sdcc_program_startup
+                                     86 ;--------------------------------------------------------
+                                     87 ; Home
+                                     88 ;--------------------------------------------------------
+                                     89 	.area HOME
+                                     90 	.area HOME
+      000004                         91 __sdcc_program_startup:
+      000004 CCr04rB4         [ 2]   92 	jp	_main
+                                     93 ;	return from main will return to caller
+                                     94 ;--------------------------------------------------------
+                                     95 ; code
+                                     96 ;--------------------------------------------------------
+                                     97 	.area CODE
+                                     98 ;	main.c: 6: void delay(unsigned long count) {
+                                     99 ;	-----------------------------------------
+                                    100 ;	 function delay
+                                    101 ;	-----------------------------------------
+      000000                        102 _delay:
+      000000 52 08            [ 2]  103 	sub	sp, #8
+                                    104 ;	main.c: 7: while (count--)
+      000002 16 0D            [ 2]  105 	ldw	y, (0x0d, sp)
+      000004 17 07            [ 2]  106 	ldw	(0x07, sp), y
+      000006 1E 0B            [ 2]  107 	ldw	x, (0x0b, sp)
+      000008                        108 00101$:
+      000008 1F 01            [ 2]  109 	ldw	(0x01, sp), x
+      00000A 7B 07            [ 1]  110 	ld	a, (0x07, sp)
+      00000C 6B 03            [ 1]  111 	ld	(0x03, sp), a
+      00000E 7B 08            [ 1]  112 	ld	a, (0x08, sp)
+      000010 16 07            [ 2]  113 	ldw	y, (0x07, sp)
+      000012 72 A2 00 01      [ 2]  114 	subw	y, #0x0001
+      000016 17 07            [ 2]  115 	ldw	(0x07, sp), y
+      000018 24 01            [ 1]  116 	jrnc	00117$
+      00001A 5A               [ 2]  117 	decw	x
+      00001B                        118 00117$:
+      00001B 4D               [ 1]  119 	tnz	a
+      00001C 26 08            [ 1]  120 	jrne	00118$
+      00001E 16 02            [ 2]  121 	ldw	y, (0x02, sp)
+      000020 26 04            [ 1]  122 	jrne	00118$
+      000022 0D 01            [ 1]  123 	tnz	(0x01, sp)
+      000024 27 03            [ 1]  124 	jreq	00104$
+      000026                        125 00118$:
+                                    126 ;	main.c: 8: nop();
+      000026 9D               [ 1]  127 	nop
+      000027 20 DF            [ 2]  128 	jra	00101$
+      000029                        129 00104$:
+                                    130 ;	main.c: 9: }
+      000029 1E 09            [ 2]  131 	ldw	x, (9, sp)
+      00002B 5B 0E            [ 2]  132 	addw	sp, #14
+      00002D FC               [ 2]  133 	jp	(x)
+                                    134 ;	main.c: 10: void UART_TX(unsigned char value)
+                                    135 ;	-----------------------------------------
+                                    136 ;	 function UART_TX
+                                    137 ;	-----------------------------------------
+      00002E                        138 _UART_TX:
+                                    139 ;	main.c: 12: UART1_DR = value;
+      00002E C7 52 31         [ 1]  140 	ld	0x5231, a
+                                    141 ;	main.c: 13: while(!(UART1_SR & UART_SR_TXE));
+      000031                        142 00101$:
+      000031 C6 52 30         [ 1]  143 	ld	a, 0x5230
+      000034 2A FB            [ 1]  144 	jrpl	00101$
+                                    145 ;	main.c: 14: }
+      000036 81               [ 4]  146 	ret
+                                    147 ;	main.c: 15: unsigned char UART_RX(void)
+                                    148 ;	-----------------------------------------
+                                    149 ;	 function UART_RX
+                                    150 ;	-----------------------------------------
+      000037                        151 _UART_RX:
+                                    152 ;	main.c: 17: while(!(UART1_SR & UART_SR_RXNE));
+      000037                        153 00101$:
+      000037 72 0B 52 30 FB   [ 2]  154 	btjf	0x5230, #5, 00101$
+                                    155 ;	main.c: 18: return UART1_DR;
+      00003C C6 52 31         [ 1]  156 	ld	a, 0x5231
+                                    157 ;	main.c: 19: }
+      00003F 81               [ 4]  158 	ret
+                                    159 ;	main.c: 20: int uart_write(const char *str) {
+                                    160 ;	-----------------------------------------
+                                    161 ;	 function uart_write
+                                    162 ;	-----------------------------------------
+      000040                        163 _uart_write:
+      000040 52 05            [ 2]  164 	sub	sp, #5
+      000042 1F 03            [ 2]  165 	ldw	(0x03, sp), x
+                                    166 ;	main.c: 23: for(i = 0; i < strlen(str); i++) {
+      000044 0F 05            [ 1]  167 	clr	(0x05, sp)
+      000046                        168 00103$:
+      000046 1E 03            [ 2]  169 	ldw	x, (0x03, sp)
+      000048 CDr00r00         [ 4]  170 	call	_strlen
+      00004B 1F 01            [ 2]  171 	ldw	(0x01, sp), x
+      00004D 7B 05            [ 1]  172 	ld	a, (0x05, sp)
+      00004F 5F               [ 1]  173 	clrw	x
+      000050 97               [ 1]  174 	ld	xl, a
+      000051 13 01            [ 2]  175 	cpw	x, (0x01, sp)
+      000053 24 0F            [ 1]  176 	jrnc	00101$
+                                    177 ;	main.c: 25: UART_TX(str[i]);
+      000055 5F               [ 1]  178 	clrw	x
+      000056 7B 05            [ 1]  179 	ld	a, (0x05, sp)
+      000058 97               [ 1]  180 	ld	xl, a
+      000059 72 FB 03         [ 2]  181 	addw	x, (0x03, sp)
+      00005C F6               [ 1]  182 	ld	a, (x)
+      00005D CDr00r2E         [ 4]  183 	call	_UART_TX
+                                    184 ;	main.c: 23: for(i = 0; i < strlen(str); i++) {
+      000060 0C 05            [ 1]  185 	inc	(0x05, sp)
+      000062 20 E2            [ 2]  186 	jra	00103$
+      000064                        187 00101$:
+                                    188 ;	main.c: 27: return(i); // Bytes sent
+      000064 7B 05            [ 1]  189 	ld	a, (0x05, sp)
+      000066 5F               [ 1]  190 	clrw	x
+      000067 97               [ 1]  191 	ld	xl, a
+                                    192 ;	main.c: 28: }
+      000068 5B 05            [ 2]  193 	addw	sp, #5
+      00006A 81               [ 4]  194 	ret
+                                    195 ;	main.c: 30: void convert_int_to_binary(int num, char* rx_binary_chars) {
+                                    196 ;	-----------------------------------------
+                                    197 ;	 function convert_int_to_binary
+                                    198 ;	-----------------------------------------
+      00006B                        199 _convert_int_to_binary:
+      00006B 52 04            [ 2]  200 	sub	sp, #4
+      00006D 1F 01            [ 2]  201 	ldw	(0x01, sp), x
+                                    202 ;	main.c: 32: for(int i = 7; i >= 0; i--) {
+      00006F AE 00 07         [ 2]  203 	ldw	x, #0x0007
+      000072 1F 03            [ 2]  204 	ldw	(0x03, sp), x
+      000074                        205 00103$:
+      000074 0D 03            [ 1]  206 	tnz	(0x03, sp)
+      000076 2B 22            [ 1]  207 	jrmi	00101$
+                                    208 ;	main.c: 34: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
+      000078 AE 00 07         [ 2]  209 	ldw	x, #0x0007
+      00007B 72 F0 03         [ 2]  210 	subw	x, (0x03, sp)
+      00007E 72 FB 07         [ 2]  211 	addw	x, (0x07, sp)
+      000081 16 01            [ 2]  212 	ldw	y, (0x01, sp)
+      000083 7B 04            [ 1]  213 	ld	a, (0x04, sp)
+      000085 27 05            [ 1]  214 	jreq	00120$
+      000087                        215 00119$:
+      000087 90 57            [ 2]  216 	sraw	y
+      000089 4A               [ 1]  217 	dec	a
+      00008A 26 FB            [ 1]  218 	jrne	00119$
+      00008C                        219 00120$:
+      00008C 90 9F            [ 1]  220 	ld	a, yl
+      00008E A4 01            [ 1]  221 	and	a, #0x01
+      000090 AB 30            [ 1]  222 	add	a, #0x30
+      000092 F7               [ 1]  223 	ld	(x), a
+                                    224 ;	main.c: 32: for(int i = 7; i >= 0; i--) {
+      000093 1E 03            [ 2]  225 	ldw	x, (0x03, sp)
+      000095 5A               [ 2]  226 	decw	x
+      000096 1F 03            [ 2]  227 	ldw	(0x03, sp), x
+      000098 20 DA            [ 2]  228 	jra	00103$
+      00009A                        229 00101$:
+                                    230 ;	main.c: 36: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
+      00009A 1E 07            [ 2]  231 	ldw	x, (0x07, sp)
+      00009C 6F 08            [ 1]  232 	clr	(0x0008, x)
+                                    233 ;	main.c: 37: }
+      00009E 1E 05            [ 2]  234 	ldw	x, (5, sp)
+      0000A0 5B 08            [ 2]  235 	addw	sp, #8
+      0000A2 FC               [ 2]  236 	jp	(x)
+                                    237 ;	main.c: 39: void status_check(void){
+                                    238 ;	-----------------------------------------
+                                    239 ;	 function status_check
+                                    240 ;	-----------------------------------------
+      0000A3                        241 _status_check:
+      0000A3 52 09            [ 2]  242 	sub	sp, #9
+                                    243 ;	main.c: 40: char rx_binary_chars[9]={0};
+      0000A5 0F 01            [ 1]  244 	clr	(0x01, sp)
+      0000A7 0F 02            [ 1]  245 	clr	(0x02, sp)
+      0000A9 0F 03            [ 1]  246 	clr	(0x03, sp)
+      0000AB 0F 04            [ 1]  247 	clr	(0x04, sp)
+      0000AD 0F 05            [ 1]  248 	clr	(0x05, sp)
+      0000AF 0F 06            [ 1]  249 	clr	(0x06, sp)
+      0000B1 0F 07            [ 1]  250 	clr	(0x07, sp)
+      0000B3 0F 08            [ 1]  251 	clr	(0x08, sp)
+      0000B5 0F 09            [ 1]  252 	clr	(0x09, sp)
+                                    253 ;	main.c: 41: uart_write("UART_REGS >.<\n");
+      0000B7 AEr00r00         [ 2]  254 	ldw	x, #(___str_0+0)
+      0000BA CDr00r40         [ 4]  255 	call	_uart_write
+                                    256 ;	main.c: 42: convert_int_to_binary(UART1_SR, rx_binary_chars);
+      0000BD 96               [ 1]  257 	ldw	x, sp
+      0000BE 5C               [ 1]  258 	incw	x
+      0000BF 51               [ 1]  259 	exgw	x, y
+      0000C0 C6 52 30         [ 1]  260 	ld	a, 0x5230
+      0000C3 5F               [ 1]  261 	clrw	x
+      0000C4 90 89            [ 2]  262 	pushw	y
+      0000C6 97               [ 1]  263 	ld	xl, a
+      0000C7 CDr00r6B         [ 4]  264 	call	_convert_int_to_binary
+                                    265 ;	main.c: 43: uart_write("\nSR -> ");
+      0000CA AEr00r0F         [ 2]  266 	ldw	x, #(___str_1+0)
+      0000CD CDr00r40         [ 4]  267 	call	_uart_write
+                                    268 ;	main.c: 44: uart_write(rx_binary_chars);
+      0000D0 96               [ 1]  269 	ldw	x, sp
+      0000D1 5C               [ 1]  270 	incw	x
+      0000D2 CDr00r40         [ 4]  271 	call	_uart_write
+                                    272 ;	main.c: 45: uart_write(" <-\n");
+      0000D5 AEr00r17         [ 2]  273 	ldw	x, #(___str_2+0)
+      0000D8 CDr00r40         [ 4]  274 	call	_uart_write
+                                    275 ;	main.c: 46: convert_int_to_binary(UART1_DR, rx_binary_chars);
+      0000DB 96               [ 1]  276 	ldw	x, sp
+      0000DC 5C               [ 1]  277 	incw	x
+      0000DD 51               [ 1]  278 	exgw	x, y
+      0000DE C6 52 31         [ 1]  279 	ld	a, 0x5231
+      0000E1 5F               [ 1]  280 	clrw	x
+      0000E2 90 89            [ 2]  281 	pushw	y
+      0000E4 97               [ 1]  282 	ld	xl, a
+      0000E5 CDr00r6B         [ 4]  283 	call	_convert_int_to_binary
+                                    284 ;	main.c: 47: uart_write("DR -> ");
+      0000E8 AEr00r1C         [ 2]  285 	ldw	x, #(___str_3+0)
+      0000EB CDr00r40         [ 4]  286 	call	_uart_write
+                                    287 ;	main.c: 48: uart_write(rx_binary_chars);
+      0000EE 96               [ 1]  288 	ldw	x, sp
+      0000EF 5C               [ 1]  289 	incw	x
+      0000F0 CDr00r40         [ 4]  290 	call	_uart_write
+                                    291 ;	main.c: 49: uart_write(" <-\n");
+      0000F3 AEr00r17         [ 2]  292 	ldw	x, #(___str_2+0)
+      0000F6 CDr00r40         [ 4]  293 	call	_uart_write
+                                    294 ;	main.c: 50: convert_int_to_binary(UART1_BRR1, rx_binary_chars);
+      0000F9 96               [ 1]  295 	ldw	x, sp
+      0000FA 5C               [ 1]  296 	incw	x
+      0000FB 51               [ 1]  297 	exgw	x, y
+      0000FC C6 52 32         [ 1]  298 	ld	a, 0x5232
+      0000FF 5F               [ 1]  299 	clrw	x
+      000100 90 89            [ 2]  300 	pushw	y
+      000102 97               [ 1]  301 	ld	xl, a
+      000103 CDr00r6B         [ 4]  302 	call	_convert_int_to_binary
+                                    303 ;	main.c: 51: uart_write("BRR1 -> ");
+      000106 AEr00r23         [ 2]  304 	ldw	x, #(___str_4+0)
+      000109 CDr00r40         [ 4]  305 	call	_uart_write
+                                    306 ;	main.c: 52: uart_write(rx_binary_chars);
+      00010C 96               [ 1]  307 	ldw	x, sp
+      00010D 5C               [ 1]  308 	incw	x
+      00010E CDr00r40         [ 4]  309 	call	_uart_write
+                                    310 ;	main.c: 53: uart_write(" <-\n");
+      000111 AEr00r17         [ 2]  311 	ldw	x, #(___str_2+0)
+      000114 CDr00r40         [ 4]  312 	call	_uart_write
+                                    313 ;	main.c: 54: convert_int_to_binary(UART1_BRR2, rx_binary_chars);
+      000117 96               [ 1]  314 	ldw	x, sp
+      000118 5C               [ 1]  315 	incw	x
+      000119 51               [ 1]  316 	exgw	x, y
+      00011A C6 52 33         [ 1]  317 	ld	a, 0x5233
+      00011D 5F               [ 1]  318 	clrw	x
+      00011E 90 89            [ 2]  319 	pushw	y
+      000120 97               [ 1]  320 	ld	xl, a
+      000121 CDr00r6B         [ 4]  321 	call	_convert_int_to_binary
+                                    322 ;	main.c: 55: uart_write("BRR2 -> ");
+      000124 AEr00r2C         [ 2]  323 	ldw	x, #(___str_5+0)
+      000127 CDr00r40         [ 4]  324 	call	_uart_write
+                                    325 ;	main.c: 56: uart_write(rx_binary_chars);
+      00012A 96               [ 1]  326 	ldw	x, sp
+      00012B 5C               [ 1]  327 	incw	x
+      00012C CDr00r40         [ 4]  328 	call	_uart_write
+                                    329 ;	main.c: 57: uart_write(" <-\n");
+      00012F AEr00r17         [ 2]  330 	ldw	x, #(___str_2+0)
+      000132 CDr00r40         [ 4]  331 	call	_uart_write
+                                    332 ;	main.c: 58: convert_int_to_binary(UART1_CR1, rx_binary_chars);
+      000135 96               [ 1]  333 	ldw	x, sp
+      000136 5C               [ 1]  334 	incw	x
+      000137 51               [ 1]  335 	exgw	x, y
+      000138 C6 52 34         [ 1]  336 	ld	a, 0x5234
+      00013B 5F               [ 1]  337 	clrw	x
+      00013C 90 89            [ 2]  338 	pushw	y
+      00013E 97               [ 1]  339 	ld	xl, a
+      00013F CDr00r6B         [ 4]  340 	call	_convert_int_to_binary
+                                    341 ;	main.c: 59: uart_write("CR1 -> ");
+      000142 AEr00r35         [ 2]  342 	ldw	x, #(___str_6+0)
+      000145 CDr00r40         [ 4]  343 	call	_uart_write
+                                    344 ;	main.c: 60: uart_write(rx_binary_chars);
+      000148 96               [ 1]  345 	ldw	x, sp
+      000149 5C               [ 1]  346 	incw	x
+      00014A CDr00r40         [ 4]  347 	call	_uart_write
+                                    348 ;	main.c: 61: uart_write(" <-\n");
+      00014D AEr00r17         [ 2]  349 	ldw	x, #(___str_2+0)
+      000150 CDr00r40         [ 4]  350 	call	_uart_write
+                                    351 ;	main.c: 62: convert_int_to_binary(UART1_CR2, rx_binary_chars);
+      000153 96               [ 1]  352 	ldw	x, sp
+      000154 5C               [ 1]  353 	incw	x
+      000155 51               [ 1]  354 	exgw	x, y
+      000156 C6 52 35         [ 1]  355 	ld	a, 0x5235
+      000159 5F               [ 1]  356 	clrw	x
+      00015A 90 89            [ 2]  357 	pushw	y
+      00015C 97               [ 1]  358 	ld	xl, a
+      00015D CDr00r6B         [ 4]  359 	call	_convert_int_to_binary
+                                    360 ;	main.c: 63: uart_write("CR2 -> ");
+      000160 AEr00r3D         [ 2]  361 	ldw	x, #(___str_7+0)
+      000163 CDr00r40         [ 4]  362 	call	_uart_write
+                                    363 ;	main.c: 64: uart_write(rx_binary_chars);
+      000166 96               [ 1]  364 	ldw	x, sp
+      000167 5C               [ 1]  365 	incw	x
+      000168 CDr00r40         [ 4]  366 	call	_uart_write
+                                    367 ;	main.c: 65: uart_write(" <-\n");
+      00016B AEr00r17         [ 2]  368 	ldw	x, #(___str_2+0)
+      00016E CDr00r40         [ 4]  369 	call	_uart_write
+                                    370 ;	main.c: 66: convert_int_to_binary(UART1_CR3, rx_binary_chars);
+      000171 96               [ 1]  371 	ldw	x, sp
+      000172 5C               [ 1]  372 	incw	x
+      000173 51               [ 1]  373 	exgw	x, y
+      000174 C6 52 36         [ 1]  374 	ld	a, 0x5236
+      000177 5F               [ 1]  375 	clrw	x
+      000178 90 89            [ 2]  376 	pushw	y
+      00017A 97               [ 1]  377 	ld	xl, a
+      00017B CDr00r6B         [ 4]  378 	call	_convert_int_to_binary
+                                    379 ;	main.c: 67: uart_write("CR3 -> ");
+      00017E AEr00r45         [ 2]  380 	ldw	x, #(___str_8+0)
+      000181 CDr00r40         [ 4]  381 	call	_uart_write
+                                    382 ;	main.c: 68: uart_write(rx_binary_chars);
+      000184 96               [ 1]  383 	ldw	x, sp
+      000185 5C               [ 1]  384 	incw	x
+      000186 CDr00r40         [ 4]  385 	call	_uart_write
+                                    386 ;	main.c: 69: uart_write(" <-\n");
+      000189 AEr00r17         [ 2]  387 	ldw	x, #(___str_2+0)
+      00018C CDr00r40         [ 4]  388 	call	_uart_write
+                                    389 ;	main.c: 70: convert_int_to_binary(UART1_CR4, rx_binary_chars);
+      00018F 96               [ 1]  390 	ldw	x, sp
+      000190 5C               [ 1]  391 	incw	x
+      000191 51               [ 1]  392 	exgw	x, y
+      000192 C6 52 37         [ 1]  393 	ld	a, 0x5237
+      000195 5F               [ 1]  394 	clrw	x
+      000196 90 89            [ 2]  395 	pushw	y
+      000198 97               [ 1]  396 	ld	xl, a
+      000199 CDr00r6B         [ 4]  397 	call	_convert_int_to_binary
+                                    398 ;	main.c: 71: uart_write("CR4 -> ");
+      00019C AEr00r4D         [ 2]  399 	ldw	x, #(___str_9+0)
+      00019F CDr00r40         [ 4]  400 	call	_uart_write
+                                    401 ;	main.c: 72: uart_write(rx_binary_chars);
+      0001A2 96               [ 1]  402 	ldw	x, sp
+      0001A3 5C               [ 1]  403 	incw	x
+      0001A4 CDr00r40         [ 4]  404 	call	_uart_write
+                                    405 ;	main.c: 73: uart_write(" <-\n");
+      0001A7 AEr00r17         [ 2]  406 	ldw	x, #(___str_2+0)
+      0001AA CDr00r40         [ 4]  407 	call	_uart_write
+                                    408 ;	main.c: 74: convert_int_to_binary(UART1_CR5, rx_binary_chars);
+      0001AD 96               [ 1]  409 	ldw	x, sp
+      0001AE 5C               [ 1]  410 	incw	x
+      0001AF 51               [ 1]  411 	exgw	x, y
+      0001B0 C6 52 38         [ 1]  412 	ld	a, 0x5238
+      0001B3 5F               [ 1]  413 	clrw	x
+      0001B4 90 89            [ 2]  414 	pushw	y
+      0001B6 97               [ 1]  415 	ld	xl, a
+      0001B7 CDr00r6B         [ 4]  416 	call	_convert_int_to_binary
+                                    417 ;	main.c: 75: uart_write("CR5 -> ");
+      0001BA AEr00r55         [ 2]  418 	ldw	x, #(___str_10+0)
+      0001BD CDr00r40         [ 4]  419 	call	_uart_write
+                                    420 ;	main.c: 76: uart_write(rx_binary_chars);
+      0001C0 96               [ 1]  421 	ldw	x, sp
+      0001C1 5C               [ 1]  422 	incw	x
+      0001C2 CDr00r40         [ 4]  423 	call	_uart_write
+                                    424 ;	main.c: 77: uart_write(" <-\n");
+      0001C5 AEr00r17         [ 2]  425 	ldw	x, #(___str_2+0)
+      0001C8 CDr00r40         [ 4]  426 	call	_uart_write
+                                    427 ;	main.c: 78: convert_int_to_binary(UART1_GTR, rx_binary_chars);
+      0001CB 96               [ 1]  428 	ldw	x, sp
+      0001CC 5C               [ 1]  429 	incw	x
+      0001CD 51               [ 1]  430 	exgw	x, y
+      0001CE C6 52 39         [ 1]  431 	ld	a, 0x5239
+      0001D1 5F               [ 1]  432 	clrw	x
+      0001D2 90 89            [ 2]  433 	pushw	y
+      0001D4 97               [ 1]  434 	ld	xl, a
+      0001D5 CDr00r6B         [ 4]  435 	call	_convert_int_to_binary
+                                    436 ;	main.c: 79: uart_write("GTR -> ");
+      0001D8 AEr00r5D         [ 2]  437 	ldw	x, #(___str_11+0)
+      0001DB CDr00r40         [ 4]  438 	call	_uart_write
+                                    439 ;	main.c: 80: uart_write(rx_binary_chars);
+      0001DE 96               [ 1]  440 	ldw	x, sp
+      0001DF 5C               [ 1]  441 	incw	x
+      0001E0 CDr00r40         [ 4]  442 	call	_uart_write
+                                    443 ;	main.c: 81: uart_write(" <-\n");
+      0001E3 AEr00r17         [ 2]  444 	ldw	x, #(___str_2+0)
+      0001E6 CDr00r40         [ 4]  445 	call	_uart_write
+                                    446 ;	main.c: 82: convert_int_to_binary(UART1_PSCR, rx_binary_chars);
+      0001E9 96               [ 1]  447 	ldw	x, sp
+      0001EA 5C               [ 1]  448 	incw	x
+      0001EB 51               [ 1]  449 	exgw	x, y
+      0001EC C6 52 3A         [ 1]  450 	ld	a, 0x523a
+      0001EF 5F               [ 1]  451 	clrw	x
+      0001F0 90 89            [ 2]  452 	pushw	y
+      0001F2 97               [ 1]  453 	ld	xl, a
+      0001F3 CDr00r6B         [ 4]  454 	call	_convert_int_to_binary
+                                    455 ;	main.c: 83: uart_write("PSCR -> ");
+      0001F6 AEr00r65         [ 2]  456 	ldw	x, #(___str_12+0)
+      0001F9 CDr00r40         [ 4]  457 	call	_uart_write
+                                    458 ;	main.c: 84: uart_write(rx_binary_chars);
+      0001FC 96               [ 1]  459 	ldw	x, sp
+      0001FD 5C               [ 1]  460 	incw	x
+      0001FE CDr00r40         [ 4]  461 	call	_uart_write
+                                    462 ;	main.c: 85: uart_write(" <-\n");
+      000201 AEr00r17         [ 2]  463 	ldw	x, #(___str_2+0)
+      000204 CDr00r40         [ 4]  464 	call	_uart_write
+                                    465 ;	main.c: 86: }
+      000207 5B 09            [ 2]  466 	addw	sp, #9
+      000209 81               [ 4]  467 	ret
+                                    468 ;	main.c: 92: void uart_init(void){
+                                    469 ;	-----------------------------------------
+                                    470 ;	 function uart_init
+                                    471 ;	-----------------------------------------
+      00020A                        472 _uart_init:
+                                    473 ;	main.c: 93: CLK_CKDIVR = 0;
+      00020A 35 00 50 C6      [ 1]  474 	mov	0x50c6+0, #0x00
+                                    475 ;	main.c: 96: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
+      00020E 72 16 52 35      [ 1]  476 	bset	0x5235, #3
+                                    477 ;	main.c: 97: UART1_CR2 |= UART_CR2_REN; // Receiver enable
+      000212 72 14 52 35      [ 1]  478 	bset	0x5235, #2
+                                    479 ;	main.c: 98: UART1_CR2 |= UART_CR2_ILIEN; //String Enable
+      000216 72 18 52 35      [ 1]  480 	bset	0x5235, #4
+                                    481 ;	main.c: 99: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+      00021A C6 52 36         [ 1]  482 	ld	a, 0x5236
+      00021D A4 CF            [ 1]  483 	and	a, #0xcf
+      00021F C7 52 36         [ 1]  484 	ld	0x5236, a
+                                    485 ;	main.c: 101: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
+      000222 35 03 52 33      [ 1]  486 	mov	0x5233+0, #0x03
+      000226 35 68 52 32      [ 1]  487 	mov	0x5232+0, #0x68
+                                    488 ;	main.c: 102: }
+      00022A 81               [ 4]  489 	ret
+                                    490 ;	main.c: 104: int uart_read(void)
+                                    491 ;	-----------------------------------------
+                                    492 ;	 function uart_read
+                                    493 ;	-----------------------------------------
+      00022B                        494 _uart_read:
+      00022B 90 96            [ 1]  495 	ldw	y, sp
+      00022D 72 A2 00 09      [ 2]  496 	subw	y, #9
+      000231 52 FF            [ 2]  497 	sub	sp, #255
+      000233 52 05            [ 2]  498 	sub	sp, #5
+                                    499 ;	main.c: 107: char buffer[256]={0};
+      000235 0F 01            [ 1]  500 	clr	(0x01, sp)
+      000237 0F 02            [ 1]  501 	clr	(0x02, sp)
+      000239 0F 03            [ 1]  502 	clr	(0x03, sp)
+      00023B 0F 04            [ 1]  503 	clr	(0x04, sp)
+      00023D 0F 05            [ 1]  504 	clr	(0x05, sp)
+      00023F 0F 06            [ 1]  505 	clr	(0x06, sp)
+      000241 0F 07            [ 1]  506 	clr	(0x07, sp)
+      000243 0F 08            [ 1]  507 	clr	(0x08, sp)
+      000245 0F 09            [ 1]  508 	clr	(0x09, sp)
+      000247 0F 0A            [ 1]  509 	clr	(0x0a, sp)
+      000249 0F 0B            [ 1]  510 	clr	(0x0b, sp)
+      00024B 0F 0C            [ 1]  511 	clr	(0x0c, sp)
+      00024D 0F 0D            [ 1]  512 	clr	(0x0d, sp)
+      00024F 0F 0E            [ 1]  513 	clr	(0x0e, sp)
+      000251 0F 0F            [ 1]  514 	clr	(0x0f, sp)
+      000253 0F 10            [ 1]  515 	clr	(0x10, sp)
+      000255 0F 11            [ 1]  516 	clr	(0x11, sp)
+      000257 0F 12            [ 1]  517 	clr	(0x12, sp)
+      000259 0F 13            [ 1]  518 	clr	(0x13, sp)
+      00025B 0F 14            [ 1]  519 	clr	(0x14, sp)
+      00025D 0F 15            [ 1]  520 	clr	(0x15, sp)
+      00025F 0F 16            [ 1]  521 	clr	(0x16, sp)
+      000261 0F 17            [ 1]  522 	clr	(0x17, sp)
+      000263 0F 18            [ 1]  523 	clr	(0x18, sp)
+      000265 0F 19            [ 1]  524 	clr	(0x19, sp)
+      000267 0F 1A            [ 1]  525 	clr	(0x1a, sp)
+      000269 0F 1B            [ 1]  526 	clr	(0x1b, sp)
+      00026B 0F 1C            [ 1]  527 	clr	(0x1c, sp)
+      00026D 0F 1D            [ 1]  528 	clr	(0x1d, sp)
+      00026F 0F 1E            [ 1]  529 	clr	(0x1e, sp)
+      000271 0F 1F            [ 1]  530 	clr	(0x1f, sp)
+      000273 0F 20            [ 1]  531 	clr	(0x20, sp)
+      000275 0F 21            [ 1]  532 	clr	(0x21, sp)
+      000277 0F 22            [ 1]  533 	clr	(0x22, sp)
+      000279 0F 23            [ 1]  534 	clr	(0x23, sp)
+      00027B 0F 24            [ 1]  535 	clr	(0x24, sp)
+      00027D 0F 25            [ 1]  536 	clr	(0x25, sp)
+      00027F 0F 26            [ 1]  537 	clr	(0x26, sp)
+      000281 0F 27            [ 1]  538 	clr	(0x27, sp)
+      000283 0F 28            [ 1]  539 	clr	(0x28, sp)
+      000285 0F 29            [ 1]  540 	clr	(0x29, sp)
+      000287 0F 2A            [ 1]  541 	clr	(0x2a, sp)
+      000289 0F 2B            [ 1]  542 	clr	(0x2b, sp)
+      00028B 0F 2C            [ 1]  543 	clr	(0x2c, sp)
+      00028D 0F 2D            [ 1]  544 	clr	(0x2d, sp)
+      00028F 0F 2E            [ 1]  545 	clr	(0x2e, sp)
+      000291 0F 2F            [ 1]  546 	clr	(0x2f, sp)
+      000293 0F 30            [ 1]  547 	clr	(0x30, sp)
+      000295 0F 31            [ 1]  548 	clr	(0x31, sp)
+      000297 0F 32            [ 1]  549 	clr	(0x32, sp)
+      000299 0F 33            [ 1]  550 	clr	(0x33, sp)
+      00029B 0F 34            [ 1]  551 	clr	(0x34, sp)
+      00029D 0F 35            [ 1]  552 	clr	(0x35, sp)
+      00029F 0F 36            [ 1]  553 	clr	(0x36, sp)
+      0002A1 0F 37            [ 1]  554 	clr	(0x37, sp)
+      0002A3 0F 38            [ 1]  555 	clr	(0x38, sp)
+      0002A5 0F 39            [ 1]  556 	clr	(0x39, sp)
+      0002A7 0F 3A            [ 1]  557 	clr	(0x3a, sp)
+      0002A9 0F 3B            [ 1]  558 	clr	(0x3b, sp)
+      0002AB 0F 3C            [ 1]  559 	clr	(0x3c, sp)
+      0002AD 0F 3D            [ 1]  560 	clr	(0x3d, sp)
+      0002AF 0F 3E            [ 1]  561 	clr	(0x3e, sp)
+      0002B1 0F 3F            [ 1]  562 	clr	(0x3f, sp)
+      0002B3 0F 40            [ 1]  563 	clr	(0x40, sp)
+      0002B5 0F 41            [ 1]  564 	clr	(0x41, sp)
+      0002B7 0F 42            [ 1]  565 	clr	(0x42, sp)
+      0002B9 0F 43            [ 1]  566 	clr	(0x43, sp)
+      0002BB 0F 44            [ 1]  567 	clr	(0x44, sp)
+      0002BD 0F 45            [ 1]  568 	clr	(0x45, sp)
+      0002BF 0F 46            [ 1]  569 	clr	(0x46, sp)
+      0002C1 0F 47            [ 1]  570 	clr	(0x47, sp)
+      0002C3 0F 48            [ 1]  571 	clr	(0x48, sp)
+      0002C5 0F 49            [ 1]  572 	clr	(0x49, sp)
+      0002C7 0F 4A            [ 1]  573 	clr	(0x4a, sp)
+      0002C9 0F 4B            [ 1]  574 	clr	(0x4b, sp)
+      0002CB 0F 4C            [ 1]  575 	clr	(0x4c, sp)
+      0002CD 0F 4D            [ 1]  576 	clr	(0x4d, sp)
+      0002CF 0F 4E            [ 1]  577 	clr	(0x4e, sp)
+      0002D1 0F 4F            [ 1]  578 	clr	(0x4f, sp)
+      0002D3 0F 50            [ 1]  579 	clr	(0x50, sp)
+      0002D5 0F 51            [ 1]  580 	clr	(0x51, sp)
+      0002D7 0F 52            [ 1]  581 	clr	(0x52, sp)
+      0002D9 0F 53            [ 1]  582 	clr	(0x53, sp)
+      0002DB 0F 54            [ 1]  583 	clr	(0x54, sp)
+      0002DD 0F 55            [ 1]  584 	clr	(0x55, sp)
+      0002DF 0F 56            [ 1]  585 	clr	(0x56, sp)
+      0002E1 0F 57            [ 1]  586 	clr	(0x57, sp)
+      0002E3 0F 58            [ 1]  587 	clr	(0x58, sp)
+      0002E5 0F 59            [ 1]  588 	clr	(0x59, sp)
+      0002E7 0F 5A            [ 1]  589 	clr	(0x5a, sp)
+      0002E9 0F 5B            [ 1]  590 	clr	(0x5b, sp)
+      0002EB 0F 5C            [ 1]  591 	clr	(0x5c, sp)
+      0002ED 0F 5D            [ 1]  592 	clr	(0x5d, sp)
+      0002EF 0F 5E            [ 1]  593 	clr	(0x5e, sp)
+      0002F1 0F 5F            [ 1]  594 	clr	(0x5f, sp)
+      0002F3 0F 60            [ 1]  595 	clr	(0x60, sp)
+      0002F5 0F 61            [ 1]  596 	clr	(0x61, sp)
+      0002F7 0F 62            [ 1]  597 	clr	(0x62, sp)
+      0002F9 0F 63            [ 1]  598 	clr	(0x63, sp)
+      0002FB 0F 64            [ 1]  599 	clr	(0x64, sp)
+      0002FD 0F 65            [ 1]  600 	clr	(0x65, sp)
+      0002FF 0F 66            [ 1]  601 	clr	(0x66, sp)
+      000301 0F 67            [ 1]  602 	clr	(0x67, sp)
+      000303 0F 68            [ 1]  603 	clr	(0x68, sp)
+      000305 0F 69            [ 1]  604 	clr	(0x69, sp)
+      000307 0F 6A            [ 1]  605 	clr	(0x6a, sp)
+      000309 0F 6B            [ 1]  606 	clr	(0x6b, sp)
+      00030B 0F 6C            [ 1]  607 	clr	(0x6c, sp)
+      00030D 0F 6D            [ 1]  608 	clr	(0x6d, sp)
+      00030F 0F 6E            [ 1]  609 	clr	(0x6e, sp)
+      000311 0F 6F            [ 1]  610 	clr	(0x6f, sp)
+      000313 0F 70            [ 1]  611 	clr	(0x70, sp)
+      000315 0F 71            [ 1]  612 	clr	(0x71, sp)
+      000317 0F 72            [ 1]  613 	clr	(0x72, sp)
+      000319 0F 73            [ 1]  614 	clr	(0x73, sp)
+      00031B 0F 74            [ 1]  615 	clr	(0x74, sp)
+      00031D 0F 75            [ 1]  616 	clr	(0x75, sp)
+      00031F 0F 76            [ 1]  617 	clr	(0x76, sp)
+      000321 0F 77            [ 1]  618 	clr	(0x77, sp)
+      000323 0F 78            [ 1]  619 	clr	(0x78, sp)
+      000325 0F 79            [ 1]  620 	clr	(0x79, sp)
+      000327 0F 7A            [ 1]  621 	clr	(0x7a, sp)
+      000329 0F 7B            [ 1]  622 	clr	(0x7b, sp)
+      00032B 0F 7C            [ 1]  623 	clr	(0x7c, sp)
+      00032D 0F 7D            [ 1]  624 	clr	(0x7d, sp)
+      00032F 0F 7E            [ 1]  625 	clr	(0x7e, sp)
+      000331 0F 7F            [ 1]  626 	clr	(0x7f, sp)
+      000333 0F 80            [ 1]  627 	clr	(0x80, sp)
+      000335 0F 81            [ 1]  628 	clr	(0x81, sp)
+      000337 0F 82            [ 1]  629 	clr	(0x82, sp)
+      000339 0F 83            [ 1]  630 	clr	(0x83, sp)
+      00033B 0F 84            [ 1]  631 	clr	(0x84, sp)
+      00033D 0F 85            [ 1]  632 	clr	(0x85, sp)
+      00033F 0F 86            [ 1]  633 	clr	(0x86, sp)
+      000341 0F 87            [ 1]  634 	clr	(0x87, sp)
+      000343 0F 88            [ 1]  635 	clr	(0x88, sp)
+      000345 0F 89            [ 1]  636 	clr	(0x89, sp)
+      000347 0F 8A            [ 1]  637 	clr	(0x8a, sp)
+      000349 0F 8B            [ 1]  638 	clr	(0x8b, sp)
+      00034B 0F 8C            [ 1]  639 	clr	(0x8c, sp)
+      00034D 0F 8D            [ 1]  640 	clr	(0x8d, sp)
+      00034F 0F 8E            [ 1]  641 	clr	(0x8e, sp)
+      000351 0F 8F            [ 1]  642 	clr	(0x8f, sp)
+      000353 0F 90            [ 1]  643 	clr	(0x90, sp)
+      000355 0F 91            [ 1]  644 	clr	(0x91, sp)
+      000357 0F 92            [ 1]  645 	clr	(0x92, sp)
+      000359 0F 93            [ 1]  646 	clr	(0x93, sp)
+      00035B 0F 94            [ 1]  647 	clr	(0x94, sp)
+      00035D 0F 95            [ 1]  648 	clr	(0x95, sp)
+      00035F 0F 96            [ 1]  649 	clr	(0x96, sp)
+      000361 0F 97            [ 1]  650 	clr	(0x97, sp)
+      000363 0F 98            [ 1]  651 	clr	(0x98, sp)
+      000365 0F 99            [ 1]  652 	clr	(0x99, sp)
+      000367 0F 9A            [ 1]  653 	clr	(0x9a, sp)
+      000369 0F 9B            [ 1]  654 	clr	(0x9b, sp)
+      00036B 0F 9C            [ 1]  655 	clr	(0x9c, sp)
+      00036D 0F 9D            [ 1]  656 	clr	(0x9d, sp)
+      00036F 0F 9E            [ 1]  657 	clr	(0x9e, sp)
+      000371 0F 9F            [ 1]  658 	clr	(0x9f, sp)
+      000373 0F A0            [ 1]  659 	clr	(0xa0, sp)
+      000375 0F A1            [ 1]  660 	clr	(0xa1, sp)
+      000377 0F A2            [ 1]  661 	clr	(0xa2, sp)
+      000379 0F A3            [ 1]  662 	clr	(0xa3, sp)
+      00037B 0F A4            [ 1]  663 	clr	(0xa4, sp)
+      00037D 0F A5            [ 1]  664 	clr	(0xa5, sp)
+      00037F 0F A6            [ 1]  665 	clr	(0xa6, sp)
+      000381 0F A7            [ 1]  666 	clr	(0xa7, sp)
+      000383 0F A8            [ 1]  667 	clr	(0xa8, sp)
+      000385 0F A9            [ 1]  668 	clr	(0xa9, sp)
+      000387 0F AA            [ 1]  669 	clr	(0xaa, sp)
+      000389 0F AB            [ 1]  670 	clr	(0xab, sp)
+      00038B 0F AC            [ 1]  671 	clr	(0xac, sp)
+      00038D 0F AD            [ 1]  672 	clr	(0xad, sp)
+      00038F 0F AE            [ 1]  673 	clr	(0xae, sp)
+      000391 0F AF            [ 1]  674 	clr	(0xaf, sp)
+      000393 0F B0            [ 1]  675 	clr	(0xb0, sp)
+      000395 0F B1            [ 1]  676 	clr	(0xb1, sp)
+      000397 0F B2            [ 1]  677 	clr	(0xb2, sp)
+      000399 0F B3            [ 1]  678 	clr	(0xb3, sp)
+      00039B 0F B4            [ 1]  679 	clr	(0xb4, sp)
+      00039D 0F B5            [ 1]  680 	clr	(0xb5, sp)
+      00039F 0F B6            [ 1]  681 	clr	(0xb6, sp)
+      0003A1 0F B7            [ 1]  682 	clr	(0xb7, sp)
+      0003A3 0F B8            [ 1]  683 	clr	(0xb8, sp)
+      0003A5 0F B9            [ 1]  684 	clr	(0xb9, sp)
+      0003A7 0F BA            [ 1]  685 	clr	(0xba, sp)
+      0003A9 0F BB            [ 1]  686 	clr	(0xbb, sp)
+      0003AB 0F BC            [ 1]  687 	clr	(0xbc, sp)
+      0003AD 0F BD            [ 1]  688 	clr	(0xbd, sp)
+      0003AF 0F BE            [ 1]  689 	clr	(0xbe, sp)
+      0003B1 0F BF            [ 1]  690 	clr	(0xbf, sp)
+      0003B3 0F C0            [ 1]  691 	clr	(0xc0, sp)
+      0003B5 0F C1            [ 1]  692 	clr	(0xc1, sp)
+      0003B7 0F C2            [ 1]  693 	clr	(0xc2, sp)
+      0003B9 0F C3            [ 1]  694 	clr	(0xc3, sp)
+      0003BB 0F C4            [ 1]  695 	clr	(0xc4, sp)
+      0003BD 0F C5            [ 1]  696 	clr	(0xc5, sp)
+      0003BF 0F C6            [ 1]  697 	clr	(0xc6, sp)
+      0003C1 0F C7            [ 1]  698 	clr	(0xc7, sp)
+      0003C3 0F C8            [ 1]  699 	clr	(0xc8, sp)
+      0003C5 0F C9            [ 1]  700 	clr	(0xc9, sp)
+      0003C7 0F CA            [ 1]  701 	clr	(0xca, sp)
+      0003C9 0F CB            [ 1]  702 	clr	(0xcb, sp)
+      0003CB 0F CC            [ 1]  703 	clr	(0xcc, sp)
+      0003CD 0F CD            [ 1]  704 	clr	(0xcd, sp)
+      0003CF 0F CE            [ 1]  705 	clr	(0xce, sp)
+      0003D1 0F CF            [ 1]  706 	clr	(0xcf, sp)
+      0003D3 0F D0            [ 1]  707 	clr	(0xd0, sp)
+      0003D5 0F D1            [ 1]  708 	clr	(0xd1, sp)
+      0003D7 0F D2            [ 1]  709 	clr	(0xd2, sp)
+      0003D9 0F D3            [ 1]  710 	clr	(0xd3, sp)
+      0003DB 0F D4            [ 1]  711 	clr	(0xd4, sp)
+      0003DD 0F D5            [ 1]  712 	clr	(0xd5, sp)
+      0003DF 0F D6            [ 1]  713 	clr	(0xd6, sp)
+      0003E1 0F D7            [ 1]  714 	clr	(0xd7, sp)
+      0003E3 0F D8            [ 1]  715 	clr	(0xd8, sp)
+      0003E5 0F D9            [ 1]  716 	clr	(0xd9, sp)
+      0003E7 0F DA            [ 1]  717 	clr	(0xda, sp)
+      0003E9 0F DB            [ 1]  718 	clr	(0xdb, sp)
+      0003EB 0F DC            [ 1]  719 	clr	(0xdc, sp)
+      0003ED 0F DD            [ 1]  720 	clr	(0xdd, sp)
+      0003EF 0F DE            [ 1]  721 	clr	(0xde, sp)
+      0003F1 0F DF            [ 1]  722 	clr	(0xdf, sp)
+      0003F3 0F E0            [ 1]  723 	clr	(0xe0, sp)
+      0003F5 0F E1            [ 1]  724 	clr	(0xe1, sp)
+      0003F7 0F E2            [ 1]  725 	clr	(0xe2, sp)
+      0003F9 0F E3            [ 1]  726 	clr	(0xe3, sp)
+      0003FB 0F E4            [ 1]  727 	clr	(0xe4, sp)
+      0003FD 0F E5            [ 1]  728 	clr	(0xe5, sp)
+      0003FF 0F E6            [ 1]  729 	clr	(0xe6, sp)
+      000401 0F E7            [ 1]  730 	clr	(0xe7, sp)
+      000403 0F E8            [ 1]  731 	clr	(0xe8, sp)
+      000405 0F E9            [ 1]  732 	clr	(0xe9, sp)
+      000407 0F EA            [ 1]  733 	clr	(0xea, sp)
+      000409 0F EB            [ 1]  734 	clr	(0xeb, sp)
+      00040B 0F EC            [ 1]  735 	clr	(0xec, sp)
+      00040D 0F ED            [ 1]  736 	clr	(0xed, sp)
+      00040F 0F EE            [ 1]  737 	clr	(0xee, sp)
+      000411 0F EF            [ 1]  738 	clr	(0xef, sp)
+      000413 0F F0            [ 1]  739 	clr	(0xf0, sp)
+      000415 0F F1            [ 1]  740 	clr	(0xf1, sp)
+      000417 0F F2            [ 1]  741 	clr	(0xf2, sp)
+      000419 0F F3            [ 1]  742 	clr	(0xf3, sp)
+      00041B 0F F4            [ 1]  743 	clr	(0xf4, sp)
+      00041D 0F F5            [ 1]  744 	clr	(0xf5, sp)
+      00041F 0F F6            [ 1]  745 	clr	(0xf6, sp)
+      000421 0F F7            [ 1]  746 	clr	(0xf7, sp)
+      000423 0F F8            [ 1]  747 	clr	(0xf8, sp)
+      000425 0F F9            [ 1]  748 	clr	(0xf9, sp)
+      000427 0F FA            [ 1]  749 	clr	(0xfa, sp)
+      000429 0F FB            [ 1]  750 	clr	(0xfb, sp)
+      00042B 0F FC            [ 1]  751 	clr	(0xfc, sp)
+      00042D 0F FD            [ 1]  752 	clr	(0xfd, sp)
+      00042F 0F FE            [ 1]  753 	clr	(0xfe, sp)
+      000431 0F FF            [ 1]  754 	clr	(0xff, sp)
+      000433 90 6F 05         [ 1]  755 	clr	(0x5, y)
+                                    756 ;	main.c: 108: int i = 0;
+      000436 5F               [ 1]  757 	clrw	x
+      000437 90 EF 06         [ 2]  758 	ldw	(0x6, y), x
+                                    759 ;	main.c: 109: while(i<5)
+      00043A 5F               [ 1]  760 	clrw	x
+      00043B 90 EF 08         [ 2]  761 	ldw	(0x8, y), x
+      00043E                        762 00108$:
+      00043E 93               [ 1]  763 	ldw	x, y
+      00043F EE 08            [ 2]  764 	ldw	x, (0x8, x)
+      000441 A3 00 05         [ 2]  765 	cpw	x, #0x0005
+      000444 2E 68            [ 1]  766 	jrsge	00110$
+                                    767 ;	main.c: 112: if(UART1_SR & UART_SR_RXNE)
+      000446 C6 52 30         [ 1]  768 	ld	a, 0x5230
+      000449 A5 20            [ 1]  769 	bcp	a, #0x20
+      00044B 27 37            [ 1]  770 	jreq	00121$
+                                    771 ;	main.c: 116: buffer[i] = UART_RX();
+      00044D 93               [ 1]  772 	ldw	x, y
+      00044E EE 08            [ 2]  773 	ldw	x, (0x8, x)
+      000450 89               [ 2]  774 	pushw	x
+      000451 96               [ 1]  775 	ldw	x, sp
+      000452 1C 00 03         [ 2]  776 	addw	x, #3
+      000455 72 FB 01         [ 2]  777 	addw	x, (1, sp)
+      000458 5B 02            [ 2]  778 	addw	sp, #2
+      00045A 89               [ 2]  779 	pushw	x
+      00045B 90 89            [ 2]  780 	pushw	y
+      00045D CDr00r37         [ 4]  781 	call	_UART_RX
+      000460 90 85            [ 2]  782 	popw	y
+      000462 85               [ 2]  783 	popw	x
+      000463 F7               [ 1]  784 	ld	(x), a
+                                    785 ;	main.c: 120: if(buffer[i] == '\r\n' || buffer[i] == '\0')
+      000464 A1 0D            [ 1]  786 	cp	a, #0x0d
+      000466 27 03            [ 1]  787 	jreq	00101$
+      000468 F6               [ 1]  788 	ld	a, (x)
+      000469 26 04            [ 1]  789 	jrne	00102$
+      00046B                        790 00101$:
+                                    791 ;	main.c: 123: return 1;
+      00046B 5F               [ 1]  792 	clrw	x
+      00046C 5C               [ 1]  793 	incw	x
+      00046D 20 40            [ 2]  794 	jra	00114$
+                                    795 ;	main.c: 124: break;
+      00046F                        796 00102$:
+                                    797 ;	main.c: 126: i++;
+      00046F 93               [ 1]  798 	ldw	x, y
+      000470 EE 08            [ 2]  799 	ldw	x, (0x8, x)
+      000472 5C               [ 1]  800 	incw	x
+      000473 90 EF 08         [ 2]  801 	ldw	(0x8, y), x
+      000476 90 E6 08         [ 1]  802 	ld	a, (0x8, y)
+      000479 90 E7 06         [ 1]  803 	ld	(0x6, y), a
+      00047C 90 E6 09         [ 1]  804 	ld	a, (0x9, y)
+      00047F 90 E7 07         [ 1]  805 	ld	(0x7, y), a
+      000482 20 BA            [ 2]  806 	jra	00108$
+                                    807 ;	main.c: 131: for(int g = 0;g < i; g++)
+      000484                        808 00121$:
+      000484 5F               [ 1]  809 	clrw	x
+      000485 90 EF 08         [ 2]  810 	ldw	(0x8, y), x
+      000488                        811 00112$:
+      000488 93               [ 1]  812 	ldw	x, y
+      000489 EE 08            [ 2]  813 	ldw	x, (0x8, x)
+      00048B 90 E3 06         [ 1]  814 	cpw	x, (0x6, y)
+      00048E 2E 1E            [ 1]  815 	jrsge	00110$
+                                    816 ;	main.c: 132: UART_TX(buffer[g]);
+      000490 93               [ 1]  817 	ldw	x, y
+      000491 EE 08            [ 2]  818 	ldw	x, (0x8, x)
+      000493 89               [ 2]  819 	pushw	x
+      000494 96               [ 1]  820 	ldw	x, sp
+      000495 1C 00 03         [ 2]  821 	addw	x, #3
+      000498 72 FB 01         [ 2]  822 	addw	x, (1, sp)
+      00049B 5B 02            [ 2]  823 	addw	sp, #2
+      00049D F6               [ 1]  824 	ld	a, (x)
+      00049E 90 89            [ 2]  825 	pushw	y
+      0004A0 CDr00r2E         [ 4]  826 	call	_UART_TX
+      0004A3 90 85            [ 2]  827 	popw	y
+                                    828 ;	main.c: 131: for(int g = 0;g < i; g++)
+      0004A5 93               [ 1]  829 	ldw	x, y
+      0004A6 EE 08            [ 2]  830 	ldw	x, (0x8, x)
+      0004A8 5C               [ 1]  831 	incw	x
+      0004A9 90 EF 08         [ 2]  832 	ldw	(0x8, y), x
+      0004AC 20 DA            [ 2]  833 	jra	00112$
+                                    834 ;	main.c: 134: break;
+      0004AE                        835 00110$:
+                                    836 ;	main.c: 138: return 0;
+      0004AE 5F               [ 1]  837 	clrw	x
+      0004AF                        838 00114$:
+                                    839 ;	main.c: 139: }
+      0004AF 5B FF            [ 2]  840 	addw	sp, #255
+      0004B1 5B 05            [ 2]  841 	addw	sp, #5
+      0004B3 81               [ 4]  842 	ret
+                                    843 ;	main.c: 141: int main(void)
+                                    844 ;	-----------------------------------------
+                                    845 ;	 function main
+                                    846 ;	-----------------------------------------
+      0004B4                        847 _main:
+                                    848 ;	main.c: 143: uart_init();
+      0004B4 CDr02r0A         [ 4]  849 	call	_uart_init
+                                    850 ;	main.c: 144: uart_write("ECHO START\n");
+      0004B7 AEr00r6E         [ 2]  851 	ldw	x, #(___str_13+0)
+      0004BA CDr00r40         [ 4]  852 	call	_uart_write
+                                    853 ;	main.c: 145: while(uart_read()<1);
+      0004BD                        854 00101$:
+      0004BD CDr02r2B         [ 4]  855 	call	_uart_read
+      0004C0 A3 00 01         [ 2]  856 	cpw	x, #0x0001
+      0004C3 2F F8            [ 1]  857 	jrslt	00101$
+                                    858 ;	main.c: 146: uart_write("ECHO end\n");
+      0004C5 AEr00r7A         [ 2]  859 	ldw	x, #(___str_14+0)
+      0004C8 CDr00r40         [ 4]  860 	call	_uart_write
+                                    861 ;	main.c: 147: return 0;
+      0004CB 5F               [ 1]  862 	clrw	x
+                                    863 ;	main.c: 148: }
+      0004CC 81               [ 4]  864 	ret
+                                    865 	.area CODE
+                                    866 	.area CONST
+                                    867 	.area CONST
+      000000                        868 ___str_0:
+      000000 55 41 52 54 5F 52 45   869 	.ascii "UART_REGS >.<"
+             47 53 20 3E 2E 3C
+      00000D 0A                     870 	.db 0x0a
+      00000E 00                     871 	.db 0x00
+                                    872 	.area CODE
+                                    873 	.area CONST
+      00000F                        874 ___str_1:
+      00000F 0A                     875 	.db 0x0a
+      000010 53 52 20 2D 3E 20      876 	.ascii "SR -> "
+      000016 00                     877 	.db 0x00
+                                    878 	.area CODE
+                                    879 	.area CONST
+      000017                        880 ___str_2:
+      000017 20 3C 2D               881 	.ascii " <-"
+      00001A 0A                     882 	.db 0x0a
+      00001B 00                     883 	.db 0x00
+                                    884 	.area CODE
+                                    885 	.area CONST
+      00001C                        886 ___str_3:
+      00001C 44 52 20 2D 3E 20      887 	.ascii "DR -> "
+      000022 00                     888 	.db 0x00
+                                    889 	.area CODE
+                                    890 	.area CONST
+      000023                        891 ___str_4:
+      000023 42 52 52 31 20 2D 3E   892 	.ascii "BRR1 -> "
+             20
+      00002B 00                     893 	.db 0x00
+                                    894 	.area CODE
+                                    895 	.area CONST
+      00002C                        896 ___str_5:
+      00002C 42 52 52 32 20 2D 3E   897 	.ascii "BRR2 -> "
+             20
+      000034 00                     898 	.db 0x00
+                                    899 	.area CODE
+                                    900 	.area CONST
+      000035                        901 ___str_6:
+      000035 43 52 31 20 2D 3E 20   902 	.ascii "CR1 -> "
+      00003C 00                     903 	.db 0x00
+                                    904 	.area CODE
+                                    905 	.area CONST
+      00003D                        906 ___str_7:
+      00003D 43 52 32 20 2D 3E 20   907 	.ascii "CR2 -> "
+      000044 00                     908 	.db 0x00
+                                    909 	.area CODE
+                                    910 	.area CONST
+      000045                        911 ___str_8:
+      000045 43 52 33 20 2D 3E 20   912 	.ascii "CR3 -> "
+      00004C 00                     913 	.db 0x00
+                                    914 	.area CODE
+                                    915 	.area CONST
+      00004D                        916 ___str_9:
+      00004D 43 52 34 20 2D 3E 20   917 	.ascii "CR4 -> "
+      000054 00                     918 	.db 0x00
+                                    919 	.area CODE
+                                    920 	.area CONST
+      000055                        921 ___str_10:
+      000055 43 52 35 20 2D 3E 20   922 	.ascii "CR5 -> "
+      00005C 00                     923 	.db 0x00
+                                    924 	.area CODE
+                                    925 	.area CONST
+      00005D                        926 ___str_11:
+      00005D 47 54 52 20 2D 3E 20   927 	.ascii "GTR -> "
+      000064 00                     928 	.db 0x00
+                                    929 	.area CODE
+                                    930 	.area CONST
+      000065                        931 ___str_12:
+      000065 50 53 43 52 20 2D 3E   932 	.ascii "PSCR -> "
+             20
+      00006D 00                     933 	.db 0x00
+                                    934 	.area CODE
+                                    935 	.area CONST
+      00006E                        936 ___str_13:
+      00006E 45 43 48 4F 20 53 54   937 	.ascii "ECHO START"
+             41 52 54
+      000078 0A                     938 	.db 0x0a
+      000079 00                     939 	.db 0x00
+                                    940 	.area CODE
+                                    941 	.area CONST
+      00007A                        942 ___str_14:
+      00007A 45 43 48 4F 20 65 6E   943 	.ascii "ECHO end"
+             64
+      000082 0A                     944 	.db 0x0a
+      000083 00                     945 	.db 0x00
+                                    946 	.area CODE
+                                    947 	.area INITIALIZER
+                                    948 	.area CABS (ABS)

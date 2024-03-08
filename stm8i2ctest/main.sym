@@ -7,6 +7,8 @@ Symbol Table
     .__.ABS.                                                    =  000000 G
     .__.CPU.                                                    =  000000 L
     .__.H$L.                                                    =  000001 L
+  A _UART_RX                                                       000037 GR
+  A _UART_TX                                                       00002E GR
     ___sdcc_external_startup                                       ****** GX
   8 ___str_0                                                       000000 R
   8 ___str_1                                                       00000F R
@@ -21,10 +23,14 @@ Symbol Table
   8 ___str_18                                                      00009A R
   8 ___str_19                                                      00009D R
   8 ___str_2                                                       000018 R
-  8 ___str_20                                                      0000A4 R
-  8 ___str_21                                                      0000A8 R
-  8 ___str_22                                                      0000B9 R
-  8 ___str_23                                                      0000BB R
+  8 ___str_20                                                      0000A3 R
+  8 ___str_21                                                      0000A9 R
+  8 ___str_22                                                      0000B3 R
+  8 ___str_23                                                      0000BA R
+  8 ___str_24                                                      0000BE R
+  8 ___str_25                                                      0000C2 R
+  8 ___str_26                                                      0000D3 R
+  8 ___str_27                                                      0000D5 R
   8 ___str_3                                                       00001D R
   8 ___str_4                                                       000025 R
   8 ___str_5                                                       00002D R
@@ -41,33 +47,33 @@ Symbol Table
   9 __xinit__buffer                                                000000 R
   9 __xinit__current_dev                                           000100 R
   2 _buffer                                                        000000 GR
-  A _convert_int_to_binary                                         0000E3 GR
-  A _convert_int_to_chars                                          00005E GR
+  A _convert_int_to_binary                                         0000F0 GR
+  A _convert_int_to_chars                                          00006B GR
   2 _current_dev                                                   000100 GR
   A _delay                                                         000000 GR
-  A _i2c_init                                                      000359 GR
-  A _i2c_scan                                                      000399 GR
-  A _i2c_send_address                                              000384 GR
-  A _i2c_start                                                     00037A GR
-  A _i2c_stop                                                      000394 GR
-  A _main                                                          000444 GR
-  A _status_check                                                  00011B GR
-    _strlen                                                        ****** GX
-  A _uart_init                                                     00033C GR
-  A _uart_read                                                     0003E8 GR
-  A _uart_write                                                    00002E GR
-    l_DATA                                                         ****** GX
-    l_INITIALIZER                                                  ****** GX
+  A _i2c_init                                                      000366 GR
+  A _i2c_scan                                                      0003A6 GR
+  A _i2c_send_address                                              000391 GR
+  A _i2c_start                                                     000387 GR
+  A _i2c_stop                                                      0003A1 GR
+  A _main                                                          00045E GR
+    _memset                                                        ****** GX
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
+  A _status_check                                                  000128 GR
+    _strlen                                                        ****** GX
+  A _uart_init                                                     000349 GR
+  A _uart_read                                                     0003F5 GR
+  A _uart_write                                                    000040 GR
+    l_DATA                                                         ****** GX
+    l_INITIALIZER                                                  ****** GX
     s_DATA                                                         ****** GX
     s_GSINIT                                                       ****** GX
     s_INITIALIZED                                                  ****** GX
     s_INITIALIZER                                                  ****** GX
-
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
 Hexadecimal [24-Bits]
@@ -82,8 +88,8 @@ Area Table
    5 HOME                                       size      7   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
-   8 CONST                                      size     CA   flags    0
+   8 CONST                                      size     E4   flags    0
    9 INITIALIZER                                size    101   flags    0
-   A CODE                                       size    484   flags    0
+   A CODE                                       size    49E   flags    0
    B CABS                                       size      0   flags    8
 

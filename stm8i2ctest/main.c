@@ -9,12 +9,21 @@ void delay(unsigned long count) {
     while (count--)
         nop();
 }
-
+void UART_TX(unsigned char value)
+{
+    UART1_DR = value;
+    while(!(UART1_SR & UART_SR_TXE));
+}
+unsigned char UART_RX(void)
+{
+    while(!(UART1_SR & UART_SR_TXE));
+    return UART1_DR;
+}
 int uart_write(const char *str) {
     char i;
     for(i = 0; i < strlen(str); i++) {
-        while(!(UART1_SR & UART_SR_TXE)); // !Transmit data register empty
-        UART1_DR = str[i];
+         // !Transmit data register empty
+        UART_TX(str[i]);
     }
     return(i); // Bytes sent
 }
@@ -199,51 +208,23 @@ void i2c_scan(void) {
 
 int uart_read(void)
 {
-
-    for(int o = 0; 0 < 256; o++)
-    {
-        buffer[o] = 0;
-    }
+    memset(buffer, 0, sizeof(buffer));
     int i = 0;
-    while(i < 256)
+    while(i<256)
     {
-        while(!(UART1_SR & UART_SR_RXNE));
-        buffer[i] = UART1_DR;
-        if(buffer[i] == '\n' || buffer[i] == '\0')
+        //uart_write("While");
+        if(UART1_SR & UART_SR_RXNE)
         {
-            buffer[i] = '\0';
-            uart_write("flag_S");
+        buffer[i] = UART_RX();
+        if(buffer[i] == '\r\n')
+        {
             return 1;
             break;
         }
         i++;
+        }
     }
     return 0;
-
-
-
-
-    // for(int i = 0; i < 256; i++) {
-    //     uart_write("flag1");
-    //     while(!(UART1_SR & UART_SR_RXNE)); // !Transmit data register empty
-    //     uart_write("flag2");
-    //     //status_check();
-        
-    //     uart_write("flag3\n");
-    //     char b[2]={UART1_DR,'\0'};
-    //     uart_write(b);// + '\0');
-    //     //status_check();
-
-    //     uart_write("\n>buffer start<\n");
-    //     // for(int i = 0; i < 256; i++)
-    //     // {
-    //     //     uart_write(&buffer[i] + '\0');
-    //     //     uart_write("\n>____________<\n");
-    //     // }
-    //     // uart_write("> buffer end <");
-    // }
-    
-    // return 0;
 }
 
 
@@ -254,13 +235,7 @@ int main(void)
 
     while(uart_read())
     {
-        uart_write("\n>buffer start<\n");
-        for(int i = 0; i < 256; i++)
-        {
-            uart_write(&buffer[i] + '\0');
-            uart_write(" ");
-        }
-        uart_write("> buffer end <");
+
     }; 
     i2c_init();
     //status_check();

@@ -7,10 +7,12 @@ Area                                    Addr        Size        Decimal Bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000000  .__.ABS.                           
+     00000000  .__.ABS.                           _strlen
      00000000  l_CABS                          
      00000000  l_DABS                          
      00000000  l_DATA                          
+     00000000  l_INITIALIZED                   
+     00000000  l_INITIALIZER                   
      00000000  l__CODE                         
      00000000  s_CABS                          
      00000000  s_DABS                          
@@ -18,43 +20,29 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000001  l_SSEG                          
      00000001  s_DATA                          
      00000001  s_INITIALIZED                   
+     00000001  s_SSEG                          
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     000000E4  l_CONST                         
-     00000101  l_INITIALIZED                   
-     00000101  l_INITIALIZER                   
-     00000102  s_SSEG                          
-     000004FE  l_CODE                          
+     00000084  l_CONST                         
+     000004DC  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     00008111  s_INITIALIZER                   
-     00008212  s_CODE                          
+     000080B1  s_CODE                          
+     000080B1  s_INITIALIZER                   
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000001    00000101 =         257. bytes (REL,CON)
+SSEG                                00000001    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000001  _buffer                            main
-     00000101  _current_dev                       main
-
 ASxxxx Linker V03.00/V05.40 + sdld,  page 3.
-Hexadecimal  [32-Bits]
-
-Area                                    Addr        Size        Decimal Bytes (Attributes)
---------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000102    00000001 =           1. bytes (REL,CON)
-
-      Value  Global                              Global Defined In Module
-      -----  --------------------------------   ------------------------
-ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
@@ -63,7 +51,7 @@ HOME                                00008000    00000007 =           7. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-ASxxxx Linker V03.00/V05.40 + sdld,  page 5.
+ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
@@ -72,7 +60,7 @@ GSINIT                              00008007    00000023 =          35. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-ASxxxx Linker V03.00/V05.40 + sdld,  page 6.
+ASxxxx Linker V03.00/V05.40 + sdld,  page 5.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
@@ -81,55 +69,37 @@ GSFINAL                             0000802A    00000003 =           3. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00/V05.40 + sdld,  page 6.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CONST                               0000802D    00000084 =         132. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
 ASxxxx Linker V03.00/V05.40 + sdld,  page 7.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    000000E4 =         228. bytes (REL,CON)
+CODE                                000080B1    000004DC =        1244. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     000080B1  _delay                             main
+     000080DF  _UART_TX                           main
+     000080E8  _UART_RX                           main
+     000080F1  _uart_write                        main
+     0000811C  _convert_int_to_binary             main
+     00008154  _status_check                      main
+     000082BB  _uart_init                         main
+     000082DC  _uart_read                         main
+     00008565  _main                              main
+     0000857E  ___sdcc_external_startup           _startup
+     00008580  _strlen                            _strlen
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 8.
-Hexadecimal  [32-Bits]
-
-Area                                    Addr        Size        Decimal Bytes (Attributes)
---------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         00008111    00000101 =         257. bytes (REL,CON)
-
-      Value  Global                              Global Defined In Module
-      -----  --------------------------------   ------------------------
-ASxxxx Linker V03.00/V05.40 + sdld,  page 9.
-Hexadecimal  [32-Bits]
-
-Area                                    Addr        Size        Decimal Bytes (Attributes)
---------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008212    000004FE =        1278. bytes (REL,CON)
-
-      Value  Global                              Global Defined In Module
-      -----  --------------------------------   ------------------------
-     00008212  _delay                             main
-     00008240  _UART_TX                           main
-     00008249  _UART_RX                           main
-     00008252  _uart_write                        main
-     0000827D  _convert_int_to_chars              main
-     00008302  _convert_int_to_binary             main
-     0000833A  _status_check                      main
-     0000855B  _uart_init                         main
-     00008578  _i2c_init                          main
-     00008599  _i2c_start                         main
-     000085A3  _i2c_send_address                  main
-     000085B3  _i2c_stop                          main
-     000085B8  _i2c_scan                          main
-     00008607  _uart_read                         main
-     00008670  _main                              main
-     000086B0  _memset                            _memset
-     000086D2  ___sdcc_external_startup           _startup
-     000086D4  _strlen                            _strlen
-     000086E1  __modsint                          
-     000086F9  __divsint                          
-
-ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
 Files Linked                              [ module(s) ]
 
@@ -138,13 +108,10 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memset.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _strlen.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _divsint.rel ]
 
-ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
+ASxxxx Linker V03.00/V05.40 + sdld,  page 9.
 
 User Base Address Definitions
 
