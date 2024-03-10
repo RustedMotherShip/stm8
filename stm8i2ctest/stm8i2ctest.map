@@ -21,36 +21,42 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     000000E4  l_CONST                         
-     00000101  l_INITIALIZED                   
-     00000101  l_INITIALIZER                   
-     00000102  s_SSEG                          
-     000004FE  l_CODE                          
+     0000010C  l_CONST                         
+     00000208  l_INITIALIZED                   
+     00000208  l_INITIALIZER                   
+     00000209  s_SSEG                          
+     00000919  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     00008111  s_INITIALIZER                   
-     00008212  s_CODE                          
+     00008139  s_INITIALIZER                   
+     00008341  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000001    00000101 =         257. bytes (REL,CON)
+INITIALIZED                         00000001    00000208 =         520. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000001  _buffer                            main
-     00000101  _current_dev                       main
+     00000101  _a                                 main
+     00000104  _d_addr                            main
+     00000105  _p_size                            main
+     00000106  _d_size                            main
+     00000107  _p_bytes                           main
+     00000108  _data_buf                          main
+     00000208  _current_dev                       main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 3.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000102    00000001 =           1. bytes (REL,CON)
+SSEG                                00000209    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -86,7 +92,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    000000E4 =         228. bytes (REL,CON)
+CONST                               0000802D    0000010C =         268. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -95,7 +101,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         00008111    00000101 =         257. bytes (REL,CON)
+INITIALIZER                         00008139    00000208 =         520. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -104,30 +110,48 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008212    000004FE =        1278. bytes (REL,CON)
+CODE                                00008341    00000919 =        2329. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008212  _delay                             main
-     00008240  _UART_TX                           main
-     00008249  _UART_RX                           main
-     00008252  _uart_write                        main
-     0000827D  _convert_int_to_chars              main
-     00008302  _convert_int_to_binary             main
-     0000833A  _status_check                      main
-     0000855B  _uart_init                         main
-     00008578  _i2c_init                          main
-     00008599  _i2c_start                         main
-     000085A3  _i2c_send_address                  main
-     000085B3  _i2c_stop                          main
-     000085B8  _i2c_scan                          main
-     00008607  _uart_read                         main
-     00008670  _main                              main
-     000086B0  _memset                            _memset
-     000086D2  ___sdcc_external_startup           _startup
-     000086D4  _strlen                            _strlen
-     000086E1  __modsint                          
-     000086F9  __divsint                          
+     00008341  _delay                             main
+     0000836F  _UART_TX                           main
+     00008378  _UART_RX                           main
+     00008381  _uart_write                        main
+     000083AC  _uart_read                         main
+     000083E2  _convert_int_to_chars              main
+     00008467  _convert_chars_to_int              main
+     0000848E  _convert_int_to_binary             main
+     000084C6  _get_addr_from_buff                main
+     00008507  _get_size_from_buff                main
+     0000854C  _char_buffer_to_int                main
+     000085D0  _status_check                      main
+     000087F1  _uart_init                         main
+     0000880E  _i2c_init                          main
+     0000882F  _i2c_start                         main
+     00008839  _i2c_send_address                  main
+     00008849  _i2c_stop                          main
+     0000884E  _i2c_write                         main
+     000088B3  _i2c_read                          main
+     00008930  _i2c_scan                          main
+     00008968  _cm_SM                             main
+     0000898E  _cm_SN                             main
+     00008994  _cm_RM                             main
+     0000899E  _cm_DB                             main
+     000089A1  _cm_ST                             main
+     000089AF  _cm_SR                             main
+     000089BE  _cm_SW                             main
+     00008A24  _data_handler                      main
+     00008ADC  _command_switcher                  main
+     00008B4F  _main                              main
+     00008B64  _memcmp                            _memcmp
+     00008BA7  ___memcpy                          
+     00008BA7  _memcpy                            
+     00008BFA  _memset                            _memset
+     00008C1C  ___sdcc_external_startup           _startup
+     00008C1E  _strlen                            _strlen
+     00008C2B  __modsint                          
+     00008C43  __divsint                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
@@ -138,6 +162,8 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memcmp.rel ]
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ memcpy.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memset.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _strlen.rel ]

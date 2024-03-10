@@ -2,13 +2,38 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+/*commands 
+SS - program start
+SM  - what source mounted(found)
+SR (addr) (bytes) - read bytes from dev
+SW (addr) (bytes) (byte 1) ... (bytes N) - write bytes to dev
+SN - mount next dev
+ST (addr) - set dev addr manually
+RM - set dev number 0
+DB - all registers check
+*/
 char buffer[256] = {0};
+char a[3] = {0};
+#define addr_p 4;
+uint8_t d_addr = 0;
+uint8_t p_size = 0;
+uint8_t d_size = 0;
+uint8_t p_bytes = 0;
+uint8_t data_buf[256] = {0};
 uint8_t current_dev = 0;
 /* Simple busy loop delay */
 void delay(unsigned long count) {
     while (count--)
         nop();
 }
+/*
+ ______        __  ____  _____ _____ ____  
+|  _ \ \      / / |  _ \| ____|  ___/ ___| 
+| |_) \ \ /\ / /  | | | |  _| | |_  \___ \ 
+|  _ < \ V  V /   | |_| | |___|  _|  ___) |
+|_| \_\ \_/\_/    |____/|_____|_|   |____/ 
+*/
 void UART_TX(unsigned char value)
 {
     UART1_DR = value;
@@ -27,8 +52,32 @@ int uart_write(const char *str) {
     }
     return(i); // Bytes sent
 }
-
-
+int uart_read(void)
+{
+    memset(buffer, 0, sizeof(buffer));
+    int i = 0;
+    while(i<256)
+    {
+        if(UART1_SR & UART_SR_RXNE)
+        {
+        buffer[i] = UART_RX();
+        if(buffer[i] == '\r\n' )
+        {
+            return 1;
+            break;
+        }
+        i++;
+        }
+    }
+    return 0;
+}
+/*
+  ____ ___  _   ___     _______ ____ _____   ____  _____ _____ ____  
+ / ___/ _ \| \ | \ \   / / ____|  _ \_   _| |  _ \| ____|  ___/ ___| 
+| |  | | | |  \| |\ \ / /|  _| | |_) || |   | | | |  _| | |_  \___ \ 
+| |__| |_| | |\  | \ V / | |___|  _ < | |   | |_| | |___|  _|  ___) |
+ \____\___/|_| \_|  \_/  |_____|_| \_\|_|   |____/|_____|_|   |____/ 
+*/
 
 void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
     if (num > 99) {
@@ -42,15 +91,24 @@ void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
         // Если число имеет две цифры
         rx_int_chars[0] = num / 10 + '0';
         rx_int_chars[1] = num % 10 + '0';
-        rx_int_chars[2] ='\0';
-
-        //rx_int_chars[3] = '\0'; // Заканчиваем строку символом конца строки
+        rx_int_chars[2] ='\0'; // Заканчиваем строку символом конца строки
     } else {
         // Если число имеет одну цифру
         rx_int_chars[0] = num + '0';
         rx_int_chars[1] ='\0';
     }
 }
+
+int convert_chars_to_int(char* rx_chars_int) {
+    uint8_t result = 0;
+
+    for (int i = 0; i < 3; i++) {
+        result = (result * 10) + (rx_chars_int[i] - '0');
+
+    }
+    return result;
+}
+
 
 void convert_int_to_binary(int num, char* rx_binary_chars) {
     // Проверяем каждый бит числа, начиная со старшего
@@ -60,7 +118,89 @@ void convert_int_to_binary(int num, char* rx_binary_chars) {
     }
     rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
 }
+/*
+ ____  _   _ _____ _____ _____ ____    ____  _____ _____ ____  
+| __ )| | | |  ___|  ___| ____|  _ \  |  _ \| ____|  ___/ ___| 
+|  _ \| | | | |_  | |_  |  _| | |_) | | | | |  _| | |_  \___ \ 
+| |_) | |_| |  _| |  _| | |___|  _ <  | |_| | |___|  _|  ___) |
+|____/ \___/|_|   |_|   |_____|_| \_\ |____/|_____|_|   |____/ 
+*/
 
+void get_addr_from_buff(void)
+{
+    uint8_t counter = 0;
+    uint8_t i = 4;
+    while(1)
+    {
+        if(buffer[i] == 32 || buffer[i] == 10)
+        {
+            p_size = i+1;
+            break;
+        }
+        i++;
+        counter++;
+    }
+    memcpy(a, &buffer[3], counter);
+    d_addr = convert_chars_to_int(a);
+}
+
+void get_size_from_buff(void)
+{
+    uint8_t counter = 0;
+    uint8_t i = p_size;
+    while(1)
+    {
+        if(buffer[i] == 32 || buffer[i] == 10)
+        {
+            p_bytes = i+1;
+            break;
+        }
+        i++;
+        counter++;
+    }
+    memcpy(a, &buffer[p_size], counter);
+    d_size = convert_chars_to_int(a);
+}
+void char_buffer_to_int(void)
+{
+    uint8_t counter = d_size;
+    uint8_t i = p_bytes;
+    uint8_t buf_i = 0;
+    while(counter > 0)
+    {
+        if(buffer[i] == 32)
+        {
+            uint8_t buf_counter = 0;
+            while(1)
+            {
+                if(buffer[i+1] == 32)
+                break;
+                buf_counter++;
+            }
+            char ar[4]={0};
+            memcpy(a, &buffer[i], buf_counter);
+            data_buf[buf_i] = convert_chars_to_int(a);
+            counter--;
+            buf_i++;
+            convert_int_to_chars(data_buf[buf_i], ar);
+            uart_write(ar);
+        }
+        else if(buffer[i] == 10)
+        {
+            break;
+        }
+        i++;
+        uart_write("while");
+    }
+
+}
+/*
+ ____ _____ __  __  ___    ____  _____ _____ ____  
+/ ___|_   _|  \/  |( _ )  |  _ \| ____|  ___/ ___| 
+\___ \ | | | |\/| |/ _ \  | | | |  _| | |_  \___ \ 
+ ___) || | | |  | | (_) | | |_| | |___|  _|  ___) |
+|____/ |_| |_|  |_|\___/  |____/|_____|_|   |____/ 
+*/
 void status_check(void){
     char rx_binary_chars[9]={0};
     uart_write("\nI2C_REGS >.<\n");
@@ -163,8 +303,13 @@ void i2c_init(void) {
     I2C_OARH = I2C_OARH | 0x40;     // see reference manual
     I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
 }
-//I2C_CR2 = I2C_CR2 | (1 << 0)
-
+/*
+ ___ ____   ____   ____  _____ _____ ____  
+|_ _|___ \ / ___| |  _ \| ____|  ___/ ___| 
+ | |  __) | |     | | | |  _| | |_  \___ \ 
+ | | / __/| |___  | |_| | |___|  _|  ___) |
+|___|_____|\____| |____/|_____|_|   |____/ 
+*/
 
 void i2c_start(void) {
     I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
@@ -181,79 +326,213 @@ void i2c_stop(void) {
     I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
     //uart_write("Stop generated\n");
 }
+void i2c_write(void){
+    I2C_DR = d_addr; // Отправка адреса устройства с битом на запись
+    uart_write("flag1\r");
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
+        uart_write(".");
+    uart_write("flag2\r");
+    for(int i = 0;i < d_size;i++)
+    {
+        uart_write("flag3\r");
+        I2C_DR = data_buf[i];
+        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
+            uart_write(".");
+        uart_write("flag4\r");
+    }
+}
 
+void i2c_read(void){
+    I2C_DR = (current_dev << 1) & (1 << 0);
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
+        uart_write(".");
+    uart_write("\r\n");
+    I2C_DR = d_addr;
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
+        uart_write(".");
+    uart_write("\r\n");
+    i2c_stop();
+    for(int i = 0;i < d_size;i++)
+    {
+        data_buf[i] = I2C_DR;
+        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
+            uart_write(".");
+        uart_write("\r\n");
 
-
+    }
+}
 void i2c_scan(void) {
-    for (uint8_t addr = 1; addr < 127; addr++) {
+    for (uint8_t addr = current_dev; addr < 127; addr++) {
         i2c_start();
         i2c_send_address(addr);
         if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
             // Адрес подтвержден, устройство найдено
-            uart_write("SM ");
-            char rx_int_chars[4]={0};
-            convert_int_to_chars(addr, rx_int_chars);
-            uart_write(rx_int_chars); 
-            uart_write("\r\n");
             current_dev = addr;
-            status_check();
+            i2c_stop();
+            break;
         }
         i2c_stop();
         I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
-        //delay(10000); // Небольшая задержка для стабилизации шины
     }
-    //uart_write("Devs Not Found");
 }
 
 
-int uart_read(void)
+/*
+  ____ ___  __  __ __  __    _    _   _ ____    ____  _____ _____ ____  
+ / ___/ _ \|  \/  |  \/  |  / \  | \ | |  _ \  |  _ \| ____|  ___/ ___| 
+| |  | | | | |\/| | |\/| | / _ \ |  \| | | | | | | | |  _| | |_  \___ \ 
+| |__| |_| | |  | | |  | |/ ___ \| |\  | |_| | | |_| | |___|  _|  ___) |
+ \____\___/|_|  |_|_|  |_/_/   \_\_| \_|____/  |____/|_____|_|   |____/ 
+*/
+void cm_SM(void)
 {
-    memset(buffer, 0, sizeof(buffer));
-    int i = 0;
-    while(i<256)
-    {
-        //uart_write("While");
-        if(UART1_SR & UART_SR_RXNE)
-        {
-        buffer[i] = UART_RX();
-        if(buffer[i] == '\r\n')
-        {
-            return 1;
-            break;
-        }
-        i++;
-        }
-    }
+    char cur_dev[4]={0};
+    convert_int_to_chars(current_dev, cur_dev);
+    uart_write("SM ");
+    uart_write(cur_dev);
+    uart_write("\r\n");
+}
+void cm_SN(void)
+{
+    i2c_scan();
+    cm_SM();
+}
+void cm_RM(void)
+{
+    current_dev = 0;
+    uart_write("RM\n");
+}
+
+void cm_DB(void)
+{
+    status_check();
+}
+
+void cm_ST(void)
+{
+    get_addr_from_buff();
+    current_dev = d_addr;
+    uart_write("ST\n");
+}
+void cm_SR(void)
+{
+    i2c_start();
+    i2c_send_address(current_dev);
+    i2c_read();
+    i2c_stop();
+}
+void cm_SW(void)
+{
+    char ar[4]={0};
+    uart_write("f1");
+    i2c_start();
+    uart_write("f2");
+    i2c_send_address(current_dev);
+    uart_write("f3");
+    i2c_write();
+    uart_write("f4");
+    i2c_stop();
+    uart_write("f5");
+    uart_write("SW ");
+    convert_int_to_chars(d_addr, ar);
+    uart_write(ar);
+    uart_write(" ");
+    convert_int_to_chars(d_size, ar);
+    uart_write(ar);
+    uart_write("\r\n");
+}
+/*
+ ____    _  _____  _      _   _    _    _   _ ____  _     _____ ____  
+|  _ \  / \|_   _|/ \    | | | |  / \  | \ | |  _ \| |   | ____|  _ \ 
+| | | |/ _ \ | | / _ \   | |_| | / _ \ |  \| | | | | |   |  _| | |_) |
+| |_| / ___ \| |/ ___ \  |  _  |/ ___ \| |\  | |_| | |___| |___|  _ < 
+|____/_/   \_\_/_/   \_\ |_| |_/_/   \_\_| \_|____/|_____|_____|_| \_\
+// */
+int data_handler(void)
+{
+    p_size = 0;
+    p_bytes = 0;
+    d_addr = 0;
+    d_size = 0;
+    memset(data_buf, 0, sizeof(data_buf));
+    if(memcmp(&buffer[0],"SM",2) == 0)
+        return 1;
+    if(memcmp(&buffer[0],"SN",2) == 0)
+        return 2;
+    if(memcmp(&buffer[0],"ST",2) == 0)
+        return 5;
+    if(memcmp(&buffer[0],"RM",2) == 0)
+        return 6;
+    if(memcmp(&buffer[0],"DB",2) == 0)
+        return 7;
+
+    get_addr_from_buff();
+    get_size_from_buff();
+
+    if(memcmp(&buffer[0],"SR",2) == 0)
+        return 3;
+
+    char_buffer_to_int();
+
+    if(memcmp(&buffer[0],"SW",2) == 0)
+        return 4;
     return 0;
+
+}
+
+void command_switcher(void)
+{
+    char ar[4]={0};
+
+    int af = data_handler();
+    convert_int_to_chars(af, ar);
+    uart_write("preswitch\n");
+    uart_write(ar);
+    uart_write("\n");
+    switch(af)
+    {
+        case 1:
+            cm_SM();
+        break;
+        case 2:
+            cm_SN();
+        break;
+        case 3:
+            cm_SR();
+        break;
+        case 4:
+            uart_write("switch\n");
+            cm_SW();
+        break;
+        case 5:
+            cm_ST();
+        break;
+        case 6:
+            cm_RM();
+        break;
+        case 7:
+            cm_DB();
+        break;
+    }
 }
 
 
-int main(void)
+void main(void)
 {
     uart_init();
-    uart_write("SS\n");
-
-    while(uart_read())
-    {
-
-    }; 
     i2c_init();
-    //status_check();
-
-    //while (1) {
-        i2c_scan(); 
-    //}
-        return 0;
+    uart_write("SS\n");
+    while(1)
+    {
+        uart_read();
+        command_switcher();
+    }; 
 }
-
-
-
-
-// void i2c_send_address(uint8_t address) {
-//     I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
-//     // Ждем подтверждения адреса или таймаута
-//     while (!(I2C_SR1 & I2C_SR1_ADDR) && !(I2C_SR1 & I2C_SR1_AF)); 
-//     if (I2C_SR1 & I2C_SR1_ADDR) {
-//         I2C_SR1 &= ~I2C_SR1_ADDR; // Очистка флага адреса, если он был установлен
-//     }
-// }
+/*
+ __  __________   ____  
+|  \/   _   _  | |  _ \ 
+| |\/| | | | | |_| |_) |
+| |  | | | | |  _   _ < 
+|_|  |_| |_| |_| |_| \_\
+                    Inc. 
+*/
