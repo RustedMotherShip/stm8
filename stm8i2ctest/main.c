@@ -204,75 +204,75 @@ void char_buffer_to_int(void)
 void status_check(void){
     char rx_binary_chars[9]={0};
     uart_write("\nI2C_REGS >.<\n");
-    convert_int_to_binary(I2C_SR1, rx_binary_chars);
-    uart_write("\nSR1 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(I2C_SR2, rx_binary_chars);
-    uart_write("SR2 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(I2C_SR3, rx_binary_chars);
-    uart_write("SR3 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(I2C_CR1, rx_binary_chars);
-    uart_write("CR1 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(I2C_CR2, rx_binary_chars);
-    uart_write("CR2 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
+    // convert_int_to_binary(I2C_SR1, rx_binary_chars);
+    // uart_write("\nSR1 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(I2C_SR2, rx_binary_chars);
+    // uart_write("SR2 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(I2C_SR3, rx_binary_chars);
+    // uart_write("SR3 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(I2C_CR1, rx_binary_chars);
+    // uart_write("CR1 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(I2C_CR2, rx_binary_chars);
+    // uart_write("CR2 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
     convert_int_to_binary(I2C_DR, rx_binary_chars);
     uart_write("DR -> ");
     uart_write(rx_binary_chars);
     uart_write(" <-\n");
-    uart_write("UART_REGS >.<\n");
-    convert_int_to_binary(UART1_SR, rx_binary_chars);
-    uart_write("\nSR -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_DR, rx_binary_chars);
-    uart_write("DR -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_BRR1, rx_binary_chars);
-    uart_write("BRR1 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_BRR2, rx_binary_chars);
-    uart_write("BRR2 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_CR1, rx_binary_chars);
-    uart_write("CR1 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_CR2, rx_binary_chars);
-    uart_write("CR2 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_CR3, rx_binary_chars);
-    uart_write("CR3 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_CR4, rx_binary_chars);
-    uart_write("CR4 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_CR5, rx_binary_chars);
-    uart_write("CR5 -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_GTR, rx_binary_chars);
-    uart_write("GTR -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
-    convert_int_to_binary(UART1_PSCR, rx_binary_chars);
-    uart_write("PSCR -> ");
-    uart_write(rx_binary_chars);
-    uart_write(" <-\n");
+    // uart_write("UART_REGS >.<\n");
+    // convert_int_to_binary(UART1_SR, rx_binary_chars);
+    // uart_write("\nSR -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_DR, rx_binary_chars);
+    // uart_write("DR -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_BRR1, rx_binary_chars);
+    // uart_write("BRR1 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_BRR2, rx_binary_chars);
+    // uart_write("BRR2 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_CR1, rx_binary_chars);
+    // uart_write("CR1 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_CR2, rx_binary_chars);
+    // uart_write("CR2 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_CR3, rx_binary_chars);
+    // uart_write("CR3 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_CR4, rx_binary_chars);
+    // uart_write("CR4 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_CR5, rx_binary_chars);
+    // uart_write("CR5 -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_GTR, rx_binary_chars);
+    // uart_write("GTR -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
+    // convert_int_to_binary(UART1_PSCR, rx_binary_chars);
+    // uart_write("PSCR -> ");
+    // uart_write(rx_binary_chars);
+    // uart_write(" <-\n");
 }
 
 void uart_init(void){
@@ -319,6 +319,7 @@ void i2c_start(void) {
 
 void i2c_send_address(uint8_t address) {
     I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
+    status_check();
     while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 }
 
@@ -327,10 +328,12 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
-    I2C_DR = d_addr; // Отправка адреса регистра
+    I2C_DR = d_addr;
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
     for(int i = 0;i < d_size;i++)
     {
         I2C_DR = data_buf[i];
+        status_check();
         while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
     }
 }
@@ -408,20 +411,40 @@ void cm_SR(void)
     i2c_send_address(current_dev);
     i2c_read();
     i2c_stop();
+    uart_write("SR ");
+    convert_int_to_chars(d_addr, a);
+    uart_write(a);
+    uart_write(" ");
+    convert_int_to_chars(d_size, a);
+    uart_write(a);
+    for(int i = 0;i < d_size;i++)
+    {
+        uart_write(" ");
+        convert_int_to_chars(data_buf[i], a);
+        uart_write(a);
+        
+    }
+    uart_write("\r\n");
 }
 void cm_SW(void)
 {
-    char ar[4]={0};
     i2c_start();
     i2c_send_address(current_dev);
     i2c_write();
     i2c_stop();
     uart_write("SW ");
-    convert_int_to_chars(d_addr, ar);
-    uart_write(ar);
+    convert_int_to_chars(d_addr, a);
+    uart_write(a);
     uart_write(" ");
-    convert_int_to_chars(d_size, ar);
-    uart_write(ar);
+    convert_int_to_chars(d_size, a);
+    uart_write(a);
+    for(int i = 0;i < d_size;i++)
+    {
+        uart_write(" ");
+        convert_int_to_chars(data_buf[i], a);
+        uart_write(a);
+        
+    }
     uart_write("\r\n");
 }
 /*
