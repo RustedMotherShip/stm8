@@ -13,15 +13,15 @@ ST (addr) - set dev addr manually
 RM - set dev number 0
 DB - all registers check
 */
-char buffer[256] = {0};
+char buffer[255] = {0};
 char a[3] = {0};
-#define addr_p 4;
+#define addr_p 3;
 uint8_t d_addr = 0;
 uint8_t p_size = 0;
 uint8_t d_size = 0;
 uint8_t p_bytes = 0;
-uint8_t data_buf[256] = {0};
-uint8_t current_dev = 0;
+uint8_t data_buf[255] = {0};
+uint8_t current_dev = 119;
 /* Simple busy loop delay */
 void delay(unsigned long count) {
     while (count--)
@@ -99,13 +99,14 @@ void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
     }
 }
 
-uint8_t convert_chars_to_int(char* rx_chars_int) {
+uint8_t convert_chars_to_int(char* rx_chars_int, const int i) {
     uint8_t result = 0;
 
-    for (int i = 0; i < 3; i++) {
-        result = (result * 10) + (rx_chars_int[i] - '0');
-
+    for (int o = 0; o < i; o++) {
+        
+        result = (result * 10) + (rx_chars_int[o] - '0');
     }
+
     return result;
 }
 
@@ -129,10 +130,10 @@ void convert_int_to_binary(int num, char* rx_binary_chars) {
 void get_addr_from_buff(void)
 {
     uint8_t counter = 0;
-    uint8_t i = 4;
+    uint8_t i = 3;
     while(1)
     {
-        if(buffer[i] == 32 || buffer[i] == 10)
+        if(buffer[i] == ' ' || buffer[i] == '\r\n')
         {
             p_size = i+1;
             break;
@@ -141,64 +142,57 @@ void get_addr_from_buff(void)
         counter++;
     }
     memcpy(a, &buffer[3], counter);
-    d_addr = convert_chars_to_int(a);
+    d_addr = convert_chars_to_int(a, counter);
 }
 
 void get_size_from_buff(void)
 {
+    memset(a, 0, sizeof(a));
     uint8_t counter = 0;
     uint8_t i = p_size;
     while(1)
     {
-        if(buffer[i] == 32 || buffer[i] == 10)
+        if(buffer[i] == ' ' || buffer[i] == '\r\n')
         {
+
             p_bytes = i+1;
             break;
         }
         i++;
         counter++;
     }
+
     memcpy(a, &buffer[p_size], counter);
-    d_size = convert_chars_to_int(a);
+    d_size = convert_chars_to_int(a, counter);
 }
 void char_buffer_to_int(void)
 {
+    memset(a, 0, sizeof(a));
     uint8_t counter = d_size;
     uint8_t i = p_bytes;
-    uint8_t buf_i = 0;
-    while(counter > 0) // 
+    uint8_t int_buf_i = 0;
+
+    for(int o = 0; o < counter;o++)
+    {
+    uint8_t number_counter = 0;
+    while(1)
     {
         if(buffer[i] == ' ')
         {
-            uint8_t buf_counter = 0;
-            while(1)
-            {
-                i++;
-                if(buffer[i] == ' ' || buffer[i] == '\r\n')
-                break;
-                buf_counter++;
-            }
-            memcpy(a, &buffer[i], buf_counter);
-            //uart_write("AAAA\n");
-            //uart_write(a + '\0');
-            //uart_write("\nBBBB\n");
-            data_buf[buf_i] = convert_chars_to_int(a);
-            counter--;
-            buf_i++;
-        }
-        else if(buffer[i] == '\r\n')
-        {
-            convert_int_to_chars(buf_i, a);
-            uart_write("buf count -> ");
-            uart_write(a);
-            uart_write(" <-\n");
+            i++;
             break;
         }
+        else if(buffer[i] == '\r\n')
+            break;
         else
-        i++;
-
+            i++;
+        
+        number_counter++;
     }
-
+    memcpy(a, &buffer[i - number_counter], number_counter);
+    data_buf[int_buf_i] = convert_chars_to_int(a, number_counter);
+    int_buf_i++;
+    }
 }
 /*
  ____ _____ __  __  ___    ____  _____ _____ ____  

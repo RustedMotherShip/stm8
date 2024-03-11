@@ -59,27 +59,27 @@
                                      59 ;--------------------------------------------------------
                                      60 	.area INITIALIZED
       000001                         61 _buffer::
-      000001                         62 	.ds 256
-      000101                         63 _a::
-      000101                         64 	.ds 3
-      000104                         65 _d_addr::
-      000104                         66 	.ds 1
-      000105                         67 _p_size::
-      000105                         68 	.ds 1
-      000106                         69 _d_size::
-      000106                         70 	.ds 1
-      000107                         71 _p_bytes::
-      000107                         72 	.ds 1
-      000108                         73 _data_buf::
-      000108                         74 	.ds 256
-      000208                         75 _current_dev::
-      000208                         76 	.ds 1
+      000001                         62 	.ds 255
+      000100                         63 _a::
+      000100                         64 	.ds 3
+      000103                         65 _d_addr::
+      000103                         66 	.ds 1
+      000104                         67 _p_size::
+      000104                         68 	.ds 1
+      000105                         69 _d_size::
+      000105                         70 	.ds 1
+      000106                         71 _p_bytes::
+      000106                         72 	.ds 1
+      000107                         73 _data_buf::
+      000107                         74 	.ds 255
+      000206                         75 _current_dev::
+      000206                         76 	.ds 1
                                      77 ;--------------------------------------------------------
                                      78 ; Stack segment in internal ram
                                      79 ;--------------------------------------------------------
                                      80 	.area SSEG
-      000209                         81 __start__stack:
-      000209                         82 	.ds	1
+      000207                         81 __start__stack:
+      000207                         82 	.ds	1
                                      83 
                                      84 ;--------------------------------------------------------
                                      85 ; absolute external ram data
@@ -107,7 +107,7 @@
                                     107 	.area GSINIT
                                     108 	.area GSFINAL
                                     109 	.area GSINIT
-      008007 CD 8B 41         [ 4]  110 	call	___sdcc_external_startup
+      008007 CD 8C 03         [ 4]  110 	call	___sdcc_external_startup
       00800A 4D               [ 1]  111 	tnz	a
       00800B 27 03            [ 1]  112 	jreq	__sdcc_init_data
       00800D CC 80 04         [ 2]  113 	jp	__sdcc_program_startup
@@ -120,10 +120,10 @@
       008019 5A               [ 2]  120 	decw x
       00801A 26 F9            [ 1]  121 	jrne	00001$
       00801C                        122 00002$:
-      00801C AE 02 08         [ 2]  123 	ldw	x, #l_INITIALIZER
+      00801C AE 02 06         [ 2]  123 	ldw	x, #l_INITIALIZER
       00801F 27 09            [ 1]  124 	jreq	00004$
       008021                        125 00003$:
-      008021 D6 80 FE         [ 1]  126 	ld	a, (s_INITIALIZER - 1, x)
+      008021 D6 81 1F         [ 1]  126 	ld	a, (s_INITIALIZER - 1, x)
       008024 D7 00 00         [ 1]  127 	ld	(s_INITIALIZED - 1, x), a
       008027 5A               [ 2]  128 	decw	x
       008028 26 F7            [ 1]  129 	jrne	00003$
@@ -137,7 +137,7 @@
                                     137 	.area HOME
                                     138 	.area HOME
       008004                        139 __sdcc_program_startup:
-      008004 CC 8A 74         [ 2]  140 	jp	_main
+      008004 CC 8B 36         [ 2]  140 	jp	_main
                                     141 ;	return from main will return to caller
                                     142 ;--------------------------------------------------------
                                     143 ; code
@@ -147,2137 +147,2252 @@
                                     147 ;	-----------------------------------------
                                     148 ;	 function delay
                                     149 ;	-----------------------------------------
-      008307                        150 _delay:
-      008307 52 08            [ 2]  151 	sub	sp, #8
+      008326                        150 _delay:
+      008326 52 08            [ 2]  151 	sub	sp, #8
                                     152 ;	main.c: 27: while (count--)
-      008309 16 0D            [ 2]  153 	ldw	y, (0x0d, sp)
-      00830B 17 07            [ 2]  154 	ldw	(0x07, sp), y
-      00830D 1E 0B            [ 2]  155 	ldw	x, (0x0b, sp)
-      00830F                        156 00101$:
-      00830F 1F 01            [ 2]  157 	ldw	(0x01, sp), x
-      008311 7B 07            [ 1]  158 	ld	a, (0x07, sp)
-      008313 6B 03            [ 1]  159 	ld	(0x03, sp), a
-      008315 7B 08            [ 1]  160 	ld	a, (0x08, sp)
-      008317 16 07            [ 2]  161 	ldw	y, (0x07, sp)
-      008319 72 A2 00 01      [ 2]  162 	subw	y, #0x0001
-      00831D 17 07            [ 2]  163 	ldw	(0x07, sp), y
-      00831F 24 01            [ 1]  164 	jrnc	00117$
-      008321 5A               [ 2]  165 	decw	x
-      008322                        166 00117$:
-      008322 4D               [ 1]  167 	tnz	a
-      008323 26 08            [ 1]  168 	jrne	00118$
-      008325 16 02            [ 2]  169 	ldw	y, (0x02, sp)
-      008327 26 04            [ 1]  170 	jrne	00118$
-      008329 0D 01            [ 1]  171 	tnz	(0x01, sp)
-      00832B 27 03            [ 1]  172 	jreq	00104$
-      00832D                        173 00118$:
+      008328 16 0D            [ 2]  153 	ldw	y, (0x0d, sp)
+      00832A 17 07            [ 2]  154 	ldw	(0x07, sp), y
+      00832C 1E 0B            [ 2]  155 	ldw	x, (0x0b, sp)
+      00832E                        156 00101$:
+      00832E 1F 01            [ 2]  157 	ldw	(0x01, sp), x
+      008330 7B 07            [ 1]  158 	ld	a, (0x07, sp)
+      008332 6B 03            [ 1]  159 	ld	(0x03, sp), a
+      008334 7B 08            [ 1]  160 	ld	a, (0x08, sp)
+      008336 16 07            [ 2]  161 	ldw	y, (0x07, sp)
+      008338 72 A2 00 01      [ 2]  162 	subw	y, #0x0001
+      00833C 17 07            [ 2]  163 	ldw	(0x07, sp), y
+      00833E 24 01            [ 1]  164 	jrnc	00117$
+      008340 5A               [ 2]  165 	decw	x
+      008341                        166 00117$:
+      008341 4D               [ 1]  167 	tnz	a
+      008342 26 08            [ 1]  168 	jrne	00118$
+      008344 16 02            [ 2]  169 	ldw	y, (0x02, sp)
+      008346 26 04            [ 1]  170 	jrne	00118$
+      008348 0D 01            [ 1]  171 	tnz	(0x01, sp)
+      00834A 27 03            [ 1]  172 	jreq	00104$
+      00834C                        173 00118$:
                                     174 ;	main.c: 28: nop();
-      00832D 9D               [ 1]  175 	nop
-      00832E 20 DF            [ 2]  176 	jra	00101$
-      008330                        177 00104$:
+      00834C 9D               [ 1]  175 	nop
+      00834D 20 DF            [ 2]  176 	jra	00101$
+      00834F                        177 00104$:
                                     178 ;	main.c: 29: }
-      008330 1E 09            [ 2]  179 	ldw	x, (9, sp)
-      008332 5B 0E            [ 2]  180 	addw	sp, #14
-      008334 FC               [ 2]  181 	jp	(x)
+      00834F 1E 09            [ 2]  179 	ldw	x, (9, sp)
+      008351 5B 0E            [ 2]  180 	addw	sp, #14
+      008353 FC               [ 2]  181 	jp	(x)
                                     182 ;	main.c: 37: void UART_TX(unsigned char value)
                                     183 ;	-----------------------------------------
                                     184 ;	 function UART_TX
                                     185 ;	-----------------------------------------
-      008335                        186 _UART_TX:
+      008354                        186 _UART_TX:
                                     187 ;	main.c: 39: UART1_DR = value;
-      008335 C7 52 31         [ 1]  188 	ld	0x5231, a
+      008354 C7 52 31         [ 1]  188 	ld	0x5231, a
                                     189 ;	main.c: 40: while(!(UART1_SR & UART_SR_TXE));
-      008338                        190 00101$:
-      008338 C6 52 30         [ 1]  191 	ld	a, 0x5230
-      00833B 2A FB            [ 1]  192 	jrpl	00101$
+      008357                        190 00101$:
+      008357 C6 52 30         [ 1]  191 	ld	a, 0x5230
+      00835A 2A FB            [ 1]  192 	jrpl	00101$
                                     193 ;	main.c: 41: }
-      00833D 81               [ 4]  194 	ret
+      00835C 81               [ 4]  194 	ret
                                     195 ;	main.c: 42: unsigned char UART_RX(void)
                                     196 ;	-----------------------------------------
                                     197 ;	 function UART_RX
                                     198 ;	-----------------------------------------
-      00833E                        199 _UART_RX:
+      00835D                        199 _UART_RX:
                                     200 ;	main.c: 44: while(!(UART1_SR & UART_SR_TXE));
-      00833E                        201 00101$:
-      00833E C6 52 30         [ 1]  202 	ld	a, 0x5230
-      008341 2A FB            [ 1]  203 	jrpl	00101$
+      00835D                        201 00101$:
+      00835D C6 52 30         [ 1]  202 	ld	a, 0x5230
+      008360 2A FB            [ 1]  203 	jrpl	00101$
                                     204 ;	main.c: 45: return UART1_DR;
-      008343 C6 52 31         [ 1]  205 	ld	a, 0x5231
+      008362 C6 52 31         [ 1]  205 	ld	a, 0x5231
                                     206 ;	main.c: 46: }
-      008346 81               [ 4]  207 	ret
+      008365 81               [ 4]  207 	ret
                                     208 ;	main.c: 47: int uart_write(const char *str) {
                                     209 ;	-----------------------------------------
                                     210 ;	 function uart_write
                                     211 ;	-----------------------------------------
-      008347                        212 _uart_write:
-      008347 52 05            [ 2]  213 	sub	sp, #5
-      008349 1F 03            [ 2]  214 	ldw	(0x03, sp), x
+      008366                        212 _uart_write:
+      008366 52 05            [ 2]  213 	sub	sp, #5
+      008368 1F 03            [ 2]  214 	ldw	(0x03, sp), x
                                     215 ;	main.c: 49: for(i = 0; i < strlen(str); i++) {
-      00834B 0F 05            [ 1]  216 	clr	(0x05, sp)
-      00834D                        217 00103$:
-      00834D 1E 03            [ 2]  218 	ldw	x, (0x03, sp)
-      00834F CD 8B 43         [ 4]  219 	call	_strlen
-      008352 1F 01            [ 2]  220 	ldw	(0x01, sp), x
-      008354 7B 05            [ 1]  221 	ld	a, (0x05, sp)
-      008356 5F               [ 1]  222 	clrw	x
-      008357 97               [ 1]  223 	ld	xl, a
-      008358 13 01            [ 2]  224 	cpw	x, (0x01, sp)
-      00835A 24 0F            [ 1]  225 	jrnc	00101$
+      00836A 0F 05            [ 1]  216 	clr	(0x05, sp)
+      00836C                        217 00103$:
+      00836C 1E 03            [ 2]  218 	ldw	x, (0x03, sp)
+      00836E CD 8C 05         [ 4]  219 	call	_strlen
+      008371 1F 01            [ 2]  220 	ldw	(0x01, sp), x
+      008373 7B 05            [ 1]  221 	ld	a, (0x05, sp)
+      008375 5F               [ 1]  222 	clrw	x
+      008376 97               [ 1]  223 	ld	xl, a
+      008377 13 01            [ 2]  224 	cpw	x, (0x01, sp)
+      008379 24 0F            [ 1]  225 	jrnc	00101$
                                     226 ;	main.c: 51: UART_TX(str[i]);
-      00835C 5F               [ 1]  227 	clrw	x
-      00835D 7B 05            [ 1]  228 	ld	a, (0x05, sp)
-      00835F 97               [ 1]  229 	ld	xl, a
-      008360 72 FB 03         [ 2]  230 	addw	x, (0x03, sp)
-      008363 F6               [ 1]  231 	ld	a, (x)
-      008364 CD 83 35         [ 4]  232 	call	_UART_TX
+      00837B 5F               [ 1]  227 	clrw	x
+      00837C 7B 05            [ 1]  228 	ld	a, (0x05, sp)
+      00837E 97               [ 1]  229 	ld	xl, a
+      00837F 72 FB 03         [ 2]  230 	addw	x, (0x03, sp)
+      008382 F6               [ 1]  231 	ld	a, (x)
+      008383 CD 83 54         [ 4]  232 	call	_UART_TX
                                     233 ;	main.c: 49: for(i = 0; i < strlen(str); i++) {
-      008367 0C 05            [ 1]  234 	inc	(0x05, sp)
-      008369 20 E2            [ 2]  235 	jra	00103$
-      00836B                        236 00101$:
+      008386 0C 05            [ 1]  234 	inc	(0x05, sp)
+      008388 20 E2            [ 2]  235 	jra	00103$
+      00838A                        236 00101$:
                                     237 ;	main.c: 53: return(i); // Bytes sent
-      00836B 7B 05            [ 1]  238 	ld	a, (0x05, sp)
-      00836D 5F               [ 1]  239 	clrw	x
-      00836E 97               [ 1]  240 	ld	xl, a
+      00838A 7B 05            [ 1]  238 	ld	a, (0x05, sp)
+      00838C 5F               [ 1]  239 	clrw	x
+      00838D 97               [ 1]  240 	ld	xl, a
                                     241 ;	main.c: 54: }
-      00836F 5B 05            [ 2]  242 	addw	sp, #5
-      008371 81               [ 4]  243 	ret
+      00838E 5B 05            [ 2]  242 	addw	sp, #5
+      008390 81               [ 4]  243 	ret
                                     244 ;	main.c: 55: int uart_read(void)
                                     245 ;	-----------------------------------------
                                     246 ;	 function uart_read
                                     247 ;	-----------------------------------------
-      008372                        248 _uart_read:
+      008391                        248 _uart_read:
                                     249 ;	main.c: 57: memset(buffer, 0, sizeof(buffer));
-      008372 4B 00            [ 1]  250 	push	#0x00
-      008374 4B 01            [ 1]  251 	push	#0x01
-      008376 5F               [ 1]  252 	clrw	x
-      008377 89               [ 2]  253 	pushw	x
-      008378 AE 00 01         [ 2]  254 	ldw	x, #(_buffer+0)
-      00837B CD 8B 1F         [ 4]  255 	call	_memset
+      008391 4B FF            [ 1]  250 	push	#0xff
+      008393 4B 00            [ 1]  251 	push	#0x00
+      008395 5F               [ 1]  252 	clrw	x
+      008396 89               [ 2]  253 	pushw	x
+      008397 AE 00 01         [ 2]  254 	ldw	x, #(_buffer+0)
+      00839A CD 8B E1         [ 4]  255 	call	_memset
                                     256 ;	main.c: 59: while(i<256)
-      00837E 5F               [ 1]  257 	clrw	x
-      00837F                        258 00105$:
-      00837F A3 01 00         [ 2]  259 	cpw	x, #0x0100
-      008382 2E 22            [ 1]  260 	jrsge	00107$
+      00839D 5F               [ 1]  257 	clrw	x
+      00839E                        258 00105$:
+      00839E A3 01 00         [ 2]  259 	cpw	x, #0x0100
+      0083A1 2E 22            [ 1]  260 	jrsge	00107$
                                     261 ;	main.c: 61: if(UART1_SR & UART_SR_RXNE)
-      008384 C6 52 30         [ 1]  262 	ld	a, 0x5230
-      008387 A5 20            [ 1]  263 	bcp	a, #0x20
-      008389 27 F4            [ 1]  264 	jreq	00105$
+      0083A3 C6 52 30         [ 1]  262 	ld	a, 0x5230
+      0083A6 A5 20            [ 1]  263 	bcp	a, #0x20
+      0083A8 27 F4            [ 1]  264 	jreq	00105$
                                     265 ;	main.c: 63: buffer[i] = UART_RX();
-      00838B 90 93            [ 1]  266 	ldw	y, x
-      00838D 72 A9 00 01      [ 2]  267 	addw	y, #(_buffer+0)
-      008391 89               [ 2]  268 	pushw	x
-      008392 90 89            [ 2]  269 	pushw	y
-      008394 CD 83 3E         [ 4]  270 	call	_UART_RX
-      008397 90 85            [ 2]  271 	popw	y
-      008399 85               [ 2]  272 	popw	x
-      00839A 90 F7            [ 1]  273 	ld	(y), a
+      0083AA 90 93            [ 1]  266 	ldw	y, x
+      0083AC 72 A9 00 01      [ 2]  267 	addw	y, #(_buffer+0)
+      0083B0 89               [ 2]  268 	pushw	x
+      0083B1 90 89            [ 2]  269 	pushw	y
+      0083B3 CD 83 5D         [ 4]  270 	call	_UART_RX
+      0083B6 90 85            [ 2]  271 	popw	y
+      0083B8 85               [ 2]  272 	popw	x
+      0083B9 90 F7            [ 1]  273 	ld	(y), a
                                     274 ;	main.c: 64: if(buffer[i] == '\r\n' )
-      00839C A1 0D            [ 1]  275 	cp	a, #0x0d
-      00839E 26 03            [ 1]  276 	jrne	00102$
+      0083BB A1 0D            [ 1]  275 	cp	a, #0x0d
+      0083BD 26 03            [ 1]  276 	jrne	00102$
                                     277 ;	main.c: 66: return 1;
-      0083A0 5F               [ 1]  278 	clrw	x
-      0083A1 5C               [ 1]  279 	incw	x
-      0083A2 81               [ 4]  280 	ret
+      0083BF 5F               [ 1]  278 	clrw	x
+      0083C0 5C               [ 1]  279 	incw	x
+      0083C1 81               [ 4]  280 	ret
                                     281 ;	main.c: 67: break;
-      0083A3                        282 00102$:
+      0083C2                        282 00102$:
                                     283 ;	main.c: 69: i++;
-      0083A3 5C               [ 1]  284 	incw	x
-      0083A4 20 D9            [ 2]  285 	jra	00105$
-      0083A6                        286 00107$:
+      0083C2 5C               [ 1]  284 	incw	x
+      0083C3 20 D9            [ 2]  285 	jra	00105$
+      0083C5                        286 00107$:
                                     287 ;	main.c: 72: return 0;
-      0083A6 5F               [ 1]  288 	clrw	x
+      0083C5 5F               [ 1]  288 	clrw	x
                                     289 ;	main.c: 73: }
-      0083A7 81               [ 4]  290 	ret
+      0083C6 81               [ 4]  290 	ret
                                     291 ;	main.c: 82: void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
                                     292 ;	-----------------------------------------
                                     293 ;	 function convert_int_to_chars
                                     294 ;	-----------------------------------------
-      0083A8                        295 _convert_int_to_chars:
-      0083A8 52 0D            [ 2]  296 	sub	sp, #13
-      0083AA 6B 0D            [ 1]  297 	ld	(0x0d, sp), a
-      0083AC 1F 0B            [ 2]  298 	ldw	(0x0b, sp), x
+      0083C7                        295 _convert_int_to_chars:
+      0083C7 52 0D            [ 2]  296 	sub	sp, #13
+      0083C9 6B 0D            [ 1]  297 	ld	(0x0d, sp), a
+      0083CB 1F 0B            [ 2]  298 	ldw	(0x0b, sp), x
                                     299 ;	main.c: 85: rx_int_chars[0] = num / 100 + '0';
-      0083AE 7B 0D            [ 1]  300 	ld	a, (0x0d, sp)
-      0083B0 6B 02            [ 1]  301 	ld	(0x02, sp), a
-      0083B2 0F 01            [ 1]  302 	clr	(0x01, sp)
+      0083CD 7B 0D            [ 1]  300 	ld	a, (0x0d, sp)
+      0083CF 6B 02            [ 1]  301 	ld	(0x02, sp), a
+      0083D1 0F 01            [ 1]  302 	clr	(0x01, sp)
                                     303 ;	main.c: 86: rx_int_chars[1] = num / 10 % 10 + '0';
-      0083B4 1E 0B            [ 2]  304 	ldw	x, (0x0b, sp)
-      0083B6 5C               [ 1]  305 	incw	x
-      0083B7 1F 03            [ 2]  306 	ldw	(0x03, sp), x
+      0083D3 1E 0B            [ 2]  304 	ldw	x, (0x0b, sp)
+      0083D5 5C               [ 1]  305 	incw	x
+      0083D6 1F 03            [ 2]  306 	ldw	(0x03, sp), x
                                     307 ;	main.c: 87: rx_int_chars[2] = num % 10 + '0';
-      0083B9 1E 0B            [ 2]  308 	ldw	x, (0x0b, sp)
-      0083BB 5C               [ 1]  309 	incw	x
-      0083BC 5C               [ 1]  310 	incw	x
-      0083BD 1F 05            [ 2]  311 	ldw	(0x05, sp), x
+      0083D8 1E 0B            [ 2]  308 	ldw	x, (0x0b, sp)
+      0083DA 5C               [ 1]  309 	incw	x
+      0083DB 5C               [ 1]  310 	incw	x
+      0083DC 1F 05            [ 2]  311 	ldw	(0x05, sp), x
                                     312 ;	main.c: 86: rx_int_chars[1] = num / 10 % 10 + '0';
-      0083BF 4B 0A            [ 1]  313 	push	#0x0a
-      0083C1 4B 00            [ 1]  314 	push	#0x00
-      0083C3 1E 03            [ 2]  315 	ldw	x, (0x03, sp)
+      0083DE 4B 0A            [ 1]  313 	push	#0x0a
+      0083E0 4B 00            [ 1]  314 	push	#0x00
+      0083E2 1E 03            [ 2]  315 	ldw	x, (0x03, sp)
                                     316 ;	main.c: 87: rx_int_chars[2] = num % 10 + '0';
-      0083C5 CD 8B 68         [ 4]  317 	call	__divsint
-      0083C8 1F 07            [ 2]  318 	ldw	(0x07, sp), x
-      0083CA 4B 0A            [ 1]  319 	push	#0x0a
-      0083CC 4B 00            [ 1]  320 	push	#0x00
-      0083CE 1E 03            [ 2]  321 	ldw	x, (0x03, sp)
-      0083D0 CD 8B 50         [ 4]  322 	call	__modsint
-      0083D3 9F               [ 1]  323 	ld	a, xl
-      0083D4 AB 30            [ 1]  324 	add	a, #0x30
-      0083D6 6B 09            [ 1]  325 	ld	(0x09, sp), a
+      0083E4 CD 8C 2A         [ 4]  317 	call	__divsint
+      0083E7 1F 07            [ 2]  318 	ldw	(0x07, sp), x
+      0083E9 4B 0A            [ 1]  319 	push	#0x0a
+      0083EB 4B 00            [ 1]  320 	push	#0x00
+      0083ED 1E 03            [ 2]  321 	ldw	x, (0x03, sp)
+      0083EF CD 8C 12         [ 4]  322 	call	__modsint
+      0083F2 9F               [ 1]  323 	ld	a, xl
+      0083F3 AB 30            [ 1]  324 	add	a, #0x30
+      0083F5 6B 09            [ 1]  325 	ld	(0x09, sp), a
                                     326 ;	main.c: 83: if (num > 99) {
-      0083D8 7B 0D            [ 1]  327 	ld	a, (0x0d, sp)
-      0083DA A1 63            [ 1]  328 	cp	a, #0x63
-      0083DC 23 29            [ 2]  329 	jrule	00105$
+      0083F7 7B 0D            [ 1]  327 	ld	a, (0x0d, sp)
+      0083F9 A1 63            [ 1]  328 	cp	a, #0x63
+      0083FB 23 29            [ 2]  329 	jrule	00105$
                                     330 ;	main.c: 85: rx_int_chars[0] = num / 100 + '0';
-      0083DE 4B 64            [ 1]  331 	push	#0x64
-      0083E0 4B 00            [ 1]  332 	push	#0x00
-      0083E2 1E 03            [ 2]  333 	ldw	x, (0x03, sp)
-      0083E4 CD 8B 68         [ 4]  334 	call	__divsint
-      0083E7 9F               [ 1]  335 	ld	a, xl
-      0083E8 AB 30            [ 1]  336 	add	a, #0x30
-      0083EA 1E 0B            [ 2]  337 	ldw	x, (0x0b, sp)
-      0083EC F7               [ 1]  338 	ld	(x), a
+      0083FD 4B 64            [ 1]  331 	push	#0x64
+      0083FF 4B 00            [ 1]  332 	push	#0x00
+      008401 1E 03            [ 2]  333 	ldw	x, (0x03, sp)
+      008403 CD 8C 2A         [ 4]  334 	call	__divsint
+      008406 9F               [ 1]  335 	ld	a, xl
+      008407 AB 30            [ 1]  336 	add	a, #0x30
+      008409 1E 0B            [ 2]  337 	ldw	x, (0x0b, sp)
+      00840B F7               [ 1]  338 	ld	(x), a
                                     339 ;	main.c: 86: rx_int_chars[1] = num / 10 % 10 + '0';
-      0083ED 4B 0A            [ 1]  340 	push	#0x0a
-      0083EF 4B 00            [ 1]  341 	push	#0x00
-      0083F1 1E 09            [ 2]  342 	ldw	x, (0x09, sp)
-      0083F3 CD 8B 50         [ 4]  343 	call	__modsint
-      0083F6 9F               [ 1]  344 	ld	a, xl
-      0083F7 AB 30            [ 1]  345 	add	a, #0x30
-      0083F9 1E 03            [ 2]  346 	ldw	x, (0x03, sp)
-      0083FB F7               [ 1]  347 	ld	(x), a
+      00840C 4B 0A            [ 1]  340 	push	#0x0a
+      00840E 4B 00            [ 1]  341 	push	#0x00
+      008410 1E 09            [ 2]  342 	ldw	x, (0x09, sp)
+      008412 CD 8C 12         [ 4]  343 	call	__modsint
+      008415 9F               [ 1]  344 	ld	a, xl
+      008416 AB 30            [ 1]  345 	add	a, #0x30
+      008418 1E 03            [ 2]  346 	ldw	x, (0x03, sp)
+      00841A F7               [ 1]  347 	ld	(x), a
                                     348 ;	main.c: 87: rx_int_chars[2] = num % 10 + '0';
-      0083FC 1E 05            [ 2]  349 	ldw	x, (0x05, sp)
-      0083FE 7B 09            [ 1]  350 	ld	a, (0x09, sp)
-      008400 F7               [ 1]  351 	ld	(x), a
+      00841B 1E 05            [ 2]  349 	ldw	x, (0x05, sp)
+      00841D 7B 09            [ 1]  350 	ld	a, (0x09, sp)
+      00841F F7               [ 1]  351 	ld	(x), a
                                     352 ;	main.c: 88: rx_int_chars[3] ='\0';
-      008401 1E 0B            [ 2]  353 	ldw	x, (0x0b, sp)
-      008403 6F 03            [ 1]  354 	clr	(0x0003, x)
-      008405 20 23            [ 2]  355 	jra	00107$
-      008407                        356 00105$:
+      008420 1E 0B            [ 2]  353 	ldw	x, (0x0b, sp)
+      008422 6F 03            [ 1]  354 	clr	(0x0003, x)
+      008424 20 23            [ 2]  355 	jra	00107$
+      008426                        356 00105$:
                                     357 ;	main.c: 90: } else if (num > 9) {
-      008407 7B 0D            [ 1]  358 	ld	a, (0x0d, sp)
-      008409 A1 09            [ 1]  359 	cp	a, #0x09
-      00840B 23 13            [ 2]  360 	jrule	00102$
+      008426 7B 0D            [ 1]  358 	ld	a, (0x0d, sp)
+      008428 A1 09            [ 1]  359 	cp	a, #0x09
+      00842A 23 13            [ 2]  360 	jrule	00102$
                                     361 ;	main.c: 92: rx_int_chars[0] = num / 10 + '0';
-      00840D 7B 08            [ 1]  362 	ld	a, (0x08, sp)
-      00840F 6B 0A            [ 1]  363 	ld	(0x0a, sp), a
-      008411 AB 30            [ 1]  364 	add	a, #0x30
-      008413 1E 0B            [ 2]  365 	ldw	x, (0x0b, sp)
-      008415 F7               [ 1]  366 	ld	(x), a
+      00842C 7B 08            [ 1]  362 	ld	a, (0x08, sp)
+      00842E 6B 0A            [ 1]  363 	ld	(0x0a, sp), a
+      008430 AB 30            [ 1]  364 	add	a, #0x30
+      008432 1E 0B            [ 2]  365 	ldw	x, (0x0b, sp)
+      008434 F7               [ 1]  366 	ld	(x), a
                                     367 ;	main.c: 93: rx_int_chars[1] = num % 10 + '0';
-      008416 1E 03            [ 2]  368 	ldw	x, (0x03, sp)
-      008418 7B 09            [ 1]  369 	ld	a, (0x09, sp)
-      00841A F7               [ 1]  370 	ld	(x), a
+      008435 1E 03            [ 2]  368 	ldw	x, (0x03, sp)
+      008437 7B 09            [ 1]  369 	ld	a, (0x09, sp)
+      008439 F7               [ 1]  370 	ld	(x), a
                                     371 ;	main.c: 94: rx_int_chars[2] ='\0'; // Заканчиваем строку символом конца строки
-      00841B 1E 05            [ 2]  372 	ldw	x, (0x05, sp)
-      00841D 7F               [ 1]  373 	clr	(x)
-      00841E 20 0A            [ 2]  374 	jra	00107$
-      008420                        375 00102$:
+      00843A 1E 05            [ 2]  372 	ldw	x, (0x05, sp)
+      00843C 7F               [ 1]  373 	clr	(x)
+      00843D 20 0A            [ 2]  374 	jra	00107$
+      00843F                        375 00102$:
                                     376 ;	main.c: 97: rx_int_chars[0] = num + '0';
-      008420 7B 0D            [ 1]  377 	ld	a, (0x0d, sp)
-      008422 AB 30            [ 1]  378 	add	a, #0x30
-      008424 1E 0B            [ 2]  379 	ldw	x, (0x0b, sp)
-      008426 F7               [ 1]  380 	ld	(x), a
+      00843F 7B 0D            [ 1]  377 	ld	a, (0x0d, sp)
+      008441 AB 30            [ 1]  378 	add	a, #0x30
+      008443 1E 0B            [ 2]  379 	ldw	x, (0x0b, sp)
+      008445 F7               [ 1]  380 	ld	(x), a
                                     381 ;	main.c: 98: rx_int_chars[1] ='\0';
-      008427 1E 03            [ 2]  382 	ldw	x, (0x03, sp)
-      008429 7F               [ 1]  383 	clr	(x)
-      00842A                        384 00107$:
+      008446 1E 03            [ 2]  382 	ldw	x, (0x03, sp)
+      008448 7F               [ 1]  383 	clr	(x)
+      008449                        384 00107$:
                                     385 ;	main.c: 100: }
-      00842A 5B 0D            [ 2]  386 	addw	sp, #13
-      00842C 81               [ 4]  387 	ret
-                                    388 ;	main.c: 102: uint8_t convert_chars_to_int(char* rx_chars_int) {
+      008449 5B 0D            [ 2]  386 	addw	sp, #13
+      00844B 81               [ 4]  387 	ret
+                                    388 ;	main.c: 102: uint8_t convert_chars_to_int(char* rx_chars_int, const int i) {
                                     389 ;	-----------------------------------------
                                     390 ;	 function convert_chars_to_int
                                     391 ;	-----------------------------------------
-      00842D                        392 _convert_chars_to_int:
-      00842D 52 03            [ 2]  393 	sub	sp, #3
-      00842F 1F 02            [ 2]  394 	ldw	(0x02, sp), x
+      00844C                        392 _convert_chars_to_int:
+      00844C 52 09            [ 2]  393 	sub	sp, #9
+      00844E 1F 06            [ 2]  394 	ldw	(0x06, sp), x
                                     395 ;	main.c: 103: uint8_t result = 0;
-      008431 4F               [ 1]  396 	clr	a
-                                    397 ;	main.c: 105: for (int i = 0; i < 3; i++) {
-      008432 5F               [ 1]  398 	clrw	x
-      008433                        399 00103$:
-      008433 A3 00 03         [ 2]  400 	cpw	x, #0x0003
-      008436 2E 18            [ 1]  401 	jrsge	00101$
-                                    402 ;	main.c: 106: result = (result * 10) + (rx_chars_int[i] - '0');
-      008438 90 97            [ 1]  403 	ld	yl, a
-      00843A A6 0A            [ 1]  404 	ld	a, #0x0a
-      00843C 90 42            [ 4]  405 	mul	y, a
-      00843E 61               [ 1]  406 	exg	a, yl
-      00843F 6B 01            [ 1]  407 	ld	(0x01, sp), a
-      008441 61               [ 1]  408 	exg	a, yl
-      008442 90 93            [ 1]  409 	ldw	y, x
-      008444 72 F9 02         [ 2]  410 	addw	y, (0x02, sp)
-      008447 90 F6            [ 1]  411 	ld	a, (y)
-      008449 A0 30            [ 1]  412 	sub	a, #0x30
-      00844B 1B 01            [ 1]  413 	add	a, (0x01, sp)
-                                    414 ;	main.c: 105: for (int i = 0; i < 3; i++) {
-      00844D 5C               [ 1]  415 	incw	x
-      00844E 20 E3            [ 2]  416 	jra	00103$
-      008450                        417 00101$:
-                                    418 ;	main.c: 109: return result;
-                                    419 ;	main.c: 110: }
-      008450 5B 03            [ 2]  420 	addw	sp, #3
-      008452 81               [ 4]  421 	ret
-                                    422 ;	main.c: 113: void convert_int_to_binary(int num, char* rx_binary_chars) {
-                                    423 ;	-----------------------------------------
-                                    424 ;	 function convert_int_to_binary
-                                    425 ;	-----------------------------------------
-      008453                        426 _convert_int_to_binary:
-      008453 52 04            [ 2]  427 	sub	sp, #4
-      008455 1F 01            [ 2]  428 	ldw	(0x01, sp), x
-                                    429 ;	main.c: 115: for(int i = 7; i >= 0; i--) {
-      008457 AE 00 07         [ 2]  430 	ldw	x, #0x0007
-      00845A 1F 03            [ 2]  431 	ldw	(0x03, sp), x
-      00845C                        432 00103$:
-      00845C 0D 03            [ 1]  433 	tnz	(0x03, sp)
-      00845E 2B 22            [ 1]  434 	jrmi	00101$
-                                    435 ;	main.c: 117: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
-      008460 AE 00 07         [ 2]  436 	ldw	x, #0x0007
-      008463 72 F0 03         [ 2]  437 	subw	x, (0x03, sp)
-      008466 72 FB 07         [ 2]  438 	addw	x, (0x07, sp)
-      008469 16 01            [ 2]  439 	ldw	y, (0x01, sp)
-      00846B 7B 04            [ 1]  440 	ld	a, (0x04, sp)
-      00846D 27 05            [ 1]  441 	jreq	00120$
-      00846F                        442 00119$:
-      00846F 90 57            [ 2]  443 	sraw	y
-      008471 4A               [ 1]  444 	dec	a
-      008472 26 FB            [ 1]  445 	jrne	00119$
-      008474                        446 00120$:
-      008474 90 9F            [ 1]  447 	ld	a, yl
-      008476 A4 01            [ 1]  448 	and	a, #0x01
-      008478 AB 30            [ 1]  449 	add	a, #0x30
-      00847A F7               [ 1]  450 	ld	(x), a
-                                    451 ;	main.c: 115: for(int i = 7; i >= 0; i--) {
-      00847B 1E 03            [ 2]  452 	ldw	x, (0x03, sp)
-      00847D 5A               [ 2]  453 	decw	x
-      00847E 1F 03            [ 2]  454 	ldw	(0x03, sp), x
-      008480 20 DA            [ 2]  455 	jra	00103$
-      008482                        456 00101$:
-                                    457 ;	main.c: 119: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
-      008482 1E 07            [ 2]  458 	ldw	x, (0x07, sp)
-      008484 6F 08            [ 1]  459 	clr	(0x0008, x)
-                                    460 ;	main.c: 120: }
-      008486 1E 05            [ 2]  461 	ldw	x, (5, sp)
-      008488 5B 08            [ 2]  462 	addw	sp, #8
-      00848A FC               [ 2]  463 	jp	(x)
-                                    464 ;	main.c: 129: void get_addr_from_buff(void)
-                                    465 ;	-----------------------------------------
-                                    466 ;	 function get_addr_from_buff
-                                    467 ;	-----------------------------------------
-      00848B                        468 _get_addr_from_buff:
-      00848B 52 02            [ 2]  469 	sub	sp, #2
-                                    470 ;	main.c: 133: while(1)
-      00848D A6 04            [ 1]  471 	ld	a, #0x04
-      00848F 6B 01            [ 1]  472 	ld	(0x01, sp), a
-      008491 0F 02            [ 1]  473 	clr	(0x02, sp)
-      008493                        474 00105$:
-                                    475 ;	main.c: 135: if(buffer[i] == 32 || buffer[i] == 10)
-      008493 5F               [ 1]  476 	clrw	x
-      008494 7B 01            [ 1]  477 	ld	a, (0x01, sp)
-      008496 97               [ 1]  478 	ld	xl, a
-      008497 D6 00 01         [ 1]  479 	ld	a, (_buffer+0, x)
-      00849A A1 20            [ 1]  480 	cp	a, #0x20
-      00849C 27 04            [ 1]  481 	jreq	00101$
-      00849E A1 0A            [ 1]  482 	cp	a, #0x0a
-      0084A0 26 08            [ 1]  483 	jrne	00102$
-      0084A2                        484 00101$:
-                                    485 ;	main.c: 137: p_size = i+1;
-      0084A2 7B 01            [ 1]  486 	ld	a, (0x01, sp)
-      0084A4 4C               [ 1]  487 	inc	a
-      0084A5 C7 01 05         [ 1]  488 	ld	_p_size+0, a
-                                    489 ;	main.c: 138: break;
-      0084A8 20 06            [ 2]  490 	jra	00106$
-      0084AA                        491 00102$:
-                                    492 ;	main.c: 140: i++;
-      0084AA 0C 01            [ 1]  493 	inc	(0x01, sp)
-                                    494 ;	main.c: 141: counter++;
-      0084AC 0C 02            [ 1]  495 	inc	(0x02, sp)
-      0084AE 20 E3            [ 2]  496 	jra	00105$
-      0084B0                        497 00106$:
-                                    498 ;	main.c: 143: memcpy(a, &buffer[3], counter);
-      0084B0 5F               [ 1]  499 	clrw	x
-      0084B1 7B 02            [ 1]  500 	ld	a, (0x02, sp)
-      0084B3 97               [ 1]  501 	ld	xl, a
-      0084B4 89               [ 2]  502 	pushw	x
-      0084B5 4B 04            [ 1]  503 	push	#<(_buffer+3)
-      0084B7 4B 00            [ 1]  504 	push	#((_buffer+3) >> 8)
-      0084B9 AE 01 01         [ 2]  505 	ldw	x, #(_a+0)
-      0084BC CD 8A CC         [ 4]  506 	call	___memcpy
-                                    507 ;	main.c: 144: d_addr = convert_chars_to_int(a);
-      0084BF AE 01 01         [ 2]  508 	ldw	x, #(_a+0)
-      0084C2 CD 84 2D         [ 4]  509 	call	_convert_chars_to_int
-      0084C5 C7 01 04         [ 1]  510 	ld	_d_addr+0, a
-                                    511 ;	main.c: 145: }
-      0084C8 5B 02            [ 2]  512 	addw	sp, #2
-      0084CA 81               [ 4]  513 	ret
-                                    514 ;	main.c: 147: void get_size_from_buff(void)
-                                    515 ;	-----------------------------------------
-                                    516 ;	 function get_size_from_buff
-                                    517 ;	-----------------------------------------
-      0084CB                        518 _get_size_from_buff:
-      0084CB 88               [ 1]  519 	push	a
-                                    520 ;	main.c: 150: uint8_t i = p_size;
-      0084CC C6 01 05         [ 1]  521 	ld	a, _p_size+0
-      0084CF 6B 01            [ 1]  522 	ld	(0x01, sp), a
-                                    523 ;	main.c: 151: while(1)
-      0084D1 90 5F            [ 1]  524 	clrw	y
-      0084D3                        525 00105$:
-                                    526 ;	main.c: 153: if(buffer[i] == 32 || buffer[i] == 10)
-      0084D3 5F               [ 1]  527 	clrw	x
-      0084D4 7B 01            [ 1]  528 	ld	a, (0x01, sp)
-      0084D6 97               [ 1]  529 	ld	xl, a
-      0084D7 D6 00 01         [ 1]  530 	ld	a, (_buffer+0, x)
-      0084DA A1 20            [ 1]  531 	cp	a, #0x20
-      0084DC 27 04            [ 1]  532 	jreq	00101$
-      0084DE A1 0A            [ 1]  533 	cp	a, #0x0a
-      0084E0 26 08            [ 1]  534 	jrne	00102$
-      0084E2                        535 00101$:
-                                    536 ;	main.c: 155: p_bytes = i+1;
-      0084E2 7B 01            [ 1]  537 	ld	a, (0x01, sp)
-      0084E4 4C               [ 1]  538 	inc	a
-      0084E5 C7 01 07         [ 1]  539 	ld	_p_bytes+0, a
-                                    540 ;	main.c: 156: break;
-      0084E8 20 06            [ 2]  541 	jra	00106$
-      0084EA                        542 00102$:
-                                    543 ;	main.c: 158: i++;
-      0084EA 0C 01            [ 1]  544 	inc	(0x01, sp)
-                                    545 ;	main.c: 159: counter++;
-      0084EC 90 5C            [ 1]  546 	incw	y
-      0084EE 20 E3            [ 2]  547 	jra	00105$
-      0084F0                        548 00106$:
-                                    549 ;	main.c: 161: memcpy(a, &buffer[p_size], counter);
-      0084F0 4F               [ 1]  550 	clr	a
-      0084F1 90 95            [ 1]  551 	ld	yh, a
-      0084F3 5F               [ 1]  552 	clrw	x
-      0084F4 C6 01 05         [ 1]  553 	ld	a, _p_size+0
-      0084F7 97               [ 1]  554 	ld	xl, a
-      0084F8 1C 00 01         [ 2]  555 	addw	x, #(_buffer+0)
-      0084FB 90 89            [ 2]  556 	pushw	y
-      0084FD 89               [ 2]  557 	pushw	x
-      0084FE AE 01 01         [ 2]  558 	ldw	x, #(_a+0)
-      008501 CD 8A CC         [ 4]  559 	call	___memcpy
-                                    560 ;	main.c: 162: d_size = convert_chars_to_int(a);
-      008504 AE 01 01         [ 2]  561 	ldw	x, #(_a+0)
-      008507 CD 84 2D         [ 4]  562 	call	_convert_chars_to_int
-      00850A C7 01 06         [ 1]  563 	ld	_d_size+0, a
-                                    564 ;	main.c: 163: }
-      00850D 84               [ 1]  565 	pop	a
-      00850E 81               [ 4]  566 	ret
-                                    567 ;	main.c: 164: void char_buffer_to_int(void)
-                                    568 ;	-----------------------------------------
-                                    569 ;	 function char_buffer_to_int
-                                    570 ;	-----------------------------------------
-      00850F                        571 _char_buffer_to_int:
-      00850F 52 06            [ 2]  572 	sub	sp, #6
-                                    573 ;	main.c: 166: uint8_t counter = d_size;
-      008511 C6 01 06         [ 1]  574 	ld	a, _d_size+0
-      008514 6B 03            [ 1]  575 	ld	(0x03, sp), a
-                                    576 ;	main.c: 167: uint8_t i = p_bytes;
-      008516 C6 01 07         [ 1]  577 	ld	a, _p_bytes+0
-      008519 6B 06            [ 1]  578 	ld	(0x06, sp), a
-                                    579 ;	main.c: 168: uint8_t buf_i = 0;
-      00851B 0F 05            [ 1]  580 	clr	(0x05, sp)
-                                    581 ;	main.c: 169: while(counter > 0) // 
-      00851D 0F 04            [ 1]  582 	clr	(0x04, sp)
-      00851F                        583 00113$:
-      00851F 0D 03            [ 1]  584 	tnz	(0x03, sp)
-      008521 27 73            [ 1]  585 	jreq	00116$
-                                    586 ;	main.c: 171: if(buffer[i] == ' ')
-      008523 5F               [ 1]  587 	clrw	x
-      008524 7B 06            [ 1]  588 	ld	a, (0x06, sp)
-      008526 97               [ 1]  589 	ld	xl, a
-      008527 D6 00 01         [ 1]  590 	ld	a, (_buffer+0, x)
-      00852A A1 20            [ 1]  591 	cp	a, #0x20
-      00852C 26 44            [ 1]  592 	jrne	00111$
-                                    593 ;	main.c: 174: while(1)
-      00852E 0F 05            [ 1]  594 	clr	(0x05, sp)
-      008530                        595 00105$:
-                                    596 ;	main.c: 176: i++;
-      008530 0C 06            [ 1]  597 	inc	(0x06, sp)
-                                    598 ;	main.c: 177: if(buffer[i] == ' ' || buffer[i] == '\r\n')
-      008532 5F               [ 1]  599 	clrw	x
-      008533 7B 06            [ 1]  600 	ld	a, (0x06, sp)
-      008535 97               [ 1]  601 	ld	xl, a
-      008536 1C 00 01         [ 2]  602 	addw	x, #(_buffer+0)
-      008539 1F 01            [ 2]  603 	ldw	(0x01, sp), x
-      00853B F6               [ 1]  604 	ld	a, (x)
-      00853C A1 20            [ 1]  605 	cp	a, #0x20
-      00853E 27 08            [ 1]  606 	jreq	00125$
-      008540 A1 0D            [ 1]  607 	cp	a, #0x0d
-      008542 27 04            [ 1]  608 	jreq	00125$
-                                    609 ;	main.c: 179: buf_counter++;
-      008544 0C 05            [ 1]  610 	inc	(0x05, sp)
-      008546 20 E8            [ 2]  611 	jra	00105$
-      008548                        612 00125$:
-                                    613 ;	main.c: 181: memcpy(a, &buffer[i], buf_counter);
-      008548 7B 05            [ 1]  614 	ld	a, (0x05, sp)
-      00854A 5F               [ 1]  615 	clrw	x
-      00854B 16 01            [ 2]  616 	ldw	y, (0x01, sp)
-      00854D 88               [ 1]  617 	push	a
-      00854E 9E               [ 1]  618 	ld	a, xh
-      00854F 88               [ 1]  619 	push	a
-      008550 90 89            [ 2]  620 	pushw	y
-      008552 AE 01 01         [ 2]  621 	ldw	x, #(_a+0)
-      008555 CD 8A CC         [ 4]  622 	call	___memcpy
-                                    623 ;	main.c: 185: data_buf[buf_i] = convert_chars_to_int(a);
-      008558 5F               [ 1]  624 	clrw	x
-      008559 7B 04            [ 1]  625 	ld	a, (0x04, sp)
-      00855B 97               [ 1]  626 	ld	xl, a
-      00855C 1C 01 08         [ 2]  627 	addw	x, #(_data_buf+0)
-      00855F 89               [ 2]  628 	pushw	x
-      008560 AE 01 01         [ 2]  629 	ldw	x, #(_a+0)
-      008563 CD 84 2D         [ 4]  630 	call	_convert_chars_to_int
-      008566 85               [ 2]  631 	popw	x
-      008567 F7               [ 1]  632 	ld	(x), a
-                                    633 ;	main.c: 186: counter--;
-      008568 0A 03            [ 1]  634 	dec	(0x03, sp)
-                                    635 ;	main.c: 187: buf_i++;
-      00856A 0C 04            [ 1]  636 	inc	(0x04, sp)
-      00856C 7B 04            [ 1]  637 	ld	a, (0x04, sp)
-      00856E 6B 05            [ 1]  638 	ld	(0x05, sp), a
-      008570 20 AD            [ 2]  639 	jra	00113$
-      008572                        640 00111$:
-                                    641 ;	main.c: 189: else if(buffer[i] == '\r\n')
-      008572 A1 0D            [ 1]  642 	cp	a, #0x0d
-      008574 26 1C            [ 1]  643 	jrne	00108$
-                                    644 ;	main.c: 191: convert_int_to_chars(buf_i, a);
-      008576 AE 01 01         [ 2]  645 	ldw	x, #(_a+0)
-      008579 7B 05            [ 1]  646 	ld	a, (0x05, sp)
-      00857B CD 83 A8         [ 4]  647 	call	_convert_int_to_chars
-                                    648 ;	main.c: 192: uart_write("buf count -> ");
-      00857E AE 80 2D         [ 2]  649 	ldw	x, #(___str_0+0)
-      008581 CD 83 47         [ 4]  650 	call	_uart_write
-                                    651 ;	main.c: 193: uart_write(a);
-      008584 AE 01 01         [ 2]  652 	ldw	x, #(_a+0)
-      008587 CD 83 47         [ 4]  653 	call	_uart_write
-                                    654 ;	main.c: 194: uart_write(" <-\n");
-      00858A AE 80 3B         [ 2]  655 	ldw	x, #(___str_1+0)
-      00858D 5B 06            [ 2]  656 	addw	sp, #6
-                                    657 ;	main.c: 195: break;
-      00858F CC 83 47         [ 2]  658 	jp	_uart_write
-      008592                        659 00108$:
-                                    660 ;	main.c: 198: i++;
-      008592 0C 06            [ 1]  661 	inc	(0x06, sp)
-      008594 20 89            [ 2]  662 	jra	00113$
-      008596                        663 00116$:
-                                    664 ;	main.c: 202: }
-      008596 5B 06            [ 2]  665 	addw	sp, #6
-      008598 81               [ 4]  666 	ret
-                                    667 ;	main.c: 210: void status_check(void){
-                                    668 ;	-----------------------------------------
-                                    669 ;	 function status_check
-                                    670 ;	-----------------------------------------
-      008599                        671 _status_check:
-      008599 52 09            [ 2]  672 	sub	sp, #9
-                                    673 ;	main.c: 211: char rx_binary_chars[9]={0};
-      00859B 0F 01            [ 1]  674 	clr	(0x01, sp)
-      00859D 0F 02            [ 1]  675 	clr	(0x02, sp)
-      00859F 0F 03            [ 1]  676 	clr	(0x03, sp)
-      0085A1 0F 04            [ 1]  677 	clr	(0x04, sp)
-      0085A3 0F 05            [ 1]  678 	clr	(0x05, sp)
-      0085A5 0F 06            [ 1]  679 	clr	(0x06, sp)
-      0085A7 0F 07            [ 1]  680 	clr	(0x07, sp)
-      0085A9 0F 08            [ 1]  681 	clr	(0x08, sp)
-      0085AB 0F 09            [ 1]  682 	clr	(0x09, sp)
-                                    683 ;	main.c: 212: uart_write("\nI2C_REGS >.<\n");
-      0085AD AE 80 40         [ 2]  684 	ldw	x, #(___str_2+0)
-      0085B0 CD 83 47         [ 4]  685 	call	_uart_write
-                                    686 ;	main.c: 213: convert_int_to_binary(I2C_SR1, rx_binary_chars);
-      0085B3 96               [ 1]  687 	ldw	x, sp
-      0085B4 5C               [ 1]  688 	incw	x
-      0085B5 51               [ 1]  689 	exgw	x, y
-      0085B6 C6 52 17         [ 1]  690 	ld	a, 0x5217
-      0085B9 5F               [ 1]  691 	clrw	x
-      0085BA 90 89            [ 2]  692 	pushw	y
-      0085BC 97               [ 1]  693 	ld	xl, a
-      0085BD CD 84 53         [ 4]  694 	call	_convert_int_to_binary
-                                    695 ;	main.c: 214: uart_write("\nSR1 -> ");
-      0085C0 AE 80 4F         [ 2]  696 	ldw	x, #(___str_3+0)
-      0085C3 CD 83 47         [ 4]  697 	call	_uart_write
-                                    698 ;	main.c: 215: uart_write(rx_binary_chars);
-      0085C6 96               [ 1]  699 	ldw	x, sp
-      0085C7 5C               [ 1]  700 	incw	x
-      0085C8 CD 83 47         [ 4]  701 	call	_uart_write
-                                    702 ;	main.c: 216: uart_write(" <-\n");
-      0085CB AE 80 3B         [ 2]  703 	ldw	x, #(___str_1+0)
-      0085CE CD 83 47         [ 4]  704 	call	_uart_write
-                                    705 ;	main.c: 217: convert_int_to_binary(I2C_SR2, rx_binary_chars);
-      0085D1 96               [ 1]  706 	ldw	x, sp
-      0085D2 5C               [ 1]  707 	incw	x
-      0085D3 51               [ 1]  708 	exgw	x, y
-      0085D4 C6 52 18         [ 1]  709 	ld	a, 0x5218
-      0085D7 5F               [ 1]  710 	clrw	x
-      0085D8 90 89            [ 2]  711 	pushw	y
-      0085DA 97               [ 1]  712 	ld	xl, a
-      0085DB CD 84 53         [ 4]  713 	call	_convert_int_to_binary
-                                    714 ;	main.c: 218: uart_write("SR2 -> ");
-      0085DE AE 80 58         [ 2]  715 	ldw	x, #(___str_4+0)
-      0085E1 CD 83 47         [ 4]  716 	call	_uart_write
-                                    717 ;	main.c: 219: uart_write(rx_binary_chars);
-      0085E4 96               [ 1]  718 	ldw	x, sp
-      0085E5 5C               [ 1]  719 	incw	x
-      0085E6 CD 83 47         [ 4]  720 	call	_uart_write
-                                    721 ;	main.c: 220: uart_write(" <-\n");
-      0085E9 AE 80 3B         [ 2]  722 	ldw	x, #(___str_1+0)
-      0085EC CD 83 47         [ 4]  723 	call	_uart_write
-                                    724 ;	main.c: 221: convert_int_to_binary(I2C_SR3, rx_binary_chars);
-      0085EF 96               [ 1]  725 	ldw	x, sp
-      0085F0 5C               [ 1]  726 	incw	x
-      0085F1 51               [ 1]  727 	exgw	x, y
-      0085F2 C6 52 19         [ 1]  728 	ld	a, 0x5219
-      0085F5 5F               [ 1]  729 	clrw	x
-      0085F6 90 89            [ 2]  730 	pushw	y
-      0085F8 97               [ 1]  731 	ld	xl, a
-      0085F9 CD 84 53         [ 4]  732 	call	_convert_int_to_binary
-                                    733 ;	main.c: 222: uart_write("SR3 -> ");
-      0085FC AE 80 60         [ 2]  734 	ldw	x, #(___str_5+0)
-      0085FF CD 83 47         [ 4]  735 	call	_uart_write
-                                    736 ;	main.c: 223: uart_write(rx_binary_chars);
-      008602 96               [ 1]  737 	ldw	x, sp
-      008603 5C               [ 1]  738 	incw	x
-      008604 CD 83 47         [ 4]  739 	call	_uart_write
-                                    740 ;	main.c: 224: uart_write(" <-\n");
-      008607 AE 80 3B         [ 2]  741 	ldw	x, #(___str_1+0)
-      00860A CD 83 47         [ 4]  742 	call	_uart_write
-                                    743 ;	main.c: 225: convert_int_to_binary(I2C_CR1, rx_binary_chars);
-      00860D 96               [ 1]  744 	ldw	x, sp
-      00860E 5C               [ 1]  745 	incw	x
-      00860F 51               [ 1]  746 	exgw	x, y
-      008610 C6 52 10         [ 1]  747 	ld	a, 0x5210
-      008613 5F               [ 1]  748 	clrw	x
-      008614 90 89            [ 2]  749 	pushw	y
-      008616 97               [ 1]  750 	ld	xl, a
-      008617 CD 84 53         [ 4]  751 	call	_convert_int_to_binary
-                                    752 ;	main.c: 226: uart_write("CR1 -> ");
-      00861A AE 80 68         [ 2]  753 	ldw	x, #(___str_6+0)
-      00861D CD 83 47         [ 4]  754 	call	_uart_write
-                                    755 ;	main.c: 227: uart_write(rx_binary_chars);
-      008620 96               [ 1]  756 	ldw	x, sp
-      008621 5C               [ 1]  757 	incw	x
-      008622 CD 83 47         [ 4]  758 	call	_uart_write
-                                    759 ;	main.c: 228: uart_write(" <-\n");
-      008625 AE 80 3B         [ 2]  760 	ldw	x, #(___str_1+0)
-      008628 CD 83 47         [ 4]  761 	call	_uart_write
-                                    762 ;	main.c: 229: convert_int_to_binary(I2C_CR2, rx_binary_chars);
-      00862B 96               [ 1]  763 	ldw	x, sp
-      00862C 5C               [ 1]  764 	incw	x
-      00862D 51               [ 1]  765 	exgw	x, y
-      00862E C6 52 11         [ 1]  766 	ld	a, 0x5211
-      008631 5F               [ 1]  767 	clrw	x
-      008632 90 89            [ 2]  768 	pushw	y
-      008634 97               [ 1]  769 	ld	xl, a
-      008635 CD 84 53         [ 4]  770 	call	_convert_int_to_binary
-                                    771 ;	main.c: 230: uart_write("CR2 -> ");
-      008638 AE 80 70         [ 2]  772 	ldw	x, #(___str_7+0)
-      00863B CD 83 47         [ 4]  773 	call	_uart_write
-                                    774 ;	main.c: 231: uart_write(rx_binary_chars);
-      00863E 96               [ 1]  775 	ldw	x, sp
-      00863F 5C               [ 1]  776 	incw	x
-      008640 CD 83 47         [ 4]  777 	call	_uart_write
-                                    778 ;	main.c: 232: uart_write(" <-\n");
-      008643 AE 80 3B         [ 2]  779 	ldw	x, #(___str_1+0)
-      008646 CD 83 47         [ 4]  780 	call	_uart_write
-                                    781 ;	main.c: 233: convert_int_to_binary(I2C_DR, rx_binary_chars);
-      008649 96               [ 1]  782 	ldw	x, sp
-      00864A 5C               [ 1]  783 	incw	x
-      00864B 51               [ 1]  784 	exgw	x, y
-      00864C C6 52 16         [ 1]  785 	ld	a, 0x5216
-      00864F 5F               [ 1]  786 	clrw	x
-      008650 90 89            [ 2]  787 	pushw	y
-      008652 97               [ 1]  788 	ld	xl, a
-      008653 CD 84 53         [ 4]  789 	call	_convert_int_to_binary
-                                    790 ;	main.c: 234: uart_write("DR -> ");
-      008656 AE 80 78         [ 2]  791 	ldw	x, #(___str_8+0)
-      008659 CD 83 47         [ 4]  792 	call	_uart_write
-                                    793 ;	main.c: 235: uart_write(rx_binary_chars);
-      00865C 96               [ 1]  794 	ldw	x, sp
-      00865D 5C               [ 1]  795 	incw	x
-      00865E CD 83 47         [ 4]  796 	call	_uart_write
-                                    797 ;	main.c: 236: uart_write(" <-\n");
-      008661 AE 80 3B         [ 2]  798 	ldw	x, #(___str_1+0)
-      008664 CD 83 47         [ 4]  799 	call	_uart_write
-                                    800 ;	main.c: 237: uart_write("UART_REGS >.<\n");
-      008667 AE 80 7F         [ 2]  801 	ldw	x, #(___str_9+0)
-      00866A CD 83 47         [ 4]  802 	call	_uart_write
-                                    803 ;	main.c: 238: convert_int_to_binary(UART1_SR, rx_binary_chars);
-      00866D 96               [ 1]  804 	ldw	x, sp
-      00866E 5C               [ 1]  805 	incw	x
-      00866F 51               [ 1]  806 	exgw	x, y
-      008670 C6 52 30         [ 1]  807 	ld	a, 0x5230
-      008673 5F               [ 1]  808 	clrw	x
-      008674 90 89            [ 2]  809 	pushw	y
-      008676 97               [ 1]  810 	ld	xl, a
-      008677 CD 84 53         [ 4]  811 	call	_convert_int_to_binary
-                                    812 ;	main.c: 239: uart_write("\nSR -> ");
-      00867A AE 80 8E         [ 2]  813 	ldw	x, #(___str_10+0)
-      00867D CD 83 47         [ 4]  814 	call	_uart_write
-                                    815 ;	main.c: 240: uart_write(rx_binary_chars);
-      008680 96               [ 1]  816 	ldw	x, sp
-      008681 5C               [ 1]  817 	incw	x
-      008682 CD 83 47         [ 4]  818 	call	_uart_write
-                                    819 ;	main.c: 241: uart_write(" <-\n");
-      008685 AE 80 3B         [ 2]  820 	ldw	x, #(___str_1+0)
-      008688 CD 83 47         [ 4]  821 	call	_uart_write
-                                    822 ;	main.c: 242: convert_int_to_binary(UART1_DR, rx_binary_chars);
-      00868B 96               [ 1]  823 	ldw	x, sp
-      00868C 5C               [ 1]  824 	incw	x
-      00868D 51               [ 1]  825 	exgw	x, y
-      00868E C6 52 31         [ 1]  826 	ld	a, 0x5231
-      008691 5F               [ 1]  827 	clrw	x
-      008692 90 89            [ 2]  828 	pushw	y
-      008694 97               [ 1]  829 	ld	xl, a
-      008695 CD 84 53         [ 4]  830 	call	_convert_int_to_binary
-                                    831 ;	main.c: 243: uart_write("DR -> ");
-      008698 AE 80 78         [ 2]  832 	ldw	x, #(___str_8+0)
-      00869B CD 83 47         [ 4]  833 	call	_uart_write
-                                    834 ;	main.c: 244: uart_write(rx_binary_chars);
-      00869E 96               [ 1]  835 	ldw	x, sp
-      00869F 5C               [ 1]  836 	incw	x
-      0086A0 CD 83 47         [ 4]  837 	call	_uart_write
-                                    838 ;	main.c: 245: uart_write(" <-\n");
-      0086A3 AE 80 3B         [ 2]  839 	ldw	x, #(___str_1+0)
-      0086A6 CD 83 47         [ 4]  840 	call	_uart_write
-                                    841 ;	main.c: 246: convert_int_to_binary(UART1_BRR1, rx_binary_chars);
-      0086A9 96               [ 1]  842 	ldw	x, sp
-      0086AA 5C               [ 1]  843 	incw	x
-      0086AB 51               [ 1]  844 	exgw	x, y
-      0086AC C6 52 32         [ 1]  845 	ld	a, 0x5232
-      0086AF 5F               [ 1]  846 	clrw	x
-      0086B0 90 89            [ 2]  847 	pushw	y
-      0086B2 97               [ 1]  848 	ld	xl, a
-      0086B3 CD 84 53         [ 4]  849 	call	_convert_int_to_binary
-                                    850 ;	main.c: 247: uart_write("BRR1 -> ");
-      0086B6 AE 80 96         [ 2]  851 	ldw	x, #(___str_11+0)
-      0086B9 CD 83 47         [ 4]  852 	call	_uart_write
-                                    853 ;	main.c: 248: uart_write(rx_binary_chars);
-      0086BC 96               [ 1]  854 	ldw	x, sp
-      0086BD 5C               [ 1]  855 	incw	x
-      0086BE CD 83 47         [ 4]  856 	call	_uart_write
-                                    857 ;	main.c: 249: uart_write(" <-\n");
-      0086C1 AE 80 3B         [ 2]  858 	ldw	x, #(___str_1+0)
-      0086C4 CD 83 47         [ 4]  859 	call	_uart_write
-                                    860 ;	main.c: 250: convert_int_to_binary(UART1_BRR2, rx_binary_chars);
-      0086C7 96               [ 1]  861 	ldw	x, sp
-      0086C8 5C               [ 1]  862 	incw	x
-      0086C9 51               [ 1]  863 	exgw	x, y
-      0086CA C6 52 33         [ 1]  864 	ld	a, 0x5233
-      0086CD 5F               [ 1]  865 	clrw	x
-      0086CE 90 89            [ 2]  866 	pushw	y
-      0086D0 97               [ 1]  867 	ld	xl, a
-      0086D1 CD 84 53         [ 4]  868 	call	_convert_int_to_binary
-                                    869 ;	main.c: 251: uart_write("BRR2 -> ");
-      0086D4 AE 80 9F         [ 2]  870 	ldw	x, #(___str_12+0)
-      0086D7 CD 83 47         [ 4]  871 	call	_uart_write
-                                    872 ;	main.c: 252: uart_write(rx_binary_chars);
-      0086DA 96               [ 1]  873 	ldw	x, sp
-      0086DB 5C               [ 1]  874 	incw	x
-      0086DC CD 83 47         [ 4]  875 	call	_uart_write
-                                    876 ;	main.c: 253: uart_write(" <-\n");
-      0086DF AE 80 3B         [ 2]  877 	ldw	x, #(___str_1+0)
-      0086E2 CD 83 47         [ 4]  878 	call	_uart_write
-                                    879 ;	main.c: 254: convert_int_to_binary(UART1_CR1, rx_binary_chars);
-      0086E5 96               [ 1]  880 	ldw	x, sp
-      0086E6 5C               [ 1]  881 	incw	x
-      0086E7 51               [ 1]  882 	exgw	x, y
-      0086E8 C6 52 34         [ 1]  883 	ld	a, 0x5234
-      0086EB 5F               [ 1]  884 	clrw	x
-      0086EC 90 89            [ 2]  885 	pushw	y
-      0086EE 97               [ 1]  886 	ld	xl, a
-      0086EF CD 84 53         [ 4]  887 	call	_convert_int_to_binary
-                                    888 ;	main.c: 255: uart_write("CR1 -> ");
-      0086F2 AE 80 68         [ 2]  889 	ldw	x, #(___str_6+0)
-      0086F5 CD 83 47         [ 4]  890 	call	_uart_write
-                                    891 ;	main.c: 256: uart_write(rx_binary_chars);
-      0086F8 96               [ 1]  892 	ldw	x, sp
-      0086F9 5C               [ 1]  893 	incw	x
-      0086FA CD 83 47         [ 4]  894 	call	_uart_write
-                                    895 ;	main.c: 257: uart_write(" <-\n");
-      0086FD AE 80 3B         [ 2]  896 	ldw	x, #(___str_1+0)
-      008700 CD 83 47         [ 4]  897 	call	_uart_write
-                                    898 ;	main.c: 258: convert_int_to_binary(UART1_CR2, rx_binary_chars);
-      008703 96               [ 1]  899 	ldw	x, sp
-      008704 5C               [ 1]  900 	incw	x
-      008705 51               [ 1]  901 	exgw	x, y
-      008706 C6 52 35         [ 1]  902 	ld	a, 0x5235
-      008709 5F               [ 1]  903 	clrw	x
-      00870A 90 89            [ 2]  904 	pushw	y
-      00870C 97               [ 1]  905 	ld	xl, a
-      00870D CD 84 53         [ 4]  906 	call	_convert_int_to_binary
-                                    907 ;	main.c: 259: uart_write("CR2 -> ");
-      008710 AE 80 70         [ 2]  908 	ldw	x, #(___str_7+0)
-      008713 CD 83 47         [ 4]  909 	call	_uart_write
-                                    910 ;	main.c: 260: uart_write(rx_binary_chars);
-      008716 96               [ 1]  911 	ldw	x, sp
-      008717 5C               [ 1]  912 	incw	x
-      008718 CD 83 47         [ 4]  913 	call	_uart_write
-                                    914 ;	main.c: 261: uart_write(" <-\n");
-      00871B AE 80 3B         [ 2]  915 	ldw	x, #(___str_1+0)
-      00871E CD 83 47         [ 4]  916 	call	_uart_write
-                                    917 ;	main.c: 262: convert_int_to_binary(UART1_CR3, rx_binary_chars);
-      008721 96               [ 1]  918 	ldw	x, sp
-      008722 5C               [ 1]  919 	incw	x
-      008723 51               [ 1]  920 	exgw	x, y
-      008724 C6 52 36         [ 1]  921 	ld	a, 0x5236
-      008727 5F               [ 1]  922 	clrw	x
-      008728 90 89            [ 2]  923 	pushw	y
-      00872A 97               [ 1]  924 	ld	xl, a
-      00872B CD 84 53         [ 4]  925 	call	_convert_int_to_binary
-                                    926 ;	main.c: 263: uart_write("CR3 -> ");
-      00872E AE 80 A8         [ 2]  927 	ldw	x, #(___str_13+0)
-      008731 CD 83 47         [ 4]  928 	call	_uart_write
-                                    929 ;	main.c: 264: uart_write(rx_binary_chars);
-      008734 96               [ 1]  930 	ldw	x, sp
-      008735 5C               [ 1]  931 	incw	x
-      008736 CD 83 47         [ 4]  932 	call	_uart_write
-                                    933 ;	main.c: 265: uart_write(" <-\n");
-      008739 AE 80 3B         [ 2]  934 	ldw	x, #(___str_1+0)
-      00873C CD 83 47         [ 4]  935 	call	_uart_write
-                                    936 ;	main.c: 266: convert_int_to_binary(UART1_CR4, rx_binary_chars);
-      00873F 96               [ 1]  937 	ldw	x, sp
-      008740 5C               [ 1]  938 	incw	x
-      008741 51               [ 1]  939 	exgw	x, y
-      008742 C6 52 37         [ 1]  940 	ld	a, 0x5237
-      008745 5F               [ 1]  941 	clrw	x
-      008746 90 89            [ 2]  942 	pushw	y
-      008748 97               [ 1]  943 	ld	xl, a
-      008749 CD 84 53         [ 4]  944 	call	_convert_int_to_binary
-                                    945 ;	main.c: 267: uart_write("CR4 -> ");
-      00874C AE 80 B0         [ 2]  946 	ldw	x, #(___str_14+0)
-      00874F CD 83 47         [ 4]  947 	call	_uart_write
-                                    948 ;	main.c: 268: uart_write(rx_binary_chars);
-      008752 96               [ 1]  949 	ldw	x, sp
-      008753 5C               [ 1]  950 	incw	x
-      008754 CD 83 47         [ 4]  951 	call	_uart_write
-                                    952 ;	main.c: 269: uart_write(" <-\n");
-      008757 AE 80 3B         [ 2]  953 	ldw	x, #(___str_1+0)
-      00875A CD 83 47         [ 4]  954 	call	_uart_write
-                                    955 ;	main.c: 270: convert_int_to_binary(UART1_CR5, rx_binary_chars);
-      00875D 96               [ 1]  956 	ldw	x, sp
-      00875E 5C               [ 1]  957 	incw	x
-      00875F 51               [ 1]  958 	exgw	x, y
-      008760 C6 52 38         [ 1]  959 	ld	a, 0x5238
-      008763 5F               [ 1]  960 	clrw	x
-      008764 90 89            [ 2]  961 	pushw	y
-      008766 97               [ 1]  962 	ld	xl, a
-      008767 CD 84 53         [ 4]  963 	call	_convert_int_to_binary
-                                    964 ;	main.c: 271: uart_write("CR5 -> ");
-      00876A AE 80 B8         [ 2]  965 	ldw	x, #(___str_15+0)
-      00876D CD 83 47         [ 4]  966 	call	_uart_write
-                                    967 ;	main.c: 272: uart_write(rx_binary_chars);
-      008770 96               [ 1]  968 	ldw	x, sp
-      008771 5C               [ 1]  969 	incw	x
-      008772 CD 83 47         [ 4]  970 	call	_uart_write
-                                    971 ;	main.c: 273: uart_write(" <-\n");
-      008775 AE 80 3B         [ 2]  972 	ldw	x, #(___str_1+0)
-      008778 CD 83 47         [ 4]  973 	call	_uart_write
-                                    974 ;	main.c: 274: convert_int_to_binary(UART1_GTR, rx_binary_chars);
-      00877B 96               [ 1]  975 	ldw	x, sp
-      00877C 5C               [ 1]  976 	incw	x
-      00877D 51               [ 1]  977 	exgw	x, y
-      00877E C6 52 39         [ 1]  978 	ld	a, 0x5239
-      008781 5F               [ 1]  979 	clrw	x
-      008782 90 89            [ 2]  980 	pushw	y
-      008784 97               [ 1]  981 	ld	xl, a
-      008785 CD 84 53         [ 4]  982 	call	_convert_int_to_binary
-                                    983 ;	main.c: 275: uart_write("GTR -> ");
-      008788 AE 80 C0         [ 2]  984 	ldw	x, #(___str_16+0)
-      00878B CD 83 47         [ 4]  985 	call	_uart_write
-                                    986 ;	main.c: 276: uart_write(rx_binary_chars);
-      00878E 96               [ 1]  987 	ldw	x, sp
-      00878F 5C               [ 1]  988 	incw	x
-      008790 CD 83 47         [ 4]  989 	call	_uart_write
-                                    990 ;	main.c: 277: uart_write(" <-\n");
-      008793 AE 80 3B         [ 2]  991 	ldw	x, #(___str_1+0)
-      008796 CD 83 47         [ 4]  992 	call	_uart_write
-                                    993 ;	main.c: 278: convert_int_to_binary(UART1_PSCR, rx_binary_chars);
-      008799 96               [ 1]  994 	ldw	x, sp
-      00879A 5C               [ 1]  995 	incw	x
-      00879B 51               [ 1]  996 	exgw	x, y
-      00879C C6 52 3A         [ 1]  997 	ld	a, 0x523a
-      00879F 5F               [ 1]  998 	clrw	x
-      0087A0 90 89            [ 2]  999 	pushw	y
-      0087A2 97               [ 1] 1000 	ld	xl, a
-      0087A3 CD 84 53         [ 4] 1001 	call	_convert_int_to_binary
-                                   1002 ;	main.c: 279: uart_write("PSCR -> ");
-      0087A6 AE 80 C8         [ 2] 1003 	ldw	x, #(___str_17+0)
-      0087A9 CD 83 47         [ 4] 1004 	call	_uart_write
-                                   1005 ;	main.c: 280: uart_write(rx_binary_chars);
-      0087AC 96               [ 1] 1006 	ldw	x, sp
-      0087AD 5C               [ 1] 1007 	incw	x
-      0087AE CD 83 47         [ 4] 1008 	call	_uart_write
-                                   1009 ;	main.c: 281: uart_write(" <-\n");
-      0087B1 AE 80 3B         [ 2] 1010 	ldw	x, #(___str_1+0)
-      0087B4 CD 83 47         [ 4] 1011 	call	_uart_write
-                                   1012 ;	main.c: 282: }
-      0087B7 5B 09            [ 2] 1013 	addw	sp, #9
-      0087B9 81               [ 4] 1014 	ret
-                                   1015 ;	main.c: 284: void uart_init(void){
-                                   1016 ;	-----------------------------------------
-                                   1017 ;	 function uart_init
-                                   1018 ;	-----------------------------------------
-      0087BA                       1019 _uart_init:
-                                   1020 ;	main.c: 285: CLK_CKDIVR = 0;
-      0087BA 35 00 50 C6      [ 1] 1021 	mov	0x50c6+0, #0x00
-                                   1022 ;	main.c: 288: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
-      0087BE 72 16 52 35      [ 1] 1023 	bset	0x5235, #3
-                                   1024 ;	main.c: 289: UART1_CR2 |= UART_CR2_REN; // Receiver enable
-      0087C2 72 14 52 35      [ 1] 1025 	bset	0x5235, #2
-                                   1026 ;	main.c: 290: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
-      0087C6 C6 52 36         [ 1] 1027 	ld	a, 0x5236
-      0087C9 A4 CF            [ 1] 1028 	and	a, #0xcf
-      0087CB C7 52 36         [ 1] 1029 	ld	0x5236, a
-                                   1030 ;	main.c: 292: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
-      0087CE 35 03 52 33      [ 1] 1031 	mov	0x5233+0, #0x03
-      0087D2 35 68 52 32      [ 1] 1032 	mov	0x5232+0, #0x68
-                                   1033 ;	main.c: 293: }
-      0087D6 81               [ 4] 1034 	ret
-                                   1035 ;	main.c: 297: void i2c_init(void) {
-                                   1036 ;	-----------------------------------------
-                                   1037 ;	 function i2c_init
-                                   1038 ;	-----------------------------------------
-      0087D7                       1039 _i2c_init:
-                                   1040 ;	main.c: 303: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
-      0087D7 72 11 52 10      [ 1] 1041 	bres	0x5210, #0
-                                   1042 ;	main.c: 304: I2C_FREQR= 16;                  // peripheral frequence =16MHz
-      0087DB 35 10 52 12      [ 1] 1043 	mov	0x5212+0, #0x10
-                                   1044 ;	main.c: 305: I2C_CCRH = 0;                   // =0
-      0087DF 35 00 52 1C      [ 1] 1045 	mov	0x521c+0, #0x00
-                                   1046 ;	main.c: 306: I2C_CCRL = 80;                  // 100kHz for I2C
-      0087E3 35 50 52 1B      [ 1] 1047 	mov	0x521b+0, #0x50
-                                   1048 ;	main.c: 307: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
-      0087E7 72 1F 52 1C      [ 1] 1049 	bres	0x521c, #7
-                                   1050 ;	main.c: 308: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
-      0087EB 72 1F 52 14      [ 1] 1051 	bres	0x5214, #7
-                                   1052 ;	main.c: 309: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
-      0087EF 72 1C 52 14      [ 1] 1053 	bset	0x5214, #6
-                                   1054 ;	main.c: 310: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
-      0087F3 72 10 52 10      [ 1] 1055 	bset	0x5210, #0
-                                   1056 ;	main.c: 311: }
-      0087F7 81               [ 4] 1057 	ret
-                                   1058 ;	main.c: 320: void i2c_start(void) {
-                                   1059 ;	-----------------------------------------
-                                   1060 ;	 function i2c_start
-                                   1061 ;	-----------------------------------------
-      0087F8                       1062 _i2c_start:
-                                   1063 ;	main.c: 321: I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
-      0087F8 72 10 52 11      [ 1] 1064 	bset	0x5211, #0
-                                   1065 ;	main.c: 322: while(!(I2C_SR1 & (1 << 0)));
-      0087FC                       1066 00101$:
-      0087FC 72 01 52 17 FB   [ 2] 1067 	btjf	0x5217, #0, 00101$
-                                   1068 ;	main.c: 324: }
-      008801 81               [ 4] 1069 	ret
-                                   1070 ;	main.c: 326: void i2c_send_address(uint8_t address) {
-                                   1071 ;	-----------------------------------------
-                                   1072 ;	 function i2c_send_address
-                                   1073 ;	-----------------------------------------
-      008802                       1074 _i2c_send_address:
-                                   1075 ;	main.c: 327: I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
-      008802 48               [ 1] 1076 	sll	a
-      008803 C7 52 16         [ 1] 1077 	ld	0x5216, a
-                                   1078 ;	main.c: 328: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-      008806                       1079 00102$:
-      008806 72 03 52 17 01   [ 2] 1080 	btjf	0x5217, #1, 00117$
-      00880B 81               [ 4] 1081 	ret
-      00880C                       1082 00117$:
-      00880C 72 05 52 18 F5   [ 2] 1083 	btjf	0x5218, #2, 00102$
-                                   1084 ;	main.c: 329: }
-      008811 81               [ 4] 1085 	ret
-                                   1086 ;	main.c: 331: void i2c_stop(void) {
-                                   1087 ;	-----------------------------------------
-                                   1088 ;	 function i2c_stop
-                                   1089 ;	-----------------------------------------
-      008812                       1090 _i2c_stop:
-                                   1091 ;	main.c: 332: I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
-      008812 72 12 52 11      [ 1] 1092 	bset	0x5211, #1
-                                   1093 ;	main.c: 334: }
-      008816 81               [ 4] 1094 	ret
-                                   1095 ;	main.c: 335: void i2c_write(void){
-                                   1096 ;	-----------------------------------------
-                                   1097 ;	 function i2c_write
-                                   1098 ;	-----------------------------------------
-      008817                       1099 _i2c_write:
-      008817 52 02            [ 2] 1100 	sub	sp, #2
-                                   1101 ;	main.c: 336: I2C_DR = d_addr; // Отправка адреса регистра
-      008819 55 01 04 52 16   [ 1] 1102 	mov	0x5216+0, _d_addr+0
-                                   1103 ;	main.c: 337: for(int i = 0;i < d_size;i++)
-      00881E 5F               [ 1] 1104 	clrw	x
-      00881F                       1105 00107$:
-      00881F C6 01 06         [ 1] 1106 	ld	a, _d_size+0
-      008822 6B 02            [ 1] 1107 	ld	(0x02, sp), a
-      008824 0F 01            [ 1] 1108 	clr	(0x01, sp)
-      008826 13 01            [ 2] 1109 	cpw	x, (0x01, sp)
-      008828 2E 16            [ 1] 1110 	jrsge	00109$
-                                   1111 ;	main.c: 339: I2C_DR = data_buf[i];
-      00882A 90 93            [ 1] 1112 	ldw	y, x
-      00882C 90 D6 01 08      [ 1] 1113 	ld	a, (_data_buf+0, y)
-      008830 C7 52 16         [ 1] 1114 	ld	0x5216, a
-                                   1115 ;	main.c: 340: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-      008833                       1116 00102$:
-      008833 72 02 52 17 05   [ 2] 1117 	btjt	0x5217, #1, 00108$
-      008838 72 05 52 18 F6   [ 2] 1118 	btjf	0x5218, #2, 00102$
-      00883D                       1119 00108$:
-                                   1120 ;	main.c: 337: for(int i = 0;i < d_size;i++)
-      00883D 5C               [ 1] 1121 	incw	x
-      00883E 20 DF            [ 2] 1122 	jra	00107$
-      008840                       1123 00109$:
-                                   1124 ;	main.c: 342: }
-      008840 5B 02            [ 2] 1125 	addw	sp, #2
-      008842 81               [ 4] 1126 	ret
-                                   1127 ;	main.c: 344: void i2c_read(void){
-                                   1128 ;	-----------------------------------------
-                                   1129 ;	 function i2c_read
-                                   1130 ;	-----------------------------------------
-      008843                       1131 _i2c_read:
-      008843 52 02            [ 2] 1132 	sub	sp, #2
-                                   1133 ;	main.c: 345: I2C_DR = (current_dev << 1) & (1 << 0);
-      008845 C6 02 08         [ 1] 1134 	ld	a, _current_dev+0
-      008848 48               [ 1] 1135 	sll	a
-      008849 A4 01            [ 1] 1136 	and	a, #0x01
-      00884B C7 52 16         [ 1] 1137 	ld	0x5216, a
-                                   1138 ;	main.c: 346: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-      00884E                       1139 00102$:
-      00884E 72 02 52 17 05   [ 2] 1140 	btjt	0x5217, #1, 00104$
-      008853 72 05 52 18 F6   [ 2] 1141 	btjf	0x5218, #2, 00102$
-      008858                       1142 00104$:
-                                   1143 ;	main.c: 348: I2C_DR = d_addr;
-      008858 55 01 04 52 16   [ 1] 1144 	mov	0x5216+0, _d_addr+0
-                                   1145 ;	main.c: 349: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-      00885D                       1146 00106$:
-      00885D 72 02 52 17 05   [ 2] 1147 	btjt	0x5217, #1, 00108$
-      008862 72 05 52 18 F6   [ 2] 1148 	btjf	0x5218, #2, 00106$
-      008867                       1149 00108$:
-                                   1150 ;	main.c: 350: i2c_stop();
-      008867 CD 88 12         [ 4] 1151 	call	_i2c_stop
-                                   1152 ;	main.c: 351: for(int i = 0;i < d_size;i++)
-      00886A 5F               [ 1] 1153 	clrw	x
-      00886B                       1154 00115$:
-      00886B C6 01 06         [ 1] 1155 	ld	a, _d_size+0
-      00886E 6B 02            [ 1] 1156 	ld	(0x02, sp), a
-      008870 0F 01            [ 1] 1157 	clr	(0x01, sp)
-      008872 13 01            [ 2] 1158 	cpw	x, (0x01, sp)
-      008874 2E 13            [ 1] 1159 	jrsge	00117$
-                                   1160 ;	main.c: 353: data_buf[i] = I2C_DR;
-      008876 C6 52 16         [ 1] 1161 	ld	a, 0x5216
-      008879 D7 01 08         [ 1] 1162 	ld	((_data_buf+0), x), a
-                                   1163 ;	main.c: 354: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-      00887C                       1164 00110$:
-      00887C 72 02 52 17 05   [ 2] 1165 	btjt	0x5217, #1, 00116$
-      008881 72 05 52 18 F6   [ 2] 1166 	btjf	0x5218, #2, 00110$
-      008886                       1167 00116$:
-                                   1168 ;	main.c: 351: for(int i = 0;i < d_size;i++)
-      008886 5C               [ 1] 1169 	incw	x
-      008887 20 E2            [ 2] 1170 	jra	00115$
-      008889                       1171 00117$:
-                                   1172 ;	main.c: 357: }
-      008889 5B 02            [ 2] 1173 	addw	sp, #2
-      00888B 81               [ 4] 1174 	ret
-                                   1175 ;	main.c: 358: void i2c_scan(void) {
-                                   1176 ;	-----------------------------------------
-                                   1177 ;	 function i2c_scan
-                                   1178 ;	-----------------------------------------
-      00888C                       1179 _i2c_scan:
-      00888C 52 02            [ 2] 1180 	sub	sp, #2
-                                   1181 ;	main.c: 359: for (uint8_t addr = current_dev; addr < 127; addr++) {
-      00888E C6 02 08         [ 1] 1182 	ld	a, _current_dev+0
-      008891 6B 01            [ 1] 1183 	ld	(0x01, sp), a
-      008893 6B 02            [ 1] 1184 	ld	(0x02, sp), a
-      008895                       1185 00105$:
-      008895 7B 02            [ 1] 1186 	ld	a, (0x02, sp)
-      008897 A1 7F            [ 1] 1187 	cp	a, #0x7f
-      008899 24 26            [ 1] 1188 	jrnc	00107$
-                                   1189 ;	main.c: 360: i2c_start();
-      00889B CD 87 F8         [ 4] 1190 	call	_i2c_start
-                                   1191 ;	main.c: 361: i2c_send_address(addr);
-      00889E 7B 02            [ 1] 1192 	ld	a, (0x02, sp)
-      0088A0 CD 88 02         [ 4] 1193 	call	_i2c_send_address
-                                   1194 ;	main.c: 362: if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
-      0088A3 72 04 52 18 0A   [ 2] 1195 	btjt	0x5218, #2, 00102$
-                                   1196 ;	main.c: 364: current_dev = addr;
-      0088A8 7B 01            [ 1] 1197 	ld	a, (0x01, sp)
-      0088AA C7 02 08         [ 1] 1198 	ld	_current_dev+0, a
-                                   1199 ;	main.c: 365: i2c_stop();
-      0088AD 5B 02            [ 2] 1200 	addw	sp, #2
-                                   1201 ;	main.c: 366: break;
-      0088AF CC 88 12         [ 2] 1202 	jp	_i2c_stop
-      0088B2                       1203 00102$:
-                                   1204 ;	main.c: 368: i2c_stop();
-      0088B2 CD 88 12         [ 4] 1205 	call	_i2c_stop
-                                   1206 ;	main.c: 369: I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
-      0088B5 72 15 52 18      [ 1] 1207 	bres	0x5218, #2
-                                   1208 ;	main.c: 359: for (uint8_t addr = current_dev; addr < 127; addr++) {
-      0088B9 0C 02            [ 1] 1209 	inc	(0x02, sp)
-      0088BB 7B 02            [ 1] 1210 	ld	a, (0x02, sp)
-      0088BD 6B 01            [ 1] 1211 	ld	(0x01, sp), a
-      0088BF 20 D4            [ 2] 1212 	jra	00105$
-      0088C1                       1213 00107$:
-                                   1214 ;	main.c: 371: }
-      0088C1 5B 02            [ 2] 1215 	addw	sp, #2
-      0088C3 81               [ 4] 1216 	ret
-                                   1217 ;	main.c: 381: void cm_SM(void)
-                                   1218 ;	-----------------------------------------
-                                   1219 ;	 function cm_SM
-                                   1220 ;	-----------------------------------------
-      0088C4                       1221 _cm_SM:
-      0088C4 52 04            [ 2] 1222 	sub	sp, #4
-                                   1223 ;	main.c: 383: char cur_dev[4]={0};
-      0088C6 0F 01            [ 1] 1224 	clr	(0x01, sp)
-      0088C8 0F 02            [ 1] 1225 	clr	(0x02, sp)
-      0088CA 0F 03            [ 1] 1226 	clr	(0x03, sp)
-      0088CC 0F 04            [ 1] 1227 	clr	(0x04, sp)
-                                   1228 ;	main.c: 384: convert_int_to_chars(current_dev, cur_dev);
-      0088CE 96               [ 1] 1229 	ldw	x, sp
-      0088CF 5C               [ 1] 1230 	incw	x
-      0088D0 C6 02 08         [ 1] 1231 	ld	a, _current_dev+0
-      0088D3 CD 83 A8         [ 4] 1232 	call	_convert_int_to_chars
-                                   1233 ;	main.c: 385: uart_write("SM ");
-      0088D6 AE 80 D1         [ 2] 1234 	ldw	x, #(___str_18+0)
-      0088D9 CD 83 47         [ 4] 1235 	call	_uart_write
-                                   1236 ;	main.c: 386: uart_write(cur_dev);
-      0088DC 96               [ 1] 1237 	ldw	x, sp
-      0088DD 5C               [ 1] 1238 	incw	x
-      0088DE CD 83 47         [ 4] 1239 	call	_uart_write
-                                   1240 ;	main.c: 387: uart_write("\r\n");
-      0088E1 AE 80 D5         [ 2] 1241 	ldw	x, #(___str_19+0)
-      0088E4 CD 83 47         [ 4] 1242 	call	_uart_write
-                                   1243 ;	main.c: 388: }
-      0088E7 5B 04            [ 2] 1244 	addw	sp, #4
-      0088E9 81               [ 4] 1245 	ret
-                                   1246 ;	main.c: 389: void cm_SN(void)
-                                   1247 ;	-----------------------------------------
-                                   1248 ;	 function cm_SN
-                                   1249 ;	-----------------------------------------
-      0088EA                       1250 _cm_SN:
-                                   1251 ;	main.c: 391: i2c_scan();
-      0088EA CD 88 8C         [ 4] 1252 	call	_i2c_scan
-                                   1253 ;	main.c: 392: cm_SM();
-                                   1254 ;	main.c: 393: }
-      0088ED CC 88 C4         [ 2] 1255 	jp	_cm_SM
-                                   1256 ;	main.c: 394: void cm_RM(void)
-                                   1257 ;	-----------------------------------------
-                                   1258 ;	 function cm_RM
-                                   1259 ;	-----------------------------------------
-      0088F0                       1260 _cm_RM:
-                                   1261 ;	main.c: 396: current_dev = 0;
-      0088F0 72 5F 02 08      [ 1] 1262 	clr	_current_dev+0
-                                   1263 ;	main.c: 397: uart_write("RM\n");
-      0088F4 AE 80 D8         [ 2] 1264 	ldw	x, #(___str_20+0)
-                                   1265 ;	main.c: 398: }
-      0088F7 CC 83 47         [ 2] 1266 	jp	_uart_write
-                                   1267 ;	main.c: 400: void cm_DB(void)
-                                   1268 ;	-----------------------------------------
-                                   1269 ;	 function cm_DB
-                                   1270 ;	-----------------------------------------
-      0088FA                       1271 _cm_DB:
-                                   1272 ;	main.c: 402: status_check();
-                                   1273 ;	main.c: 403: }
-      0088FA CC 85 99         [ 2] 1274 	jp	_status_check
-                                   1275 ;	main.c: 405: void cm_ST(void)
-                                   1276 ;	-----------------------------------------
-                                   1277 ;	 function cm_ST
-                                   1278 ;	-----------------------------------------
-      0088FD                       1279 _cm_ST:
-                                   1280 ;	main.c: 407: get_addr_from_buff();
-      0088FD CD 84 8B         [ 4] 1281 	call	_get_addr_from_buff
-                                   1282 ;	main.c: 408: current_dev = d_addr;
-      008900 55 01 04 02 08   [ 1] 1283 	mov	_current_dev+0, _d_addr+0
-                                   1284 ;	main.c: 409: uart_write("ST\n");
-      008905 AE 80 DC         [ 2] 1285 	ldw	x, #(___str_21+0)
-                                   1286 ;	main.c: 410: }
-      008908 CC 83 47         [ 2] 1287 	jp	_uart_write
-                                   1288 ;	main.c: 411: void cm_SR(void)
-                                   1289 ;	-----------------------------------------
-                                   1290 ;	 function cm_SR
-                                   1291 ;	-----------------------------------------
-      00890B                       1292 _cm_SR:
-                                   1293 ;	main.c: 413: i2c_start();
-      00890B CD 87 F8         [ 4] 1294 	call	_i2c_start
-                                   1295 ;	main.c: 414: i2c_send_address(current_dev);
-      00890E C6 02 08         [ 1] 1296 	ld	a, _current_dev+0
-      008911 CD 88 02         [ 4] 1297 	call	_i2c_send_address
-                                   1298 ;	main.c: 415: i2c_read();
-      008914 CD 88 43         [ 4] 1299 	call	_i2c_read
-                                   1300 ;	main.c: 416: i2c_stop();
-                                   1301 ;	main.c: 417: }
-      008917 CC 88 12         [ 2] 1302 	jp	_i2c_stop
-                                   1303 ;	main.c: 418: void cm_SW(void)
-                                   1304 ;	-----------------------------------------
-                                   1305 ;	 function cm_SW
-                                   1306 ;	-----------------------------------------
-      00891A                       1307 _cm_SW:
-      00891A 52 04            [ 2] 1308 	sub	sp, #4
-                                   1309 ;	main.c: 420: char ar[4]={0};
-      00891C 0F 01            [ 1] 1310 	clr	(0x01, sp)
-      00891E 0F 02            [ 1] 1311 	clr	(0x02, sp)
-      008920 0F 03            [ 1] 1312 	clr	(0x03, sp)
-      008922 0F 04            [ 1] 1313 	clr	(0x04, sp)
-                                   1314 ;	main.c: 421: i2c_start();
-      008924 CD 87 F8         [ 4] 1315 	call	_i2c_start
-                                   1316 ;	main.c: 422: i2c_send_address(current_dev);
-      008927 C6 02 08         [ 1] 1317 	ld	a, _current_dev+0
-      00892A CD 88 02         [ 4] 1318 	call	_i2c_send_address
-                                   1319 ;	main.c: 423: i2c_write();
-      00892D CD 88 17         [ 4] 1320 	call	_i2c_write
-                                   1321 ;	main.c: 424: i2c_stop();
-      008930 CD 88 12         [ 4] 1322 	call	_i2c_stop
-                                   1323 ;	main.c: 425: uart_write("SW ");
-      008933 AE 80 E0         [ 2] 1324 	ldw	x, #(___str_22+0)
-      008936 CD 83 47         [ 4] 1325 	call	_uart_write
-                                   1326 ;	main.c: 426: convert_int_to_chars(d_addr, ar);
-      008939 96               [ 1] 1327 	ldw	x, sp
-      00893A 5C               [ 1] 1328 	incw	x
-      00893B C6 01 04         [ 1] 1329 	ld	a, _d_addr+0
-      00893E CD 83 A8         [ 4] 1330 	call	_convert_int_to_chars
-                                   1331 ;	main.c: 427: uart_write(ar);
-      008941 96               [ 1] 1332 	ldw	x, sp
-      008942 5C               [ 1] 1333 	incw	x
-      008943 CD 83 47         [ 4] 1334 	call	_uart_write
-                                   1335 ;	main.c: 428: uart_write(" ");
-      008946 AE 80 E4         [ 2] 1336 	ldw	x, #(___str_23+0)
-      008949 CD 83 47         [ 4] 1337 	call	_uart_write
-                                   1338 ;	main.c: 429: convert_int_to_chars(d_size, ar);
-      00894C 96               [ 1] 1339 	ldw	x, sp
-      00894D 5C               [ 1] 1340 	incw	x
-      00894E C6 01 06         [ 1] 1341 	ld	a, _d_size+0
-      008951 CD 83 A8         [ 4] 1342 	call	_convert_int_to_chars
-                                   1343 ;	main.c: 430: uart_write(ar);
-      008954 96               [ 1] 1344 	ldw	x, sp
-      008955 5C               [ 1] 1345 	incw	x
-      008956 CD 83 47         [ 4] 1346 	call	_uart_write
-                                   1347 ;	main.c: 431: uart_write("\r\n");
-      008959 AE 80 D5         [ 2] 1348 	ldw	x, #(___str_19+0)
-      00895C CD 83 47         [ 4] 1349 	call	_uart_write
-                                   1350 ;	main.c: 432: }
-      00895F 5B 04            [ 2] 1351 	addw	sp, #4
-      008961 81               [ 4] 1352 	ret
-                                   1353 ;	main.c: 440: int data_handler(void)
+      008450 0F 05            [ 1]  396 	clr	(0x05, sp)
+                                    397 ;	main.c: 104: uart_write("\nchar -> ");
+      008452 AE 80 2D         [ 2]  398 	ldw	x, #(___str_0+0)
+      008455 CD 83 66         [ 4]  399 	call	_uart_write
+                                    400 ;	main.c: 105: uart_write(rx_chars_int);
+      008458 1E 06            [ 2]  401 	ldw	x, (0x06, sp)
+      00845A CD 83 66         [ 4]  402 	call	_uart_write
+                                    403 ;	main.c: 106: uart_write(" <-\n");
+      00845D AE 80 37         [ 2]  404 	ldw	x, #(___str_1+0)
+      008460 CD 83 66         [ 4]  405 	call	_uart_write
+                                    406 ;	main.c: 107: for (int o = 0; o < i; o++) {
+      008463 5F               [ 1]  407 	clrw	x
+      008464 1F 08            [ 2]  408 	ldw	(0x08, sp), x
+      008466                        409 00103$:
+      008466 1E 08            [ 2]  410 	ldw	x, (0x08, sp)
+      008468 13 0C            [ 2]  411 	cpw	x, (0x0c, sp)
+      00846A 2E 3C            [ 1]  412 	jrsge	00101$
+                                    413 ;	main.c: 109: result = (result * 10) + (rx_chars_int[o] - '0');
+      00846C 7B 05            [ 1]  414 	ld	a, (0x05, sp)
+      00846E 97               [ 1]  415 	ld	xl, a
+      00846F A6 0A            [ 1]  416 	ld	a, #0x0a
+      008471 42               [ 4]  417 	mul	x, a
+      008472 16 06            [ 2]  418 	ldw	y, (0x06, sp)
+      008474 72 F9 08         [ 2]  419 	addw	y, (0x08, sp)
+      008477 90 F6            [ 1]  420 	ld	a, (y)
+      008479 A0 30            [ 1]  421 	sub	a, #0x30
+      00847B 89               [ 2]  422 	pushw	x
+      00847C 1B 02            [ 1]  423 	add	a, (2, sp)
+      00847E 85               [ 2]  424 	popw	x
+      00847F 6B 05            [ 1]  425 	ld	(0x05, sp), a
+                                    426 ;	main.c: 110: char rx_binary_chars[4]={0};
+      008481 0F 01            [ 1]  427 	clr	(0x01, sp)
+      008483 0F 02            [ 1]  428 	clr	(0x02, sp)
+      008485 0F 03            [ 1]  429 	clr	(0x03, sp)
+      008487 0F 04            [ 1]  430 	clr	(0x04, sp)
+                                    431 ;	main.c: 111: convert_int_to_chars(result, rx_binary_chars);
+      008489 96               [ 1]  432 	ldw	x, sp
+      00848A 5C               [ 1]  433 	incw	x
+      00848B 7B 05            [ 1]  434 	ld	a, (0x05, sp)
+      00848D CD 83 C7         [ 4]  435 	call	_convert_int_to_chars
+                                    436 ;	main.c: 112: uart_write("\nresult -> ");
+      008490 AE 80 3C         [ 2]  437 	ldw	x, #(___str_2+0)
+      008493 CD 83 66         [ 4]  438 	call	_uart_write
+                                    439 ;	main.c: 113: uart_write(rx_binary_chars);
+      008496 96               [ 1]  440 	ldw	x, sp
+      008497 5C               [ 1]  441 	incw	x
+      008498 CD 83 66         [ 4]  442 	call	_uart_write
+                                    443 ;	main.c: 114: uart_write(" <-\n");
+      00849B AE 80 37         [ 2]  444 	ldw	x, #(___str_1+0)
+      00849E CD 83 66         [ 4]  445 	call	_uart_write
+                                    446 ;	main.c: 107: for (int o = 0; o < i; o++) {
+      0084A1 1E 08            [ 2]  447 	ldw	x, (0x08, sp)
+      0084A3 5C               [ 1]  448 	incw	x
+      0084A4 1F 08            [ 2]  449 	ldw	(0x08, sp), x
+      0084A6 20 BE            [ 2]  450 	jra	00103$
+      0084A8                        451 00101$:
+                                    452 ;	main.c: 117: return result;
+      0084A8 7B 05            [ 1]  453 	ld	a, (0x05, sp)
+                                    454 ;	main.c: 118: }
+      0084AA 1E 0A            [ 2]  455 	ldw	x, (10, sp)
+      0084AC 5B 0D            [ 2]  456 	addw	sp, #13
+      0084AE FC               [ 2]  457 	jp	(x)
+                                    458 ;	main.c: 121: void convert_int_to_binary(int num, char* rx_binary_chars) {
+                                    459 ;	-----------------------------------------
+                                    460 ;	 function convert_int_to_binary
+                                    461 ;	-----------------------------------------
+      0084AF                        462 _convert_int_to_binary:
+      0084AF 52 04            [ 2]  463 	sub	sp, #4
+      0084B1 1F 01            [ 2]  464 	ldw	(0x01, sp), x
+                                    465 ;	main.c: 123: for(int i = 7; i >= 0; i--) {
+      0084B3 AE 00 07         [ 2]  466 	ldw	x, #0x0007
+      0084B6 1F 03            [ 2]  467 	ldw	(0x03, sp), x
+      0084B8                        468 00103$:
+      0084B8 0D 03            [ 1]  469 	tnz	(0x03, sp)
+      0084BA 2B 22            [ 1]  470 	jrmi	00101$
+                                    471 ;	main.c: 125: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
+      0084BC AE 00 07         [ 2]  472 	ldw	x, #0x0007
+      0084BF 72 F0 03         [ 2]  473 	subw	x, (0x03, sp)
+      0084C2 72 FB 07         [ 2]  474 	addw	x, (0x07, sp)
+      0084C5 16 01            [ 2]  475 	ldw	y, (0x01, sp)
+      0084C7 7B 04            [ 1]  476 	ld	a, (0x04, sp)
+      0084C9 27 05            [ 1]  477 	jreq	00120$
+      0084CB                        478 00119$:
+      0084CB 90 57            [ 2]  479 	sraw	y
+      0084CD 4A               [ 1]  480 	dec	a
+      0084CE 26 FB            [ 1]  481 	jrne	00119$
+      0084D0                        482 00120$:
+      0084D0 90 9F            [ 1]  483 	ld	a, yl
+      0084D2 A4 01            [ 1]  484 	and	a, #0x01
+      0084D4 AB 30            [ 1]  485 	add	a, #0x30
+      0084D6 F7               [ 1]  486 	ld	(x), a
+                                    487 ;	main.c: 123: for(int i = 7; i >= 0; i--) {
+      0084D7 1E 03            [ 2]  488 	ldw	x, (0x03, sp)
+      0084D9 5A               [ 2]  489 	decw	x
+      0084DA 1F 03            [ 2]  490 	ldw	(0x03, sp), x
+      0084DC 20 DA            [ 2]  491 	jra	00103$
+      0084DE                        492 00101$:
+                                    493 ;	main.c: 127: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
+      0084DE 1E 07            [ 2]  494 	ldw	x, (0x07, sp)
+      0084E0 6F 08            [ 1]  495 	clr	(0x0008, x)
+                                    496 ;	main.c: 128: }
+      0084E2 1E 05            [ 2]  497 	ldw	x, (5, sp)
+      0084E4 5B 08            [ 2]  498 	addw	sp, #8
+      0084E6 FC               [ 2]  499 	jp	(x)
+                                    500 ;	main.c: 137: void get_addr_from_buff(void)
+                                    501 ;	-----------------------------------------
+                                    502 ;	 function get_addr_from_buff
+                                    503 ;	-----------------------------------------
+      0084E7                        504 _get_addr_from_buff:
+      0084E7 52 02            [ 2]  505 	sub	sp, #2
+                                    506 ;	main.c: 141: while(1)
+      0084E9 A6 03            [ 1]  507 	ld	a, #0x03
+      0084EB 6B 01            [ 1]  508 	ld	(0x01, sp), a
+      0084ED 0F 02            [ 1]  509 	clr	(0x02, sp)
+      0084EF                        510 00105$:
+                                    511 ;	main.c: 143: if(buffer[i] == ' ' || buffer[i] == '\r\n')
+      0084EF 5F               [ 1]  512 	clrw	x
+      0084F0 7B 01            [ 1]  513 	ld	a, (0x01, sp)
+      0084F2 97               [ 1]  514 	ld	xl, a
+      0084F3 D6 00 01         [ 1]  515 	ld	a, (_buffer+0, x)
+      0084F6 A1 20            [ 1]  516 	cp	a, #0x20
+      0084F8 27 04            [ 1]  517 	jreq	00101$
+      0084FA A1 0D            [ 1]  518 	cp	a, #0x0d
+      0084FC 26 08            [ 1]  519 	jrne	00102$
+      0084FE                        520 00101$:
+                                    521 ;	main.c: 145: p_size = i+1;
+      0084FE 7B 01            [ 1]  522 	ld	a, (0x01, sp)
+      008500 4C               [ 1]  523 	inc	a
+      008501 C7 01 04         [ 1]  524 	ld	_p_size+0, a
+                                    525 ;	main.c: 146: break;
+      008504 20 06            [ 2]  526 	jra	00106$
+      008506                        527 00102$:
+                                    528 ;	main.c: 148: i++;
+      008506 0C 01            [ 1]  529 	inc	(0x01, sp)
+                                    530 ;	main.c: 149: counter++;
+      008508 0C 02            [ 1]  531 	inc	(0x02, sp)
+      00850A 20 E3            [ 2]  532 	jra	00105$
+      00850C                        533 00106$:
+                                    534 ;	main.c: 151: memcpy(a, &buffer[3], counter);
+      00850C 5F               [ 1]  535 	clrw	x
+      00850D 7B 02            [ 1]  536 	ld	a, (0x02, sp)
+      00850F 97               [ 1]  537 	ld	xl, a
+      008510 89               [ 2]  538 	pushw	x
+      008511 4B 04            [ 1]  539 	push	#<(_buffer+3)
+      008513 4B 00            [ 1]  540 	push	#((_buffer+3) >> 8)
+      008515 AE 01 00         [ 2]  541 	ldw	x, #(_a+0)
+      008518 CD 8B 8E         [ 4]  542 	call	___memcpy
+                                    543 ;	main.c: 152: d_addr = convert_chars_to_int(a, counter);
+      00851B 5F               [ 1]  544 	clrw	x
+      00851C 7B 02            [ 1]  545 	ld	a, (0x02, sp)
+      00851E 97               [ 1]  546 	ld	xl, a
+      00851F 89               [ 2]  547 	pushw	x
+      008520 AE 01 00         [ 2]  548 	ldw	x, #(_a+0)
+      008523 CD 84 4C         [ 4]  549 	call	_convert_chars_to_int
+      008526 C7 01 03         [ 1]  550 	ld	_d_addr+0, a
+                                    551 ;	main.c: 153: }
+      008529 5B 02            [ 2]  552 	addw	sp, #2
+      00852B 81               [ 4]  553 	ret
+                                    554 ;	main.c: 155: void get_size_from_buff(void)
+                                    555 ;	-----------------------------------------
+                                    556 ;	 function get_size_from_buff
+                                    557 ;	-----------------------------------------
+      00852C                        558 _get_size_from_buff:
+      00852C 52 02            [ 2]  559 	sub	sp, #2
+                                    560 ;	main.c: 157: memset(a, 0, sizeof(a));
+      00852E 4B 03            [ 1]  561 	push	#0x03
+      008530 4B 00            [ 1]  562 	push	#0x00
+      008532 5F               [ 1]  563 	clrw	x
+      008533 89               [ 2]  564 	pushw	x
+      008534 AE 01 00         [ 2]  565 	ldw	x, #(_a+0)
+      008537 CD 8B E1         [ 4]  566 	call	_memset
+                                    567 ;	main.c: 159: uint8_t i = p_size;
+      00853A C6 01 04         [ 1]  568 	ld	a, _p_size+0
+      00853D 6B 01            [ 1]  569 	ld	(0x01, sp), a
+                                    570 ;	main.c: 160: while(1)
+      00853F 0F 02            [ 1]  571 	clr	(0x02, sp)
+      008541                        572 00105$:
+                                    573 ;	main.c: 162: if(buffer[i] == ' ' || buffer[i] == '\r\n')
+      008541 5F               [ 1]  574 	clrw	x
+      008542 7B 01            [ 1]  575 	ld	a, (0x01, sp)
+      008544 97               [ 1]  576 	ld	xl, a
+      008545 D6 00 01         [ 1]  577 	ld	a, (_buffer+0, x)
+      008548 A1 20            [ 1]  578 	cp	a, #0x20
+      00854A 27 04            [ 1]  579 	jreq	00101$
+      00854C A1 0D            [ 1]  580 	cp	a, #0x0d
+      00854E 26 08            [ 1]  581 	jrne	00102$
+      008550                        582 00101$:
+                                    583 ;	main.c: 165: p_bytes = i+1;
+      008550 7B 01            [ 1]  584 	ld	a, (0x01, sp)
+      008552 4C               [ 1]  585 	inc	a
+      008553 C7 01 06         [ 1]  586 	ld	_p_bytes+0, a
+                                    587 ;	main.c: 166: break;
+      008556 20 06            [ 2]  588 	jra	00106$
+      008558                        589 00102$:
+                                    590 ;	main.c: 168: i++;
+      008558 0C 01            [ 1]  591 	inc	(0x01, sp)
+                                    592 ;	main.c: 169: counter++;
+      00855A 0C 02            [ 1]  593 	inc	(0x02, sp)
+      00855C 20 E3            [ 2]  594 	jra	00105$
+      00855E                        595 00106$:
+                                    596 ;	main.c: 172: memcpy(a, &buffer[p_size], counter);
+      00855E 90 5F            [ 1]  597 	clrw	y
+      008560 7B 02            [ 1]  598 	ld	a, (0x02, sp)
+      008562 90 97            [ 1]  599 	ld	yl, a
+      008564 5F               [ 1]  600 	clrw	x
+      008565 C6 01 04         [ 1]  601 	ld	a, _p_size+0
+      008568 97               [ 1]  602 	ld	xl, a
+      008569 1C 00 01         [ 2]  603 	addw	x, #(_buffer+0)
+      00856C 90 89            [ 2]  604 	pushw	y
+      00856E 89               [ 2]  605 	pushw	x
+      00856F AE 01 00         [ 2]  606 	ldw	x, #(_a+0)
+      008572 CD 8B 8E         [ 4]  607 	call	___memcpy
+                                    608 ;	main.c: 173: d_size = convert_chars_to_int(a, counter);
+      008575 5F               [ 1]  609 	clrw	x
+      008576 7B 02            [ 1]  610 	ld	a, (0x02, sp)
+      008578 97               [ 1]  611 	ld	xl, a
+      008579 89               [ 2]  612 	pushw	x
+      00857A AE 01 00         [ 2]  613 	ldw	x, #(_a+0)
+      00857D CD 84 4C         [ 4]  614 	call	_convert_chars_to_int
+      008580 C7 01 05         [ 1]  615 	ld	_d_size+0, a
+                                    616 ;	main.c: 174: }
+      008583 5B 02            [ 2]  617 	addw	sp, #2
+      008585 81               [ 4]  618 	ret
+                                    619 ;	main.c: 175: void char_buffer_to_int(void)
+                                    620 ;	-----------------------------------------
+                                    621 ;	 function char_buffer_to_int
+                                    622 ;	-----------------------------------------
+      008586                        623 _char_buffer_to_int:
+      008586 52 0C            [ 2]  624 	sub	sp, #12
+                                    625 ;	main.c: 177: memset(a, 0, sizeof(a));
+      008588 4B 03            [ 1]  626 	push	#0x03
+      00858A 4B 00            [ 1]  627 	push	#0x00
+      00858C 5F               [ 1]  628 	clrw	x
+      00858D 89               [ 2]  629 	pushw	x
+      00858E AE 01 00         [ 2]  630 	ldw	x, #(_a+0)
+      008591 CD 8B E1         [ 4]  631 	call	_memset
+                                    632 ;	main.c: 178: uint8_t counter = d_size;
+      008594 C6 01 05         [ 1]  633 	ld	a, _d_size+0
+      008597 6B 05            [ 1]  634 	ld	(0x05, sp), a
+                                    635 ;	main.c: 179: uint8_t i = p_bytes;
+      008599 C6 01 06         [ 1]  636 	ld	a, _p_bytes+0
+      00859C 6B 06            [ 1]  637 	ld	(0x06, sp), a
+                                    638 ;	main.c: 182: for(int o = 0; o < counter;o++)
+      00859E 0F 08            [ 1]  639 	clr	(0x08, sp)
+      0085A0 5F               [ 1]  640 	clrw	x
+      0085A1 1F 09            [ 2]  641 	ldw	(0x09, sp), x
+      0085A3                        642 00112$:
+      0085A3 7B 05            [ 1]  643 	ld	a, (0x05, sp)
+      0085A5 6B 0C            [ 1]  644 	ld	(0x0c, sp), a
+      0085A7 0F 0B            [ 1]  645 	clr	(0x0b, sp)
+      0085A9 1E 09            [ 2]  646 	ldw	x, (0x09, sp)
+      0085AB 13 0B            [ 2]  647 	cpw	x, (0x0b, sp)
+      0085AD 2F 03            [ 1]  648 	jrslt	00142$
+      0085AF CC 86 58         [ 2]  649 	jp	00114$
+      0085B2                        650 00142$:
+                                    651 ;	main.c: 184: uint8_t number_counter = 0;
+      0085B2 0F 07            [ 1]  652 	clr	(0x07, sp)
+                                    653 ;	main.c: 185: while(1)
+      0085B4 7B 06            [ 1]  654 	ld	a, (0x06, sp)
+      0085B6 6B 0B            [ 1]  655 	ld	(0x0b, sp), a
+      0085B8 0F 0C            [ 1]  656 	clr	(0x0c, sp)
+      0085BA                        657 00108$:
+                                    658 ;	main.c: 187: char rx_binary_chars1[4]={0};
+      0085BA 0F 01            [ 1]  659 	clr	(0x01, sp)
+      0085BC 0F 02            [ 1]  660 	clr	(0x02, sp)
+      0085BE 0F 03            [ 1]  661 	clr	(0x03, sp)
+      0085C0 0F 04            [ 1]  662 	clr	(0x04, sp)
+                                    663 ;	main.c: 188: convert_int_to_chars(i, rx_binary_chars1);
+      0085C2 96               [ 1]  664 	ldw	x, sp
+      0085C3 5C               [ 1]  665 	incw	x
+      0085C4 7B 0B            [ 1]  666 	ld	a, (0x0b, sp)
+      0085C6 CD 83 C7         [ 4]  667 	call	_convert_int_to_chars
+                                    668 ;	main.c: 189: uart_write("\ni while-> -> ");
+      0085C9 AE 80 48         [ 2]  669 	ldw	x, #(___str_3+0)
+      0085CC CD 83 66         [ 4]  670 	call	_uart_write
+                                    671 ;	main.c: 190: uart_write(rx_binary_chars1);
+      0085CF 96               [ 1]  672 	ldw	x, sp
+      0085D0 5C               [ 1]  673 	incw	x
+      0085D1 CD 83 66         [ 4]  674 	call	_uart_write
+                                    675 ;	main.c: 191: uart_write(" <-\n");
+      0085D4 AE 80 37         [ 2]  676 	ldw	x, #(___str_1+0)
+      0085D7 CD 83 66         [ 4]  677 	call	_uart_write
+                                    678 ;	main.c: 192: if(buffer[i] == ' ')
+      0085DA 5F               [ 1]  679 	clrw	x
+      0085DB 7B 0B            [ 1]  680 	ld	a, (0x0b, sp)
+      0085DD 97               [ 1]  681 	ld	xl, a
+      0085DE D6 00 01         [ 1]  682 	ld	a, (_buffer+0, x)
+      0085E1 A1 20            [ 1]  683 	cp	a, #0x20
+      0085E3 26 04            [ 1]  684 	jrne	00105$
+                                    685 ;	main.c: 194: i = i+1;
+      0085E5 0C 06            [ 1]  686 	inc	(0x06, sp)
+                                    687 ;	main.c: 195: break;
+      0085E7 20 12            [ 2]  688 	jra	00109$
+      0085E9                        689 00105$:
+                                    690 ;	main.c: 197: else if(buffer[i] == '\r\n')
+      0085E9 A1 0D            [ 1]  691 	cp	a, #0x0d
+      0085EB 27 0E            [ 1]  692 	jreq	00109$
+                                    693 ;	main.c: 200: i++;
+      0085ED 0C 0B            [ 1]  694 	inc	(0x0b, sp)
+      0085EF 7B 0B            [ 1]  695 	ld	a, (0x0b, sp)
+      0085F1 6B 06            [ 1]  696 	ld	(0x06, sp), a
+                                    697 ;	main.c: 202: number_counter++;
+      0085F3 0C 0C            [ 1]  698 	inc	(0x0c, sp)
+      0085F5 7B 0C            [ 1]  699 	ld	a, (0x0c, sp)
+      0085F7 6B 07            [ 1]  700 	ld	(0x07, sp), a
+      0085F9 20 BF            [ 2]  701 	jra	00108$
+      0085FB                        702 00109$:
+                                    703 ;	main.c: 204: memcpy(a, &buffer[i - number_counter], number_counter);
+      0085FB 90 5F            [ 1]  704 	clrw	y
+      0085FD 7B 07            [ 1]  705 	ld	a, (0x07, sp)
+      0085FF 90 97            [ 1]  706 	ld	yl, a
+      008601 5F               [ 1]  707 	clrw	x
+      008602 7B 06            [ 1]  708 	ld	a, (0x06, sp)
+      008604 97               [ 1]  709 	ld	xl, a
+      008605 7B 07            [ 1]  710 	ld	a, (0x07, sp)
+      008607 6B 0C            [ 1]  711 	ld	(0x0c, sp), a
+      008609 0F 0B            [ 1]  712 	clr	(0x0b, sp)
+      00860B 72 F0 0B         [ 2]  713 	subw	x, (0x0b, sp)
+      00860E 1C 00 01         [ 2]  714 	addw	x, #(_buffer+0)
+      008611 90 89            [ 2]  715 	pushw	y
+      008613 89               [ 2]  716 	pushw	x
+      008614 AE 01 00         [ 2]  717 	ldw	x, #(_a+0)
+      008617 CD 8B 8E         [ 4]  718 	call	___memcpy
+                                    719 ;	main.c: 205: data_buf[int_buf_i] = convert_chars_to_int(a, number_counter);
+      00861A 5F               [ 1]  720 	clrw	x
+      00861B 7B 08            [ 1]  721 	ld	a, (0x08, sp)
+      00861D 97               [ 1]  722 	ld	xl, a
+      00861E 1C 01 07         [ 2]  723 	addw	x, #(_data_buf+0)
+      008621 89               [ 2]  724 	pushw	x
+      008622 16 0D            [ 2]  725 	ldw	y, (0x0d, sp)
+      008624 90 89            [ 2]  726 	pushw	y
+      008626 AE 01 00         [ 2]  727 	ldw	x, #(_a+0)
+      008629 CD 84 4C         [ 4]  728 	call	_convert_chars_to_int
+      00862C 85               [ 2]  729 	popw	x
+      00862D F7               [ 1]  730 	ld	(x), a
+                                    731 ;	main.c: 207: char rx_binary_chars[4]={0};
+      00862E 0F 01            [ 1]  732 	clr	(0x01, sp)
+      008630 0F 02            [ 1]  733 	clr	(0x02, sp)
+      008632 0F 03            [ 1]  734 	clr	(0x03, sp)
+      008634 0F 04            [ 1]  735 	clr	(0x04, sp)
+                                    736 ;	main.c: 208: convert_int_to_chars(i, rx_binary_chars);
+      008636 96               [ 1]  737 	ldw	x, sp
+      008637 5C               [ 1]  738 	incw	x
+      008638 7B 06            [ 1]  739 	ld	a, (0x06, sp)
+      00863A CD 83 C7         [ 4]  740 	call	_convert_int_to_chars
+                                    741 ;	main.c: 209: uart_write("\ni -> -> ");
+      00863D AE 80 57         [ 2]  742 	ldw	x, #(___str_4+0)
+      008640 CD 83 66         [ 4]  743 	call	_uart_write
+                                    744 ;	main.c: 210: uart_write(rx_binary_chars);
+      008643 96               [ 1]  745 	ldw	x, sp
+      008644 5C               [ 1]  746 	incw	x
+      008645 CD 83 66         [ 4]  747 	call	_uart_write
+                                    748 ;	main.c: 211: uart_write(" <-\n");
+      008648 AE 80 37         [ 2]  749 	ldw	x, #(___str_1+0)
+      00864B CD 83 66         [ 4]  750 	call	_uart_write
+                                    751 ;	main.c: 212: int_buf_i++;
+      00864E 0C 08            [ 1]  752 	inc	(0x08, sp)
+                                    753 ;	main.c: 182: for(int o = 0; o < counter;o++)
+      008650 1E 09            [ 2]  754 	ldw	x, (0x09, sp)
+      008652 5C               [ 1]  755 	incw	x
+      008653 1F 09            [ 2]  756 	ldw	(0x09, sp), x
+      008655 CC 85 A3         [ 2]  757 	jp	00112$
+      008658                        758 00114$:
+                                    759 ;	main.c: 214: }
+      008658 5B 0C            [ 2]  760 	addw	sp, #12
+      00865A 81               [ 4]  761 	ret
+                                    762 ;	main.c: 222: void status_check(void){
+                                    763 ;	-----------------------------------------
+                                    764 ;	 function status_check
+                                    765 ;	-----------------------------------------
+      00865B                        766 _status_check:
+      00865B 52 09            [ 2]  767 	sub	sp, #9
+                                    768 ;	main.c: 223: char rx_binary_chars[9]={0};
+      00865D 0F 01            [ 1]  769 	clr	(0x01, sp)
+      00865F 0F 02            [ 1]  770 	clr	(0x02, sp)
+      008661 0F 03            [ 1]  771 	clr	(0x03, sp)
+      008663 0F 04            [ 1]  772 	clr	(0x04, sp)
+      008665 0F 05            [ 1]  773 	clr	(0x05, sp)
+      008667 0F 06            [ 1]  774 	clr	(0x06, sp)
+      008669 0F 07            [ 1]  775 	clr	(0x07, sp)
+      00866B 0F 08            [ 1]  776 	clr	(0x08, sp)
+      00866D 0F 09            [ 1]  777 	clr	(0x09, sp)
+                                    778 ;	main.c: 224: uart_write("\nI2C_REGS >.<\n");
+      00866F AE 80 61         [ 2]  779 	ldw	x, #(___str_5+0)
+      008672 CD 83 66         [ 4]  780 	call	_uart_write
+                                    781 ;	main.c: 225: convert_int_to_binary(I2C_SR1, rx_binary_chars);
+      008675 96               [ 1]  782 	ldw	x, sp
+      008676 5C               [ 1]  783 	incw	x
+      008677 51               [ 1]  784 	exgw	x, y
+      008678 C6 52 17         [ 1]  785 	ld	a, 0x5217
+      00867B 5F               [ 1]  786 	clrw	x
+      00867C 90 89            [ 2]  787 	pushw	y
+      00867E 97               [ 1]  788 	ld	xl, a
+      00867F CD 84 AF         [ 4]  789 	call	_convert_int_to_binary
+                                    790 ;	main.c: 226: uart_write("\nSR1 -> ");
+      008682 AE 80 70         [ 2]  791 	ldw	x, #(___str_6+0)
+      008685 CD 83 66         [ 4]  792 	call	_uart_write
+                                    793 ;	main.c: 227: uart_write(rx_binary_chars);
+      008688 96               [ 1]  794 	ldw	x, sp
+      008689 5C               [ 1]  795 	incw	x
+      00868A CD 83 66         [ 4]  796 	call	_uart_write
+                                    797 ;	main.c: 228: uart_write(" <-\n");
+      00868D AE 80 37         [ 2]  798 	ldw	x, #(___str_1+0)
+      008690 CD 83 66         [ 4]  799 	call	_uart_write
+                                    800 ;	main.c: 229: convert_int_to_binary(I2C_SR2, rx_binary_chars);
+      008693 96               [ 1]  801 	ldw	x, sp
+      008694 5C               [ 1]  802 	incw	x
+      008695 51               [ 1]  803 	exgw	x, y
+      008696 C6 52 18         [ 1]  804 	ld	a, 0x5218
+      008699 5F               [ 1]  805 	clrw	x
+      00869A 90 89            [ 2]  806 	pushw	y
+      00869C 97               [ 1]  807 	ld	xl, a
+      00869D CD 84 AF         [ 4]  808 	call	_convert_int_to_binary
+                                    809 ;	main.c: 230: uart_write("SR2 -> ");
+      0086A0 AE 80 79         [ 2]  810 	ldw	x, #(___str_7+0)
+      0086A3 CD 83 66         [ 4]  811 	call	_uart_write
+                                    812 ;	main.c: 231: uart_write(rx_binary_chars);
+      0086A6 96               [ 1]  813 	ldw	x, sp
+      0086A7 5C               [ 1]  814 	incw	x
+      0086A8 CD 83 66         [ 4]  815 	call	_uart_write
+                                    816 ;	main.c: 232: uart_write(" <-\n");
+      0086AB AE 80 37         [ 2]  817 	ldw	x, #(___str_1+0)
+      0086AE CD 83 66         [ 4]  818 	call	_uart_write
+                                    819 ;	main.c: 233: convert_int_to_binary(I2C_SR3, rx_binary_chars);
+      0086B1 96               [ 1]  820 	ldw	x, sp
+      0086B2 5C               [ 1]  821 	incw	x
+      0086B3 51               [ 1]  822 	exgw	x, y
+      0086B4 C6 52 19         [ 1]  823 	ld	a, 0x5219
+      0086B7 5F               [ 1]  824 	clrw	x
+      0086B8 90 89            [ 2]  825 	pushw	y
+      0086BA 97               [ 1]  826 	ld	xl, a
+      0086BB CD 84 AF         [ 4]  827 	call	_convert_int_to_binary
+                                    828 ;	main.c: 234: uart_write("SR3 -> ");
+      0086BE AE 80 81         [ 2]  829 	ldw	x, #(___str_8+0)
+      0086C1 CD 83 66         [ 4]  830 	call	_uart_write
+                                    831 ;	main.c: 235: uart_write(rx_binary_chars);
+      0086C4 96               [ 1]  832 	ldw	x, sp
+      0086C5 5C               [ 1]  833 	incw	x
+      0086C6 CD 83 66         [ 4]  834 	call	_uart_write
+                                    835 ;	main.c: 236: uart_write(" <-\n");
+      0086C9 AE 80 37         [ 2]  836 	ldw	x, #(___str_1+0)
+      0086CC CD 83 66         [ 4]  837 	call	_uart_write
+                                    838 ;	main.c: 237: convert_int_to_binary(I2C_CR1, rx_binary_chars);
+      0086CF 96               [ 1]  839 	ldw	x, sp
+      0086D0 5C               [ 1]  840 	incw	x
+      0086D1 51               [ 1]  841 	exgw	x, y
+      0086D2 C6 52 10         [ 1]  842 	ld	a, 0x5210
+      0086D5 5F               [ 1]  843 	clrw	x
+      0086D6 90 89            [ 2]  844 	pushw	y
+      0086D8 97               [ 1]  845 	ld	xl, a
+      0086D9 CD 84 AF         [ 4]  846 	call	_convert_int_to_binary
+                                    847 ;	main.c: 238: uart_write("CR1 -> ");
+      0086DC AE 80 89         [ 2]  848 	ldw	x, #(___str_9+0)
+      0086DF CD 83 66         [ 4]  849 	call	_uart_write
+                                    850 ;	main.c: 239: uart_write(rx_binary_chars);
+      0086E2 96               [ 1]  851 	ldw	x, sp
+      0086E3 5C               [ 1]  852 	incw	x
+      0086E4 CD 83 66         [ 4]  853 	call	_uart_write
+                                    854 ;	main.c: 240: uart_write(" <-\n");
+      0086E7 AE 80 37         [ 2]  855 	ldw	x, #(___str_1+0)
+      0086EA CD 83 66         [ 4]  856 	call	_uart_write
+                                    857 ;	main.c: 241: convert_int_to_binary(I2C_CR2, rx_binary_chars);
+      0086ED 96               [ 1]  858 	ldw	x, sp
+      0086EE 5C               [ 1]  859 	incw	x
+      0086EF 51               [ 1]  860 	exgw	x, y
+      0086F0 C6 52 11         [ 1]  861 	ld	a, 0x5211
+      0086F3 5F               [ 1]  862 	clrw	x
+      0086F4 90 89            [ 2]  863 	pushw	y
+      0086F6 97               [ 1]  864 	ld	xl, a
+      0086F7 CD 84 AF         [ 4]  865 	call	_convert_int_to_binary
+                                    866 ;	main.c: 242: uart_write("CR2 -> ");
+      0086FA AE 80 91         [ 2]  867 	ldw	x, #(___str_10+0)
+      0086FD CD 83 66         [ 4]  868 	call	_uart_write
+                                    869 ;	main.c: 243: uart_write(rx_binary_chars);
+      008700 96               [ 1]  870 	ldw	x, sp
+      008701 5C               [ 1]  871 	incw	x
+      008702 CD 83 66         [ 4]  872 	call	_uart_write
+                                    873 ;	main.c: 244: uart_write(" <-\n");
+      008705 AE 80 37         [ 2]  874 	ldw	x, #(___str_1+0)
+      008708 CD 83 66         [ 4]  875 	call	_uart_write
+                                    876 ;	main.c: 245: convert_int_to_binary(I2C_DR, rx_binary_chars);
+      00870B 96               [ 1]  877 	ldw	x, sp
+      00870C 5C               [ 1]  878 	incw	x
+      00870D 51               [ 1]  879 	exgw	x, y
+      00870E C6 52 16         [ 1]  880 	ld	a, 0x5216
+      008711 5F               [ 1]  881 	clrw	x
+      008712 90 89            [ 2]  882 	pushw	y
+      008714 97               [ 1]  883 	ld	xl, a
+      008715 CD 84 AF         [ 4]  884 	call	_convert_int_to_binary
+                                    885 ;	main.c: 246: uart_write("DR -> ");
+      008718 AE 80 99         [ 2]  886 	ldw	x, #(___str_11+0)
+      00871B CD 83 66         [ 4]  887 	call	_uart_write
+                                    888 ;	main.c: 247: uart_write(rx_binary_chars);
+      00871E 96               [ 1]  889 	ldw	x, sp
+      00871F 5C               [ 1]  890 	incw	x
+      008720 CD 83 66         [ 4]  891 	call	_uart_write
+                                    892 ;	main.c: 248: uart_write(" <-\n");
+      008723 AE 80 37         [ 2]  893 	ldw	x, #(___str_1+0)
+      008726 CD 83 66         [ 4]  894 	call	_uart_write
+                                    895 ;	main.c: 249: uart_write("UART_REGS >.<\n");
+      008729 AE 80 A0         [ 2]  896 	ldw	x, #(___str_12+0)
+      00872C CD 83 66         [ 4]  897 	call	_uart_write
+                                    898 ;	main.c: 250: convert_int_to_binary(UART1_SR, rx_binary_chars);
+      00872F 96               [ 1]  899 	ldw	x, sp
+      008730 5C               [ 1]  900 	incw	x
+      008731 51               [ 1]  901 	exgw	x, y
+      008732 C6 52 30         [ 1]  902 	ld	a, 0x5230
+      008735 5F               [ 1]  903 	clrw	x
+      008736 90 89            [ 2]  904 	pushw	y
+      008738 97               [ 1]  905 	ld	xl, a
+      008739 CD 84 AF         [ 4]  906 	call	_convert_int_to_binary
+                                    907 ;	main.c: 251: uart_write("\nSR -> ");
+      00873C AE 80 AF         [ 2]  908 	ldw	x, #(___str_13+0)
+      00873F CD 83 66         [ 4]  909 	call	_uart_write
+                                    910 ;	main.c: 252: uart_write(rx_binary_chars);
+      008742 96               [ 1]  911 	ldw	x, sp
+      008743 5C               [ 1]  912 	incw	x
+      008744 CD 83 66         [ 4]  913 	call	_uart_write
+                                    914 ;	main.c: 253: uart_write(" <-\n");
+      008747 AE 80 37         [ 2]  915 	ldw	x, #(___str_1+0)
+      00874A CD 83 66         [ 4]  916 	call	_uart_write
+                                    917 ;	main.c: 254: convert_int_to_binary(UART1_DR, rx_binary_chars);
+      00874D 96               [ 1]  918 	ldw	x, sp
+      00874E 5C               [ 1]  919 	incw	x
+      00874F 51               [ 1]  920 	exgw	x, y
+      008750 C6 52 31         [ 1]  921 	ld	a, 0x5231
+      008753 5F               [ 1]  922 	clrw	x
+      008754 90 89            [ 2]  923 	pushw	y
+      008756 97               [ 1]  924 	ld	xl, a
+      008757 CD 84 AF         [ 4]  925 	call	_convert_int_to_binary
+                                    926 ;	main.c: 255: uart_write("DR -> ");
+      00875A AE 80 99         [ 2]  927 	ldw	x, #(___str_11+0)
+      00875D CD 83 66         [ 4]  928 	call	_uart_write
+                                    929 ;	main.c: 256: uart_write(rx_binary_chars);
+      008760 96               [ 1]  930 	ldw	x, sp
+      008761 5C               [ 1]  931 	incw	x
+      008762 CD 83 66         [ 4]  932 	call	_uart_write
+                                    933 ;	main.c: 257: uart_write(" <-\n");
+      008765 AE 80 37         [ 2]  934 	ldw	x, #(___str_1+0)
+      008768 CD 83 66         [ 4]  935 	call	_uart_write
+                                    936 ;	main.c: 258: convert_int_to_binary(UART1_BRR1, rx_binary_chars);
+      00876B 96               [ 1]  937 	ldw	x, sp
+      00876C 5C               [ 1]  938 	incw	x
+      00876D 51               [ 1]  939 	exgw	x, y
+      00876E C6 52 32         [ 1]  940 	ld	a, 0x5232
+      008771 5F               [ 1]  941 	clrw	x
+      008772 90 89            [ 2]  942 	pushw	y
+      008774 97               [ 1]  943 	ld	xl, a
+      008775 CD 84 AF         [ 4]  944 	call	_convert_int_to_binary
+                                    945 ;	main.c: 259: uart_write("BRR1 -> ");
+      008778 AE 80 B7         [ 2]  946 	ldw	x, #(___str_14+0)
+      00877B CD 83 66         [ 4]  947 	call	_uart_write
+                                    948 ;	main.c: 260: uart_write(rx_binary_chars);
+      00877E 96               [ 1]  949 	ldw	x, sp
+      00877F 5C               [ 1]  950 	incw	x
+      008780 CD 83 66         [ 4]  951 	call	_uart_write
+                                    952 ;	main.c: 261: uart_write(" <-\n");
+      008783 AE 80 37         [ 2]  953 	ldw	x, #(___str_1+0)
+      008786 CD 83 66         [ 4]  954 	call	_uart_write
+                                    955 ;	main.c: 262: convert_int_to_binary(UART1_BRR2, rx_binary_chars);
+      008789 96               [ 1]  956 	ldw	x, sp
+      00878A 5C               [ 1]  957 	incw	x
+      00878B 51               [ 1]  958 	exgw	x, y
+      00878C C6 52 33         [ 1]  959 	ld	a, 0x5233
+      00878F 5F               [ 1]  960 	clrw	x
+      008790 90 89            [ 2]  961 	pushw	y
+      008792 97               [ 1]  962 	ld	xl, a
+      008793 CD 84 AF         [ 4]  963 	call	_convert_int_to_binary
+                                    964 ;	main.c: 263: uart_write("BRR2 -> ");
+      008796 AE 80 C0         [ 2]  965 	ldw	x, #(___str_15+0)
+      008799 CD 83 66         [ 4]  966 	call	_uart_write
+                                    967 ;	main.c: 264: uart_write(rx_binary_chars);
+      00879C 96               [ 1]  968 	ldw	x, sp
+      00879D 5C               [ 1]  969 	incw	x
+      00879E CD 83 66         [ 4]  970 	call	_uart_write
+                                    971 ;	main.c: 265: uart_write(" <-\n");
+      0087A1 AE 80 37         [ 2]  972 	ldw	x, #(___str_1+0)
+      0087A4 CD 83 66         [ 4]  973 	call	_uart_write
+                                    974 ;	main.c: 266: convert_int_to_binary(UART1_CR1, rx_binary_chars);
+      0087A7 96               [ 1]  975 	ldw	x, sp
+      0087A8 5C               [ 1]  976 	incw	x
+      0087A9 51               [ 1]  977 	exgw	x, y
+      0087AA C6 52 34         [ 1]  978 	ld	a, 0x5234
+      0087AD 5F               [ 1]  979 	clrw	x
+      0087AE 90 89            [ 2]  980 	pushw	y
+      0087B0 97               [ 1]  981 	ld	xl, a
+      0087B1 CD 84 AF         [ 4]  982 	call	_convert_int_to_binary
+                                    983 ;	main.c: 267: uart_write("CR1 -> ");
+      0087B4 AE 80 89         [ 2]  984 	ldw	x, #(___str_9+0)
+      0087B7 CD 83 66         [ 4]  985 	call	_uart_write
+                                    986 ;	main.c: 268: uart_write(rx_binary_chars);
+      0087BA 96               [ 1]  987 	ldw	x, sp
+      0087BB 5C               [ 1]  988 	incw	x
+      0087BC CD 83 66         [ 4]  989 	call	_uart_write
+                                    990 ;	main.c: 269: uart_write(" <-\n");
+      0087BF AE 80 37         [ 2]  991 	ldw	x, #(___str_1+0)
+      0087C2 CD 83 66         [ 4]  992 	call	_uart_write
+                                    993 ;	main.c: 270: convert_int_to_binary(UART1_CR2, rx_binary_chars);
+      0087C5 96               [ 1]  994 	ldw	x, sp
+      0087C6 5C               [ 1]  995 	incw	x
+      0087C7 51               [ 1]  996 	exgw	x, y
+      0087C8 C6 52 35         [ 1]  997 	ld	a, 0x5235
+      0087CB 5F               [ 1]  998 	clrw	x
+      0087CC 90 89            [ 2]  999 	pushw	y
+      0087CE 97               [ 1] 1000 	ld	xl, a
+      0087CF CD 84 AF         [ 4] 1001 	call	_convert_int_to_binary
+                                   1002 ;	main.c: 271: uart_write("CR2 -> ");
+      0087D2 AE 80 91         [ 2] 1003 	ldw	x, #(___str_10+0)
+      0087D5 CD 83 66         [ 4] 1004 	call	_uart_write
+                                   1005 ;	main.c: 272: uart_write(rx_binary_chars);
+      0087D8 96               [ 1] 1006 	ldw	x, sp
+      0087D9 5C               [ 1] 1007 	incw	x
+      0087DA CD 83 66         [ 4] 1008 	call	_uart_write
+                                   1009 ;	main.c: 273: uart_write(" <-\n");
+      0087DD AE 80 37         [ 2] 1010 	ldw	x, #(___str_1+0)
+      0087E0 CD 83 66         [ 4] 1011 	call	_uart_write
+                                   1012 ;	main.c: 274: convert_int_to_binary(UART1_CR3, rx_binary_chars);
+      0087E3 96               [ 1] 1013 	ldw	x, sp
+      0087E4 5C               [ 1] 1014 	incw	x
+      0087E5 51               [ 1] 1015 	exgw	x, y
+      0087E6 C6 52 36         [ 1] 1016 	ld	a, 0x5236
+      0087E9 5F               [ 1] 1017 	clrw	x
+      0087EA 90 89            [ 2] 1018 	pushw	y
+      0087EC 97               [ 1] 1019 	ld	xl, a
+      0087ED CD 84 AF         [ 4] 1020 	call	_convert_int_to_binary
+                                   1021 ;	main.c: 275: uart_write("CR3 -> ");
+      0087F0 AE 80 C9         [ 2] 1022 	ldw	x, #(___str_16+0)
+      0087F3 CD 83 66         [ 4] 1023 	call	_uart_write
+                                   1024 ;	main.c: 276: uart_write(rx_binary_chars);
+      0087F6 96               [ 1] 1025 	ldw	x, sp
+      0087F7 5C               [ 1] 1026 	incw	x
+      0087F8 CD 83 66         [ 4] 1027 	call	_uart_write
+                                   1028 ;	main.c: 277: uart_write(" <-\n");
+      0087FB AE 80 37         [ 2] 1029 	ldw	x, #(___str_1+0)
+      0087FE CD 83 66         [ 4] 1030 	call	_uart_write
+                                   1031 ;	main.c: 278: convert_int_to_binary(UART1_CR4, rx_binary_chars);
+      008801 96               [ 1] 1032 	ldw	x, sp
+      008802 5C               [ 1] 1033 	incw	x
+      008803 51               [ 1] 1034 	exgw	x, y
+      008804 C6 52 37         [ 1] 1035 	ld	a, 0x5237
+      008807 5F               [ 1] 1036 	clrw	x
+      008808 90 89            [ 2] 1037 	pushw	y
+      00880A 97               [ 1] 1038 	ld	xl, a
+      00880B CD 84 AF         [ 4] 1039 	call	_convert_int_to_binary
+                                   1040 ;	main.c: 279: uart_write("CR4 -> ");
+      00880E AE 80 D1         [ 2] 1041 	ldw	x, #(___str_17+0)
+      008811 CD 83 66         [ 4] 1042 	call	_uart_write
+                                   1043 ;	main.c: 280: uart_write(rx_binary_chars);
+      008814 96               [ 1] 1044 	ldw	x, sp
+      008815 5C               [ 1] 1045 	incw	x
+      008816 CD 83 66         [ 4] 1046 	call	_uart_write
+                                   1047 ;	main.c: 281: uart_write(" <-\n");
+      008819 AE 80 37         [ 2] 1048 	ldw	x, #(___str_1+0)
+      00881C CD 83 66         [ 4] 1049 	call	_uart_write
+                                   1050 ;	main.c: 282: convert_int_to_binary(UART1_CR5, rx_binary_chars);
+      00881F 96               [ 1] 1051 	ldw	x, sp
+      008820 5C               [ 1] 1052 	incw	x
+      008821 51               [ 1] 1053 	exgw	x, y
+      008822 C6 52 38         [ 1] 1054 	ld	a, 0x5238
+      008825 5F               [ 1] 1055 	clrw	x
+      008826 90 89            [ 2] 1056 	pushw	y
+      008828 97               [ 1] 1057 	ld	xl, a
+      008829 CD 84 AF         [ 4] 1058 	call	_convert_int_to_binary
+                                   1059 ;	main.c: 283: uart_write("CR5 -> ");
+      00882C AE 80 D9         [ 2] 1060 	ldw	x, #(___str_18+0)
+      00882F CD 83 66         [ 4] 1061 	call	_uart_write
+                                   1062 ;	main.c: 284: uart_write(rx_binary_chars);
+      008832 96               [ 1] 1063 	ldw	x, sp
+      008833 5C               [ 1] 1064 	incw	x
+      008834 CD 83 66         [ 4] 1065 	call	_uart_write
+                                   1066 ;	main.c: 285: uart_write(" <-\n");
+      008837 AE 80 37         [ 2] 1067 	ldw	x, #(___str_1+0)
+      00883A CD 83 66         [ 4] 1068 	call	_uart_write
+                                   1069 ;	main.c: 286: convert_int_to_binary(UART1_GTR, rx_binary_chars);
+      00883D 96               [ 1] 1070 	ldw	x, sp
+      00883E 5C               [ 1] 1071 	incw	x
+      00883F 51               [ 1] 1072 	exgw	x, y
+      008840 C6 52 39         [ 1] 1073 	ld	a, 0x5239
+      008843 5F               [ 1] 1074 	clrw	x
+      008844 90 89            [ 2] 1075 	pushw	y
+      008846 97               [ 1] 1076 	ld	xl, a
+      008847 CD 84 AF         [ 4] 1077 	call	_convert_int_to_binary
+                                   1078 ;	main.c: 287: uart_write("GTR -> ");
+      00884A AE 80 E1         [ 2] 1079 	ldw	x, #(___str_19+0)
+      00884D CD 83 66         [ 4] 1080 	call	_uart_write
+                                   1081 ;	main.c: 288: uart_write(rx_binary_chars);
+      008850 96               [ 1] 1082 	ldw	x, sp
+      008851 5C               [ 1] 1083 	incw	x
+      008852 CD 83 66         [ 4] 1084 	call	_uart_write
+                                   1085 ;	main.c: 289: uart_write(" <-\n");
+      008855 AE 80 37         [ 2] 1086 	ldw	x, #(___str_1+0)
+      008858 CD 83 66         [ 4] 1087 	call	_uart_write
+                                   1088 ;	main.c: 290: convert_int_to_binary(UART1_PSCR, rx_binary_chars);
+      00885B 96               [ 1] 1089 	ldw	x, sp
+      00885C 5C               [ 1] 1090 	incw	x
+      00885D 51               [ 1] 1091 	exgw	x, y
+      00885E C6 52 3A         [ 1] 1092 	ld	a, 0x523a
+      008861 5F               [ 1] 1093 	clrw	x
+      008862 90 89            [ 2] 1094 	pushw	y
+      008864 97               [ 1] 1095 	ld	xl, a
+      008865 CD 84 AF         [ 4] 1096 	call	_convert_int_to_binary
+                                   1097 ;	main.c: 291: uart_write("PSCR -> ");
+      008868 AE 80 E9         [ 2] 1098 	ldw	x, #(___str_20+0)
+      00886B CD 83 66         [ 4] 1099 	call	_uart_write
+                                   1100 ;	main.c: 292: uart_write(rx_binary_chars);
+      00886E 96               [ 1] 1101 	ldw	x, sp
+      00886F 5C               [ 1] 1102 	incw	x
+      008870 CD 83 66         [ 4] 1103 	call	_uart_write
+                                   1104 ;	main.c: 293: uart_write(" <-\n");
+      008873 AE 80 37         [ 2] 1105 	ldw	x, #(___str_1+0)
+      008876 CD 83 66         [ 4] 1106 	call	_uart_write
+                                   1107 ;	main.c: 294: }
+      008879 5B 09            [ 2] 1108 	addw	sp, #9
+      00887B 81               [ 4] 1109 	ret
+                                   1110 ;	main.c: 296: void uart_init(void){
+                                   1111 ;	-----------------------------------------
+                                   1112 ;	 function uart_init
+                                   1113 ;	-----------------------------------------
+      00887C                       1114 _uart_init:
+                                   1115 ;	main.c: 297: CLK_CKDIVR = 0;
+      00887C 35 00 50 C6      [ 1] 1116 	mov	0x50c6+0, #0x00
+                                   1117 ;	main.c: 300: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
+      008880 72 16 52 35      [ 1] 1118 	bset	0x5235, #3
+                                   1119 ;	main.c: 301: UART1_CR2 |= UART_CR2_REN; // Receiver enable
+      008884 72 14 52 35      [ 1] 1120 	bset	0x5235, #2
+                                   1121 ;	main.c: 302: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+      008888 C6 52 36         [ 1] 1122 	ld	a, 0x5236
+      00888B A4 CF            [ 1] 1123 	and	a, #0xcf
+      00888D C7 52 36         [ 1] 1124 	ld	0x5236, a
+                                   1125 ;	main.c: 304: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
+      008890 35 03 52 33      [ 1] 1126 	mov	0x5233+0, #0x03
+      008894 35 68 52 32      [ 1] 1127 	mov	0x5232+0, #0x68
+                                   1128 ;	main.c: 305: }
+      008898 81               [ 4] 1129 	ret
+                                   1130 ;	main.c: 309: void i2c_init(void) {
+                                   1131 ;	-----------------------------------------
+                                   1132 ;	 function i2c_init
+                                   1133 ;	-----------------------------------------
+      008899                       1134 _i2c_init:
+                                   1135 ;	main.c: 315: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
+      008899 72 11 52 10      [ 1] 1136 	bres	0x5210, #0
+                                   1137 ;	main.c: 316: I2C_FREQR= 16;                  // peripheral frequence =16MHz
+      00889D 35 10 52 12      [ 1] 1138 	mov	0x5212+0, #0x10
+                                   1139 ;	main.c: 317: I2C_CCRH = 0;                   // =0
+      0088A1 35 00 52 1C      [ 1] 1140 	mov	0x521c+0, #0x00
+                                   1141 ;	main.c: 318: I2C_CCRL = 80;                  // 100kHz for I2C
+      0088A5 35 50 52 1B      [ 1] 1142 	mov	0x521b+0, #0x50
+                                   1143 ;	main.c: 319: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
+      0088A9 72 1F 52 1C      [ 1] 1144 	bres	0x521c, #7
+                                   1145 ;	main.c: 320: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
+      0088AD 72 1F 52 14      [ 1] 1146 	bres	0x5214, #7
+                                   1147 ;	main.c: 321: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
+      0088B1 72 1C 52 14      [ 1] 1148 	bset	0x5214, #6
+                                   1149 ;	main.c: 322: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
+      0088B5 72 10 52 10      [ 1] 1150 	bset	0x5210, #0
+                                   1151 ;	main.c: 323: }
+      0088B9 81               [ 4] 1152 	ret
+                                   1153 ;	main.c: 332: void i2c_start(void) {
+                                   1154 ;	-----------------------------------------
+                                   1155 ;	 function i2c_start
+                                   1156 ;	-----------------------------------------
+      0088BA                       1157 _i2c_start:
+                                   1158 ;	main.c: 333: I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
+      0088BA 72 10 52 11      [ 1] 1159 	bset	0x5211, #0
+                                   1160 ;	main.c: 334: while(!(I2C_SR1 & (1 << 0)));
+      0088BE                       1161 00101$:
+      0088BE 72 01 52 17 FB   [ 2] 1162 	btjf	0x5217, #0, 00101$
+                                   1163 ;	main.c: 336: }
+      0088C3 81               [ 4] 1164 	ret
+                                   1165 ;	main.c: 338: void i2c_send_address(uint8_t address) {
+                                   1166 ;	-----------------------------------------
+                                   1167 ;	 function i2c_send_address
+                                   1168 ;	-----------------------------------------
+      0088C4                       1169 _i2c_send_address:
+                                   1170 ;	main.c: 339: I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
+      0088C4 48               [ 1] 1171 	sll	a
+      0088C5 C7 52 16         [ 1] 1172 	ld	0x5216, a
+                                   1173 ;	main.c: 340: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      0088C8                       1174 00102$:
+      0088C8 72 03 52 17 01   [ 2] 1175 	btjf	0x5217, #1, 00117$
+      0088CD 81               [ 4] 1176 	ret
+      0088CE                       1177 00117$:
+      0088CE 72 05 52 18 F5   [ 2] 1178 	btjf	0x5218, #2, 00102$
+                                   1179 ;	main.c: 341: }
+      0088D3 81               [ 4] 1180 	ret
+                                   1181 ;	main.c: 343: void i2c_stop(void) {
+                                   1182 ;	-----------------------------------------
+                                   1183 ;	 function i2c_stop
+                                   1184 ;	-----------------------------------------
+      0088D4                       1185 _i2c_stop:
+                                   1186 ;	main.c: 344: I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
+      0088D4 72 12 52 11      [ 1] 1187 	bset	0x5211, #1
+                                   1188 ;	main.c: 346: }
+      0088D8 81               [ 4] 1189 	ret
+                                   1190 ;	main.c: 347: void i2c_write(void){
+                                   1191 ;	-----------------------------------------
+                                   1192 ;	 function i2c_write
+                                   1193 ;	-----------------------------------------
+      0088D9                       1194 _i2c_write:
+      0088D9 52 02            [ 2] 1195 	sub	sp, #2
+                                   1196 ;	main.c: 348: I2C_DR = d_addr; // Отправка адреса регистра
+      0088DB 55 01 03 52 16   [ 1] 1197 	mov	0x5216+0, _d_addr+0
+                                   1198 ;	main.c: 349: for(int i = 0;i < d_size;i++)
+      0088E0 5F               [ 1] 1199 	clrw	x
+      0088E1                       1200 00107$:
+      0088E1 C6 01 05         [ 1] 1201 	ld	a, _d_size+0
+      0088E4 6B 02            [ 1] 1202 	ld	(0x02, sp), a
+      0088E6 0F 01            [ 1] 1203 	clr	(0x01, sp)
+      0088E8 13 01            [ 2] 1204 	cpw	x, (0x01, sp)
+      0088EA 2E 16            [ 1] 1205 	jrsge	00109$
+                                   1206 ;	main.c: 351: I2C_DR = data_buf[i];
+      0088EC 90 93            [ 1] 1207 	ldw	y, x
+      0088EE 90 D6 01 07      [ 1] 1208 	ld	a, (_data_buf+0, y)
+      0088F2 C7 52 16         [ 1] 1209 	ld	0x5216, a
+                                   1210 ;	main.c: 352: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      0088F5                       1211 00102$:
+      0088F5 72 02 52 17 05   [ 2] 1212 	btjt	0x5217, #1, 00108$
+      0088FA 72 05 52 18 F6   [ 2] 1213 	btjf	0x5218, #2, 00102$
+      0088FF                       1214 00108$:
+                                   1215 ;	main.c: 349: for(int i = 0;i < d_size;i++)
+      0088FF 5C               [ 1] 1216 	incw	x
+      008900 20 DF            [ 2] 1217 	jra	00107$
+      008902                       1218 00109$:
+                                   1219 ;	main.c: 354: }
+      008902 5B 02            [ 2] 1220 	addw	sp, #2
+      008904 81               [ 4] 1221 	ret
+                                   1222 ;	main.c: 356: void i2c_read(void){
+                                   1223 ;	-----------------------------------------
+                                   1224 ;	 function i2c_read
+                                   1225 ;	-----------------------------------------
+      008905                       1226 _i2c_read:
+      008905 52 02            [ 2] 1227 	sub	sp, #2
+                                   1228 ;	main.c: 357: I2C_DR = (current_dev << 1) & (1 << 0);
+      008907 C6 02 06         [ 1] 1229 	ld	a, _current_dev+0
+      00890A 48               [ 1] 1230 	sll	a
+      00890B A4 01            [ 1] 1231 	and	a, #0x01
+      00890D C7 52 16         [ 1] 1232 	ld	0x5216, a
+                                   1233 ;	main.c: 358: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      008910                       1234 00102$:
+      008910 72 02 52 17 05   [ 2] 1235 	btjt	0x5217, #1, 00104$
+      008915 72 05 52 18 F6   [ 2] 1236 	btjf	0x5218, #2, 00102$
+      00891A                       1237 00104$:
+                                   1238 ;	main.c: 360: I2C_DR = d_addr;
+      00891A 55 01 03 52 16   [ 1] 1239 	mov	0x5216+0, _d_addr+0
+                                   1240 ;	main.c: 361: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      00891F                       1241 00106$:
+      00891F 72 02 52 17 05   [ 2] 1242 	btjt	0x5217, #1, 00108$
+      008924 72 05 52 18 F6   [ 2] 1243 	btjf	0x5218, #2, 00106$
+      008929                       1244 00108$:
+                                   1245 ;	main.c: 362: i2c_stop();
+      008929 CD 88 D4         [ 4] 1246 	call	_i2c_stop
+                                   1247 ;	main.c: 363: for(int i = 0;i < d_size;i++)
+      00892C 5F               [ 1] 1248 	clrw	x
+      00892D                       1249 00115$:
+      00892D C6 01 05         [ 1] 1250 	ld	a, _d_size+0
+      008930 6B 02            [ 1] 1251 	ld	(0x02, sp), a
+      008932 0F 01            [ 1] 1252 	clr	(0x01, sp)
+      008934 13 01            [ 2] 1253 	cpw	x, (0x01, sp)
+      008936 2E 13            [ 1] 1254 	jrsge	00117$
+                                   1255 ;	main.c: 365: data_buf[i] = I2C_DR;
+      008938 C6 52 16         [ 1] 1256 	ld	a, 0x5216
+      00893B D7 01 07         [ 1] 1257 	ld	((_data_buf+0), x), a
+                                   1258 ;	main.c: 366: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+      00893E                       1259 00110$:
+      00893E 72 02 52 17 05   [ 2] 1260 	btjt	0x5217, #1, 00116$
+      008943 72 05 52 18 F6   [ 2] 1261 	btjf	0x5218, #2, 00110$
+      008948                       1262 00116$:
+                                   1263 ;	main.c: 363: for(int i = 0;i < d_size;i++)
+      008948 5C               [ 1] 1264 	incw	x
+      008949 20 E2            [ 2] 1265 	jra	00115$
+      00894B                       1266 00117$:
+                                   1267 ;	main.c: 369: }
+      00894B 5B 02            [ 2] 1268 	addw	sp, #2
+      00894D 81               [ 4] 1269 	ret
+                                   1270 ;	main.c: 370: void i2c_scan(void) {
+                                   1271 ;	-----------------------------------------
+                                   1272 ;	 function i2c_scan
+                                   1273 ;	-----------------------------------------
+      00894E                       1274 _i2c_scan:
+      00894E 52 02            [ 2] 1275 	sub	sp, #2
+                                   1276 ;	main.c: 371: for (uint8_t addr = current_dev; addr < 127; addr++) {
+      008950 C6 02 06         [ 1] 1277 	ld	a, _current_dev+0
+      008953 6B 01            [ 1] 1278 	ld	(0x01, sp), a
+      008955 6B 02            [ 1] 1279 	ld	(0x02, sp), a
+      008957                       1280 00105$:
+      008957 7B 02            [ 1] 1281 	ld	a, (0x02, sp)
+      008959 A1 7F            [ 1] 1282 	cp	a, #0x7f
+      00895B 24 26            [ 1] 1283 	jrnc	00107$
+                                   1284 ;	main.c: 372: i2c_start();
+      00895D CD 88 BA         [ 4] 1285 	call	_i2c_start
+                                   1286 ;	main.c: 373: i2c_send_address(addr);
+      008960 7B 02            [ 1] 1287 	ld	a, (0x02, sp)
+      008962 CD 88 C4         [ 4] 1288 	call	_i2c_send_address
+                                   1289 ;	main.c: 374: if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
+      008965 72 04 52 18 0A   [ 2] 1290 	btjt	0x5218, #2, 00102$
+                                   1291 ;	main.c: 376: current_dev = addr;
+      00896A 7B 01            [ 1] 1292 	ld	a, (0x01, sp)
+      00896C C7 02 06         [ 1] 1293 	ld	_current_dev+0, a
+                                   1294 ;	main.c: 377: i2c_stop();
+      00896F 5B 02            [ 2] 1295 	addw	sp, #2
+                                   1296 ;	main.c: 378: break;
+      008971 CC 88 D4         [ 2] 1297 	jp	_i2c_stop
+      008974                       1298 00102$:
+                                   1299 ;	main.c: 380: i2c_stop();
+      008974 CD 88 D4         [ 4] 1300 	call	_i2c_stop
+                                   1301 ;	main.c: 381: I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
+      008977 72 15 52 18      [ 1] 1302 	bres	0x5218, #2
+                                   1303 ;	main.c: 371: for (uint8_t addr = current_dev; addr < 127; addr++) {
+      00897B 0C 02            [ 1] 1304 	inc	(0x02, sp)
+      00897D 7B 02            [ 1] 1305 	ld	a, (0x02, sp)
+      00897F 6B 01            [ 1] 1306 	ld	(0x01, sp), a
+      008981 20 D4            [ 2] 1307 	jra	00105$
+      008983                       1308 00107$:
+                                   1309 ;	main.c: 383: }
+      008983 5B 02            [ 2] 1310 	addw	sp, #2
+      008985 81               [ 4] 1311 	ret
+                                   1312 ;	main.c: 393: void cm_SM(void)
+                                   1313 ;	-----------------------------------------
+                                   1314 ;	 function cm_SM
+                                   1315 ;	-----------------------------------------
+      008986                       1316 _cm_SM:
+      008986 52 04            [ 2] 1317 	sub	sp, #4
+                                   1318 ;	main.c: 395: char cur_dev[4]={0};
+      008988 0F 01            [ 1] 1319 	clr	(0x01, sp)
+      00898A 0F 02            [ 1] 1320 	clr	(0x02, sp)
+      00898C 0F 03            [ 1] 1321 	clr	(0x03, sp)
+      00898E 0F 04            [ 1] 1322 	clr	(0x04, sp)
+                                   1323 ;	main.c: 396: convert_int_to_chars(current_dev, cur_dev);
+      008990 96               [ 1] 1324 	ldw	x, sp
+      008991 5C               [ 1] 1325 	incw	x
+      008992 C6 02 06         [ 1] 1326 	ld	a, _current_dev+0
+      008995 CD 83 C7         [ 4] 1327 	call	_convert_int_to_chars
+                                   1328 ;	main.c: 397: uart_write("SM ");
+      008998 AE 80 F2         [ 2] 1329 	ldw	x, #(___str_21+0)
+      00899B CD 83 66         [ 4] 1330 	call	_uart_write
+                                   1331 ;	main.c: 398: uart_write(cur_dev);
+      00899E 96               [ 1] 1332 	ldw	x, sp
+      00899F 5C               [ 1] 1333 	incw	x
+      0089A0 CD 83 66         [ 4] 1334 	call	_uart_write
+                                   1335 ;	main.c: 399: uart_write("\r\n");
+      0089A3 AE 80 F6         [ 2] 1336 	ldw	x, #(___str_22+0)
+      0089A6 CD 83 66         [ 4] 1337 	call	_uart_write
+                                   1338 ;	main.c: 400: }
+      0089A9 5B 04            [ 2] 1339 	addw	sp, #4
+      0089AB 81               [ 4] 1340 	ret
+                                   1341 ;	main.c: 401: void cm_SN(void)
+                                   1342 ;	-----------------------------------------
+                                   1343 ;	 function cm_SN
+                                   1344 ;	-----------------------------------------
+      0089AC                       1345 _cm_SN:
+                                   1346 ;	main.c: 403: i2c_scan();
+      0089AC CD 89 4E         [ 4] 1347 	call	_i2c_scan
+                                   1348 ;	main.c: 404: cm_SM();
+                                   1349 ;	main.c: 405: }
+      0089AF CC 89 86         [ 2] 1350 	jp	_cm_SM
+                                   1351 ;	main.c: 406: void cm_RM(void)
+                                   1352 ;	-----------------------------------------
+                                   1353 ;	 function cm_RM
                                    1354 ;	-----------------------------------------
-                                   1355 ;	 function data_handler
-                                   1356 ;	-----------------------------------------
-      008962                       1357 _data_handler:
-                                   1358 ;	main.c: 442: p_size = 0;
-      008962 72 5F 01 05      [ 1] 1359 	clr	_p_size+0
-                                   1360 ;	main.c: 443: p_bytes = 0;
-      008966 72 5F 01 07      [ 1] 1361 	clr	_p_bytes+0
-                                   1362 ;	main.c: 444: d_addr = 0;
-      00896A 72 5F 01 04      [ 1] 1363 	clr	_d_addr+0
-                                   1364 ;	main.c: 445: d_size = 0;
-      00896E 72 5F 01 06      [ 1] 1365 	clr	_d_size+0
-                                   1366 ;	main.c: 446: memset(a, 0, sizeof(a));
-      008972 4B 03            [ 1] 1367 	push	#0x03
-      008974 4B 00            [ 1] 1368 	push	#0x00
-      008976 5F               [ 1] 1369 	clrw	x
-      008977 89               [ 2] 1370 	pushw	x
-      008978 AE 01 01         [ 2] 1371 	ldw	x, #(_a+0)
-      00897B CD 8B 1F         [ 4] 1372 	call	_memset
-                                   1373 ;	main.c: 447: memset(data_buf, 0, sizeof(data_buf));
-      00897E 4B 00            [ 1] 1374 	push	#0x00
-      008980 4B 01            [ 1] 1375 	push	#0x01
-      008982 5F               [ 1] 1376 	clrw	x
-      008983 89               [ 2] 1377 	pushw	x
-      008984 AE 01 08         [ 2] 1378 	ldw	x, #(_data_buf+0)
-      008987 CD 8B 1F         [ 4] 1379 	call	_memset
-                                   1380 ;	main.c: 448: if(memcmp(&buffer[0],"SM",2) == 0)
-      00898A 4B 02            [ 1] 1381 	push	#0x02
-      00898C 4B 00            [ 1] 1382 	push	#0x00
-      00898E 4B E6            [ 1] 1383 	push	#<(___str_24+0)
-      008990 4B 80            [ 1] 1384 	push	#((___str_24+0) >> 8)
-      008992 AE 00 01         [ 2] 1385 	ldw	x, #(_buffer+0)
-      008995 CD 8A 89         [ 4] 1386 	call	_memcmp
-                                   1387 ;	main.c: 449: return 1;
-      008998 5D               [ 2] 1388 	tnzw	x
-      008999 26 02            [ 1] 1389 	jrne	00102$
-      00899B 5C               [ 1] 1390 	incw	x
-      00899C 81               [ 4] 1391 	ret
-      00899D                       1392 00102$:
-                                   1393 ;	main.c: 450: if(memcmp(&buffer[0],"SN",2) == 0)
-      00899D 4B 02            [ 1] 1394 	push	#0x02
-      00899F 4B 00            [ 1] 1395 	push	#0x00
-      0089A1 4B E9            [ 1] 1396 	push	#<(___str_25+0)
-      0089A3 4B 80            [ 1] 1397 	push	#((___str_25+0) >> 8)
-      0089A5 AE 00 01         [ 2] 1398 	ldw	x, #(_buffer+0)
-      0089A8 CD 8A 89         [ 4] 1399 	call	_memcmp
-      0089AB 5D               [ 2] 1400 	tnzw	x
-      0089AC 26 04            [ 1] 1401 	jrne	00104$
-                                   1402 ;	main.c: 451: return 2;
-      0089AE AE 00 02         [ 2] 1403 	ldw	x, #0x0002
-      0089B1 81               [ 4] 1404 	ret
-      0089B2                       1405 00104$:
-                                   1406 ;	main.c: 452: if(memcmp(&buffer[0],"ST",2) == 0)
-      0089B2 4B 02            [ 1] 1407 	push	#0x02
-      0089B4 4B 00            [ 1] 1408 	push	#0x00
-      0089B6 4B EC            [ 1] 1409 	push	#<(___str_26+0)
-      0089B8 4B 80            [ 1] 1410 	push	#((___str_26+0) >> 8)
-      0089BA AE 00 01         [ 2] 1411 	ldw	x, #(_buffer+0)
-      0089BD CD 8A 89         [ 4] 1412 	call	_memcmp
-      0089C0 5D               [ 2] 1413 	tnzw	x
-      0089C1 26 04            [ 1] 1414 	jrne	00106$
-                                   1415 ;	main.c: 453: return 5;
-      0089C3 AE 00 05         [ 2] 1416 	ldw	x, #0x0005
-      0089C6 81               [ 4] 1417 	ret
-      0089C7                       1418 00106$:
-                                   1419 ;	main.c: 454: if(memcmp(&buffer[0],"RM",2) == 0)
-      0089C7 4B 02            [ 1] 1420 	push	#0x02
-      0089C9 4B 00            [ 1] 1421 	push	#0x00
-      0089CB 4B EF            [ 1] 1422 	push	#<(___str_27+0)
-      0089CD 4B 80            [ 1] 1423 	push	#((___str_27+0) >> 8)
-      0089CF AE 00 01         [ 2] 1424 	ldw	x, #(_buffer+0)
-      0089D2 CD 8A 89         [ 4] 1425 	call	_memcmp
-      0089D5 5D               [ 2] 1426 	tnzw	x
-      0089D6 26 04            [ 1] 1427 	jrne	00108$
-                                   1428 ;	main.c: 455: return 6;
-      0089D8 AE 00 06         [ 2] 1429 	ldw	x, #0x0006
-      0089DB 81               [ 4] 1430 	ret
-      0089DC                       1431 00108$:
-                                   1432 ;	main.c: 456: if(memcmp(&buffer[0],"DB",2) == 0)
-      0089DC 4B 02            [ 1] 1433 	push	#0x02
-      0089DE 4B 00            [ 1] 1434 	push	#0x00
-      0089E0 4B F2            [ 1] 1435 	push	#<(___str_28+0)
-      0089E2 4B 80            [ 1] 1436 	push	#((___str_28+0) >> 8)
-      0089E4 AE 00 01         [ 2] 1437 	ldw	x, #(_buffer+0)
-      0089E7 CD 8A 89         [ 4] 1438 	call	_memcmp
-      0089EA 5D               [ 2] 1439 	tnzw	x
-      0089EB 26 04            [ 1] 1440 	jrne	00110$
-                                   1441 ;	main.c: 457: return 7;
-      0089ED AE 00 07         [ 2] 1442 	ldw	x, #0x0007
-      0089F0 81               [ 4] 1443 	ret
-      0089F1                       1444 00110$:
-                                   1445 ;	main.c: 459: get_addr_from_buff();
-      0089F1 CD 84 8B         [ 4] 1446 	call	_get_addr_from_buff
-                                   1447 ;	main.c: 460: get_size_from_buff();
-      0089F4 CD 84 CB         [ 4] 1448 	call	_get_size_from_buff
-                                   1449 ;	main.c: 462: if(memcmp(&buffer[0],"SR",2) == 0)
-      0089F7 4B 02            [ 1] 1450 	push	#0x02
-      0089F9 4B 00            [ 1] 1451 	push	#0x00
-      0089FB 4B F5            [ 1] 1452 	push	#<(___str_29+0)
-      0089FD 4B 80            [ 1] 1453 	push	#((___str_29+0) >> 8)
-      0089FF AE 00 01         [ 2] 1454 	ldw	x, #(_buffer+0)
-      008A02 CD 8A 89         [ 4] 1455 	call	_memcmp
-      008A05 5D               [ 2] 1456 	tnzw	x
-      008A06 26 04            [ 1] 1457 	jrne	00112$
-                                   1458 ;	main.c: 463: return 3;
-      008A08 AE 00 03         [ 2] 1459 	ldw	x, #0x0003
-      008A0B 81               [ 4] 1460 	ret
-      008A0C                       1461 00112$:
-                                   1462 ;	main.c: 465: char_buffer_to_int();
-      008A0C CD 85 0F         [ 4] 1463 	call	_char_buffer_to_int
-                                   1464 ;	main.c: 467: if(memcmp(&buffer[0],"SW",2) == 0)
-      008A0F 4B 02            [ 1] 1465 	push	#0x02
-      008A11 4B 00            [ 1] 1466 	push	#0x00
-      008A13 4B F8            [ 1] 1467 	push	#<(___str_30+0)
-      008A15 4B 80            [ 1] 1468 	push	#((___str_30+0) >> 8)
-      008A17 AE 00 01         [ 2] 1469 	ldw	x, #(_buffer+0)
-      008A1A CD 8A 89         [ 4] 1470 	call	_memcmp
-      008A1D 5D               [ 2] 1471 	tnzw	x
-      008A1E 26 04            [ 1] 1472 	jrne	00114$
-                                   1473 ;	main.c: 468: return 4;
-      008A20 AE 00 04         [ 2] 1474 	ldw	x, #0x0004
-      008A23 81               [ 4] 1475 	ret
-      008A24                       1476 00114$:
-                                   1477 ;	main.c: 469: return 0;
-      008A24 5F               [ 1] 1478 	clrw	x
-                                   1479 ;	main.c: 471: }
-      008A25 81               [ 4] 1480 	ret
-                                   1481 ;	main.c: 473: void command_switcher(void)
-                                   1482 ;	-----------------------------------------
-                                   1483 ;	 function command_switcher
-                                   1484 ;	-----------------------------------------
-      008A26                       1485 _command_switcher:
-      008A26 52 04            [ 2] 1486 	sub	sp, #4
-                                   1487 ;	main.c: 475: char ar[4]={0};
-      008A28 0F 01            [ 1] 1488 	clr	(0x01, sp)
-      008A2A 0F 02            [ 1] 1489 	clr	(0x02, sp)
-      008A2C 0F 03            [ 1] 1490 	clr	(0x03, sp)
-      008A2E 0F 04            [ 1] 1491 	clr	(0x04, sp)
-                                   1492 ;	main.c: 477: switch(data_handler())
-      008A30 CD 89 62         [ 4] 1493 	call	_data_handler
-      008A33 5D               [ 2] 1494 	tnzw	x
-      008A34 2B 3B            [ 1] 1495 	jrmi	00109$
-      008A36 A3 00 07         [ 2] 1496 	cpw	x, #0x0007
-      008A39 2C 36            [ 1] 1497 	jrsgt	00109$
-      008A3B 58               [ 2] 1498 	sllw	x
-      008A3C DE 8A 40         [ 2] 1499 	ldw	x, (#00123$, x)
-      008A3F FC               [ 2] 1500 	jp	(x)
-      008A40                       1501 00123$:
-      008A40 8A 71                 1502 	.dw	#00109$
-      008A42 8A 50                 1503 	.dw	#00101$
-      008A44 8A 55                 1504 	.dw	#00102$
-      008A46 8A 5A                 1505 	.dw	#00103$
-      008A48 8A 5F                 1506 	.dw	#00104$
-      008A4A 8A 64                 1507 	.dw	#00105$
-      008A4C 8A 69                 1508 	.dw	#00106$
-      008A4E 8A 6E                 1509 	.dw	#00107$
-                                   1510 ;	main.c: 479: case 1:
-      008A50                       1511 00101$:
-                                   1512 ;	main.c: 480: cm_SM();
-      008A50 CD 88 C4         [ 4] 1513 	call	_cm_SM
-                                   1514 ;	main.c: 481: break;
-      008A53 20 1C            [ 2] 1515 	jra	00109$
-                                   1516 ;	main.c: 482: case 2:
-      008A55                       1517 00102$:
-                                   1518 ;	main.c: 483: cm_SN();
-      008A55 CD 88 EA         [ 4] 1519 	call	_cm_SN
-                                   1520 ;	main.c: 484: break;
-      008A58 20 17            [ 2] 1521 	jra	00109$
-                                   1522 ;	main.c: 485: case 3:
-      008A5A                       1523 00103$:
-                                   1524 ;	main.c: 486: cm_SR();
-      008A5A CD 89 0B         [ 4] 1525 	call	_cm_SR
-                                   1526 ;	main.c: 487: break;
-      008A5D 20 12            [ 2] 1527 	jra	00109$
-                                   1528 ;	main.c: 488: case 4:
-      008A5F                       1529 00104$:
-                                   1530 ;	main.c: 489: cm_SW();
-      008A5F CD 89 1A         [ 4] 1531 	call	_cm_SW
-                                   1532 ;	main.c: 490: break;
-      008A62 20 0D            [ 2] 1533 	jra	00109$
-                                   1534 ;	main.c: 491: case 5:
-      008A64                       1535 00105$:
-                                   1536 ;	main.c: 492: cm_ST();
-      008A64 CD 88 FD         [ 4] 1537 	call	_cm_ST
-                                   1538 ;	main.c: 493: break;
-      008A67 20 08            [ 2] 1539 	jra	00109$
-                                   1540 ;	main.c: 494: case 6:
-      008A69                       1541 00106$:
-                                   1542 ;	main.c: 495: cm_RM();
-      008A69 CD 88 F0         [ 4] 1543 	call	_cm_RM
-                                   1544 ;	main.c: 496: break;
-      008A6C 20 03            [ 2] 1545 	jra	00109$
-                                   1546 ;	main.c: 497: case 7:
-      008A6E                       1547 00107$:
-                                   1548 ;	main.c: 498: cm_DB();
-      008A6E CD 88 FA         [ 4] 1549 	call	_cm_DB
-                                   1550 ;	main.c: 500: }
-      008A71                       1551 00109$:
-                                   1552 ;	main.c: 501: }
-      008A71 5B 04            [ 2] 1553 	addw	sp, #4
-      008A73 81               [ 4] 1554 	ret
-                                   1555 ;	main.c: 504: void main(void)
-                                   1556 ;	-----------------------------------------
-                                   1557 ;	 function main
-                                   1558 ;	-----------------------------------------
-      008A74                       1559 _main:
-                                   1560 ;	main.c: 506: uart_init();
-      008A74 CD 87 BA         [ 4] 1561 	call	_uart_init
-                                   1562 ;	main.c: 507: i2c_init();
-      008A77 CD 87 D7         [ 4] 1563 	call	_i2c_init
-                                   1564 ;	main.c: 508: uart_write("SS\n");
-      008A7A AE 80 FB         [ 2] 1565 	ldw	x, #(___str_31+0)
-      008A7D CD 83 47         [ 4] 1566 	call	_uart_write
-                                   1567 ;	main.c: 509: while(1)
-      008A80                       1568 00102$:
-                                   1569 ;	main.c: 511: uart_read();
-      008A80 CD 83 72         [ 4] 1570 	call	_uart_read
-                                   1571 ;	main.c: 512: command_switcher();
-      008A83 CD 8A 26         [ 4] 1572 	call	_command_switcher
-      008A86 20 F8            [ 2] 1573 	jra	00102$
-                                   1574 ;	main.c: 514: }
-      008A88 81               [ 4] 1575 	ret
-                                   1576 	.area CODE
-                                   1577 	.area CONST
-                                   1578 	.area CONST
-      00802D                       1579 ___str_0:
-      00802D 62 75 66 20 63 6F 75  1580 	.ascii "buf count -> "
-             6E 74 20 2D 3E 20
-      00803A 00                    1581 	.db 0x00
-                                   1582 	.area CODE
-                                   1583 	.area CONST
-      00803B                       1584 ___str_1:
-      00803B 20 3C 2D              1585 	.ascii " <-"
-      00803E 0A                    1586 	.db 0x0a
-      00803F 00                    1587 	.db 0x00
-                                   1588 	.area CODE
-                                   1589 	.area CONST
-      008040                       1590 ___str_2:
-      008040 0A                    1591 	.db 0x0a
-      008041 49 32 43 5F 52 45 47  1592 	.ascii "I2C_REGS >.<"
-             53 20 3E 2E 3C
-      00804D 0A                    1593 	.db 0x0a
-      00804E 00                    1594 	.db 0x00
-                                   1595 	.area CODE
-                                   1596 	.area CONST
-      00804F                       1597 ___str_3:
-      00804F 0A                    1598 	.db 0x0a
-      008050 53 52 31 20 2D 3E 20  1599 	.ascii "SR1 -> "
-      008057 00                    1600 	.db 0x00
-                                   1601 	.area CODE
-                                   1602 	.area CONST
-      008058                       1603 ___str_4:
-      008058 53 52 32 20 2D 3E 20  1604 	.ascii "SR2 -> "
-      00805F 00                    1605 	.db 0x00
-                                   1606 	.area CODE
-                                   1607 	.area CONST
-      008060                       1608 ___str_5:
-      008060 53 52 33 20 2D 3E 20  1609 	.ascii "SR3 -> "
-      008067 00                    1610 	.db 0x00
-                                   1611 	.area CODE
-                                   1612 	.area CONST
-      008068                       1613 ___str_6:
-      008068 43 52 31 20 2D 3E 20  1614 	.ascii "CR1 -> "
-      00806F 00                    1615 	.db 0x00
-                                   1616 	.area CODE
-                                   1617 	.area CONST
-      008070                       1618 ___str_7:
-      008070 43 52 32 20 2D 3E 20  1619 	.ascii "CR2 -> "
-      008077 00                    1620 	.db 0x00
-                                   1621 	.area CODE
-                                   1622 	.area CONST
-      008078                       1623 ___str_8:
-      008078 44 52 20 2D 3E 20     1624 	.ascii "DR -> "
-      00807E 00                    1625 	.db 0x00
-                                   1626 	.area CODE
-                                   1627 	.area CONST
-      00807F                       1628 ___str_9:
-      00807F 55 41 52 54 5F 52 45  1629 	.ascii "UART_REGS >.<"
-             47 53 20 3E 2E 3C
-      00808C 0A                    1630 	.db 0x0a
-      00808D 00                    1631 	.db 0x00
-                                   1632 	.area CODE
-                                   1633 	.area CONST
-      00808E                       1634 ___str_10:
-      00808E 0A                    1635 	.db 0x0a
-      00808F 53 52 20 2D 3E 20     1636 	.ascii "SR -> "
-      008095 00                    1637 	.db 0x00
-                                   1638 	.area CODE
-                                   1639 	.area CONST
-      008096                       1640 ___str_11:
-      008096 42 52 52 31 20 2D 3E  1641 	.ascii "BRR1 -> "
+      0089B2                       1355 _cm_RM:
+                                   1356 ;	main.c: 408: current_dev = 0;
+      0089B2 72 5F 02 06      [ 1] 1357 	clr	_current_dev+0
+                                   1358 ;	main.c: 409: uart_write("RM\n");
+      0089B6 AE 80 F9         [ 2] 1359 	ldw	x, #(___str_23+0)
+                                   1360 ;	main.c: 410: }
+      0089B9 CC 83 66         [ 2] 1361 	jp	_uart_write
+                                   1362 ;	main.c: 412: void cm_DB(void)
+                                   1363 ;	-----------------------------------------
+                                   1364 ;	 function cm_DB
+                                   1365 ;	-----------------------------------------
+      0089BC                       1366 _cm_DB:
+                                   1367 ;	main.c: 414: status_check();
+                                   1368 ;	main.c: 415: }
+      0089BC CC 86 5B         [ 2] 1369 	jp	_status_check
+                                   1370 ;	main.c: 417: void cm_ST(void)
+                                   1371 ;	-----------------------------------------
+                                   1372 ;	 function cm_ST
+                                   1373 ;	-----------------------------------------
+      0089BF                       1374 _cm_ST:
+                                   1375 ;	main.c: 419: get_addr_from_buff();
+      0089BF CD 84 E7         [ 4] 1376 	call	_get_addr_from_buff
+                                   1377 ;	main.c: 420: current_dev = d_addr;
+      0089C2 55 01 03 02 06   [ 1] 1378 	mov	_current_dev+0, _d_addr+0
+                                   1379 ;	main.c: 421: uart_write("ST\n");
+      0089C7 AE 80 FD         [ 2] 1380 	ldw	x, #(___str_24+0)
+                                   1381 ;	main.c: 422: }
+      0089CA CC 83 66         [ 2] 1382 	jp	_uart_write
+                                   1383 ;	main.c: 423: void cm_SR(void)
+                                   1384 ;	-----------------------------------------
+                                   1385 ;	 function cm_SR
+                                   1386 ;	-----------------------------------------
+      0089CD                       1387 _cm_SR:
+                                   1388 ;	main.c: 425: i2c_start();
+      0089CD CD 88 BA         [ 4] 1389 	call	_i2c_start
+                                   1390 ;	main.c: 426: i2c_send_address(current_dev);
+      0089D0 C6 02 06         [ 1] 1391 	ld	a, _current_dev+0
+      0089D3 CD 88 C4         [ 4] 1392 	call	_i2c_send_address
+                                   1393 ;	main.c: 427: i2c_read();
+      0089D6 CD 89 05         [ 4] 1394 	call	_i2c_read
+                                   1395 ;	main.c: 428: i2c_stop();
+                                   1396 ;	main.c: 429: }
+      0089D9 CC 88 D4         [ 2] 1397 	jp	_i2c_stop
+                                   1398 ;	main.c: 430: void cm_SW(void)
+                                   1399 ;	-----------------------------------------
+                                   1400 ;	 function cm_SW
+                                   1401 ;	-----------------------------------------
+      0089DC                       1402 _cm_SW:
+      0089DC 52 04            [ 2] 1403 	sub	sp, #4
+                                   1404 ;	main.c: 432: char ar[4]={0};
+      0089DE 0F 01            [ 1] 1405 	clr	(0x01, sp)
+      0089E0 0F 02            [ 1] 1406 	clr	(0x02, sp)
+      0089E2 0F 03            [ 1] 1407 	clr	(0x03, sp)
+      0089E4 0F 04            [ 1] 1408 	clr	(0x04, sp)
+                                   1409 ;	main.c: 433: i2c_start();
+      0089E6 CD 88 BA         [ 4] 1410 	call	_i2c_start
+                                   1411 ;	main.c: 434: i2c_send_address(current_dev);
+      0089E9 C6 02 06         [ 1] 1412 	ld	a, _current_dev+0
+      0089EC CD 88 C4         [ 4] 1413 	call	_i2c_send_address
+                                   1414 ;	main.c: 435: i2c_write();
+      0089EF CD 88 D9         [ 4] 1415 	call	_i2c_write
+                                   1416 ;	main.c: 436: i2c_stop();
+      0089F2 CD 88 D4         [ 4] 1417 	call	_i2c_stop
+                                   1418 ;	main.c: 437: uart_write("SW ");
+      0089F5 AE 81 01         [ 2] 1419 	ldw	x, #(___str_25+0)
+      0089F8 CD 83 66         [ 4] 1420 	call	_uart_write
+                                   1421 ;	main.c: 438: convert_int_to_chars(d_addr, ar);
+      0089FB 96               [ 1] 1422 	ldw	x, sp
+      0089FC 5C               [ 1] 1423 	incw	x
+      0089FD C6 01 03         [ 1] 1424 	ld	a, _d_addr+0
+      008A00 CD 83 C7         [ 4] 1425 	call	_convert_int_to_chars
+                                   1426 ;	main.c: 439: uart_write(ar);
+      008A03 96               [ 1] 1427 	ldw	x, sp
+      008A04 5C               [ 1] 1428 	incw	x
+      008A05 CD 83 66         [ 4] 1429 	call	_uart_write
+                                   1430 ;	main.c: 440: uart_write(" ");
+      008A08 AE 81 05         [ 2] 1431 	ldw	x, #(___str_26+0)
+      008A0B CD 83 66         [ 4] 1432 	call	_uart_write
+                                   1433 ;	main.c: 441: convert_int_to_chars(d_size, ar);
+      008A0E 96               [ 1] 1434 	ldw	x, sp
+      008A0F 5C               [ 1] 1435 	incw	x
+      008A10 C6 01 05         [ 1] 1436 	ld	a, _d_size+0
+      008A13 CD 83 C7         [ 4] 1437 	call	_convert_int_to_chars
+                                   1438 ;	main.c: 442: uart_write(ar);
+      008A16 96               [ 1] 1439 	ldw	x, sp
+      008A17 5C               [ 1] 1440 	incw	x
+      008A18 CD 83 66         [ 4] 1441 	call	_uart_write
+                                   1442 ;	main.c: 443: uart_write("\r\n");
+      008A1B AE 80 F6         [ 2] 1443 	ldw	x, #(___str_22+0)
+      008A1E CD 83 66         [ 4] 1444 	call	_uart_write
+                                   1445 ;	main.c: 444: }
+      008A21 5B 04            [ 2] 1446 	addw	sp, #4
+      008A23 81               [ 4] 1447 	ret
+                                   1448 ;	main.c: 452: int data_handler(void)
+                                   1449 ;	-----------------------------------------
+                                   1450 ;	 function data_handler
+                                   1451 ;	-----------------------------------------
+      008A24                       1452 _data_handler:
+                                   1453 ;	main.c: 454: p_size = 0;
+      008A24 72 5F 01 04      [ 1] 1454 	clr	_p_size+0
+                                   1455 ;	main.c: 455: p_bytes = 0;
+      008A28 72 5F 01 06      [ 1] 1456 	clr	_p_bytes+0
+                                   1457 ;	main.c: 456: d_addr = 0;
+      008A2C 72 5F 01 03      [ 1] 1458 	clr	_d_addr+0
+                                   1459 ;	main.c: 457: d_size = 0;
+      008A30 72 5F 01 05      [ 1] 1460 	clr	_d_size+0
+                                   1461 ;	main.c: 458: memset(a, 0, sizeof(a));
+      008A34 4B 03            [ 1] 1462 	push	#0x03
+      008A36 4B 00            [ 1] 1463 	push	#0x00
+      008A38 5F               [ 1] 1464 	clrw	x
+      008A39 89               [ 2] 1465 	pushw	x
+      008A3A AE 01 00         [ 2] 1466 	ldw	x, #(_a+0)
+      008A3D CD 8B E1         [ 4] 1467 	call	_memset
+                                   1468 ;	main.c: 459: memset(data_buf, 0, sizeof(data_buf));
+      008A40 4B FF            [ 1] 1469 	push	#0xff
+      008A42 4B 00            [ 1] 1470 	push	#0x00
+      008A44 5F               [ 1] 1471 	clrw	x
+      008A45 89               [ 2] 1472 	pushw	x
+      008A46 AE 01 07         [ 2] 1473 	ldw	x, #(_data_buf+0)
+      008A49 CD 8B E1         [ 4] 1474 	call	_memset
+                                   1475 ;	main.c: 460: if(memcmp(&buffer[0],"SM",2) == 0)
+      008A4C 4B 02            [ 1] 1476 	push	#0x02
+      008A4E 4B 00            [ 1] 1477 	push	#0x00
+      008A50 4B 07            [ 1] 1478 	push	#<(___str_27+0)
+      008A52 4B 81            [ 1] 1479 	push	#((___str_27+0) >> 8)
+      008A54 AE 00 01         [ 2] 1480 	ldw	x, #(_buffer+0)
+      008A57 CD 8B 4B         [ 4] 1481 	call	_memcmp
+                                   1482 ;	main.c: 461: return 1;
+      008A5A 5D               [ 2] 1483 	tnzw	x
+      008A5B 26 02            [ 1] 1484 	jrne	00102$
+      008A5D 5C               [ 1] 1485 	incw	x
+      008A5E 81               [ 4] 1486 	ret
+      008A5F                       1487 00102$:
+                                   1488 ;	main.c: 462: if(memcmp(&buffer[0],"SN",2) == 0)
+      008A5F 4B 02            [ 1] 1489 	push	#0x02
+      008A61 4B 00            [ 1] 1490 	push	#0x00
+      008A63 4B 0A            [ 1] 1491 	push	#<(___str_28+0)
+      008A65 4B 81            [ 1] 1492 	push	#((___str_28+0) >> 8)
+      008A67 AE 00 01         [ 2] 1493 	ldw	x, #(_buffer+0)
+      008A6A CD 8B 4B         [ 4] 1494 	call	_memcmp
+      008A6D 5D               [ 2] 1495 	tnzw	x
+      008A6E 26 04            [ 1] 1496 	jrne	00104$
+                                   1497 ;	main.c: 463: return 2;
+      008A70 AE 00 02         [ 2] 1498 	ldw	x, #0x0002
+      008A73 81               [ 4] 1499 	ret
+      008A74                       1500 00104$:
+                                   1501 ;	main.c: 464: if(memcmp(&buffer[0],"ST",2) == 0)
+      008A74 4B 02            [ 1] 1502 	push	#0x02
+      008A76 4B 00            [ 1] 1503 	push	#0x00
+      008A78 4B 0D            [ 1] 1504 	push	#<(___str_29+0)
+      008A7A 4B 81            [ 1] 1505 	push	#((___str_29+0) >> 8)
+      008A7C AE 00 01         [ 2] 1506 	ldw	x, #(_buffer+0)
+      008A7F CD 8B 4B         [ 4] 1507 	call	_memcmp
+      008A82 5D               [ 2] 1508 	tnzw	x
+      008A83 26 04            [ 1] 1509 	jrne	00106$
+                                   1510 ;	main.c: 465: return 5;
+      008A85 AE 00 05         [ 2] 1511 	ldw	x, #0x0005
+      008A88 81               [ 4] 1512 	ret
+      008A89                       1513 00106$:
+                                   1514 ;	main.c: 466: if(memcmp(&buffer[0],"RM",2) == 0)
+      008A89 4B 02            [ 1] 1515 	push	#0x02
+      008A8B 4B 00            [ 1] 1516 	push	#0x00
+      008A8D 4B 10            [ 1] 1517 	push	#<(___str_30+0)
+      008A8F 4B 81            [ 1] 1518 	push	#((___str_30+0) >> 8)
+      008A91 AE 00 01         [ 2] 1519 	ldw	x, #(_buffer+0)
+      008A94 CD 8B 4B         [ 4] 1520 	call	_memcmp
+      008A97 5D               [ 2] 1521 	tnzw	x
+      008A98 26 04            [ 1] 1522 	jrne	00108$
+                                   1523 ;	main.c: 467: return 6;
+      008A9A AE 00 06         [ 2] 1524 	ldw	x, #0x0006
+      008A9D 81               [ 4] 1525 	ret
+      008A9E                       1526 00108$:
+                                   1527 ;	main.c: 468: if(memcmp(&buffer[0],"DB",2) == 0)
+      008A9E 4B 02            [ 1] 1528 	push	#0x02
+      008AA0 4B 00            [ 1] 1529 	push	#0x00
+      008AA2 4B 13            [ 1] 1530 	push	#<(___str_31+0)
+      008AA4 4B 81            [ 1] 1531 	push	#((___str_31+0) >> 8)
+      008AA6 AE 00 01         [ 2] 1532 	ldw	x, #(_buffer+0)
+      008AA9 CD 8B 4B         [ 4] 1533 	call	_memcmp
+      008AAC 5D               [ 2] 1534 	tnzw	x
+      008AAD 26 04            [ 1] 1535 	jrne	00110$
+                                   1536 ;	main.c: 469: return 7;
+      008AAF AE 00 07         [ 2] 1537 	ldw	x, #0x0007
+      008AB2 81               [ 4] 1538 	ret
+      008AB3                       1539 00110$:
+                                   1540 ;	main.c: 471: get_addr_from_buff();
+      008AB3 CD 84 E7         [ 4] 1541 	call	_get_addr_from_buff
+                                   1542 ;	main.c: 472: get_size_from_buff();
+      008AB6 CD 85 2C         [ 4] 1543 	call	_get_size_from_buff
+                                   1544 ;	main.c: 474: if(memcmp(&buffer[0],"SR",2) == 0)
+      008AB9 4B 02            [ 1] 1545 	push	#0x02
+      008ABB 4B 00            [ 1] 1546 	push	#0x00
+      008ABD 4B 16            [ 1] 1547 	push	#<(___str_32+0)
+      008ABF 4B 81            [ 1] 1548 	push	#((___str_32+0) >> 8)
+      008AC1 AE 00 01         [ 2] 1549 	ldw	x, #(_buffer+0)
+      008AC4 CD 8B 4B         [ 4] 1550 	call	_memcmp
+      008AC7 5D               [ 2] 1551 	tnzw	x
+      008AC8 26 04            [ 1] 1552 	jrne	00112$
+                                   1553 ;	main.c: 475: return 3;
+      008ACA AE 00 03         [ 2] 1554 	ldw	x, #0x0003
+      008ACD 81               [ 4] 1555 	ret
+      008ACE                       1556 00112$:
+                                   1557 ;	main.c: 477: char_buffer_to_int();
+      008ACE CD 85 86         [ 4] 1558 	call	_char_buffer_to_int
+                                   1559 ;	main.c: 479: if(memcmp(&buffer[0],"SW",2) == 0)
+      008AD1 4B 02            [ 1] 1560 	push	#0x02
+      008AD3 4B 00            [ 1] 1561 	push	#0x00
+      008AD5 4B 19            [ 1] 1562 	push	#<(___str_33+0)
+      008AD7 4B 81            [ 1] 1563 	push	#((___str_33+0) >> 8)
+      008AD9 AE 00 01         [ 2] 1564 	ldw	x, #(_buffer+0)
+      008ADC CD 8B 4B         [ 4] 1565 	call	_memcmp
+      008ADF 5D               [ 2] 1566 	tnzw	x
+      008AE0 26 04            [ 1] 1567 	jrne	00114$
+                                   1568 ;	main.c: 480: return 4;
+      008AE2 AE 00 04         [ 2] 1569 	ldw	x, #0x0004
+      008AE5 81               [ 4] 1570 	ret
+      008AE6                       1571 00114$:
+                                   1572 ;	main.c: 481: return 0;
+      008AE6 5F               [ 1] 1573 	clrw	x
+                                   1574 ;	main.c: 483: }
+      008AE7 81               [ 4] 1575 	ret
+                                   1576 ;	main.c: 485: void command_switcher(void)
+                                   1577 ;	-----------------------------------------
+                                   1578 ;	 function command_switcher
+                                   1579 ;	-----------------------------------------
+      008AE8                       1580 _command_switcher:
+      008AE8 52 04            [ 2] 1581 	sub	sp, #4
+                                   1582 ;	main.c: 487: char ar[4]={0};
+      008AEA 0F 01            [ 1] 1583 	clr	(0x01, sp)
+      008AEC 0F 02            [ 1] 1584 	clr	(0x02, sp)
+      008AEE 0F 03            [ 1] 1585 	clr	(0x03, sp)
+      008AF0 0F 04            [ 1] 1586 	clr	(0x04, sp)
+                                   1587 ;	main.c: 489: switch(data_handler())
+      008AF2 CD 8A 24         [ 4] 1588 	call	_data_handler
+      008AF5 5D               [ 2] 1589 	tnzw	x
+      008AF6 2B 3B            [ 1] 1590 	jrmi	00109$
+      008AF8 A3 00 07         [ 2] 1591 	cpw	x, #0x0007
+      008AFB 2C 36            [ 1] 1592 	jrsgt	00109$
+      008AFD 58               [ 2] 1593 	sllw	x
+      008AFE DE 8B 02         [ 2] 1594 	ldw	x, (#00123$, x)
+      008B01 FC               [ 2] 1595 	jp	(x)
+      008B02                       1596 00123$:
+      008B02 8B 33                 1597 	.dw	#00109$
+      008B04 8B 12                 1598 	.dw	#00101$
+      008B06 8B 17                 1599 	.dw	#00102$
+      008B08 8B 1C                 1600 	.dw	#00103$
+      008B0A 8B 21                 1601 	.dw	#00104$
+      008B0C 8B 26                 1602 	.dw	#00105$
+      008B0E 8B 2B                 1603 	.dw	#00106$
+      008B10 8B 30                 1604 	.dw	#00107$
+                                   1605 ;	main.c: 491: case 1:
+      008B12                       1606 00101$:
+                                   1607 ;	main.c: 492: cm_SM();
+      008B12 CD 89 86         [ 4] 1608 	call	_cm_SM
+                                   1609 ;	main.c: 493: break;
+      008B15 20 1C            [ 2] 1610 	jra	00109$
+                                   1611 ;	main.c: 494: case 2:
+      008B17                       1612 00102$:
+                                   1613 ;	main.c: 495: cm_SN();
+      008B17 CD 89 AC         [ 4] 1614 	call	_cm_SN
+                                   1615 ;	main.c: 496: break;
+      008B1A 20 17            [ 2] 1616 	jra	00109$
+                                   1617 ;	main.c: 497: case 3:
+      008B1C                       1618 00103$:
+                                   1619 ;	main.c: 498: cm_SR();
+      008B1C CD 89 CD         [ 4] 1620 	call	_cm_SR
+                                   1621 ;	main.c: 499: break;
+      008B1F 20 12            [ 2] 1622 	jra	00109$
+                                   1623 ;	main.c: 500: case 4:
+      008B21                       1624 00104$:
+                                   1625 ;	main.c: 501: cm_SW();
+      008B21 CD 89 DC         [ 4] 1626 	call	_cm_SW
+                                   1627 ;	main.c: 502: break;
+      008B24 20 0D            [ 2] 1628 	jra	00109$
+                                   1629 ;	main.c: 503: case 5:
+      008B26                       1630 00105$:
+                                   1631 ;	main.c: 504: cm_ST();
+      008B26 CD 89 BF         [ 4] 1632 	call	_cm_ST
+                                   1633 ;	main.c: 505: break;
+      008B29 20 08            [ 2] 1634 	jra	00109$
+                                   1635 ;	main.c: 506: case 6:
+      008B2B                       1636 00106$:
+                                   1637 ;	main.c: 507: cm_RM();
+      008B2B CD 89 B2         [ 4] 1638 	call	_cm_RM
+                                   1639 ;	main.c: 508: break;
+      008B2E 20 03            [ 2] 1640 	jra	00109$
+                                   1641 ;	main.c: 509: case 7:
+      008B30                       1642 00107$:
+                                   1643 ;	main.c: 510: cm_DB();
+      008B30 CD 89 BC         [ 4] 1644 	call	_cm_DB
+                                   1645 ;	main.c: 512: }
+      008B33                       1646 00109$:
+                                   1647 ;	main.c: 513: }
+      008B33 5B 04            [ 2] 1648 	addw	sp, #4
+      008B35 81               [ 4] 1649 	ret
+                                   1650 ;	main.c: 516: void main(void)
+                                   1651 ;	-----------------------------------------
+                                   1652 ;	 function main
+                                   1653 ;	-----------------------------------------
+      008B36                       1654 _main:
+                                   1655 ;	main.c: 518: uart_init();
+      008B36 CD 88 7C         [ 4] 1656 	call	_uart_init
+                                   1657 ;	main.c: 519: i2c_init();
+      008B39 CD 88 99         [ 4] 1658 	call	_i2c_init
+                                   1659 ;	main.c: 520: uart_write("SS\n");
+      008B3C AE 81 1C         [ 2] 1660 	ldw	x, #(___str_34+0)
+      008B3F CD 83 66         [ 4] 1661 	call	_uart_write
+                                   1662 ;	main.c: 521: while(1)
+      008B42                       1663 00102$:
+                                   1664 ;	main.c: 523: uart_read();
+      008B42 CD 83 91         [ 4] 1665 	call	_uart_read
+                                   1666 ;	main.c: 524: command_switcher();
+      008B45 CD 8A E8         [ 4] 1667 	call	_command_switcher
+      008B48 20 F8            [ 2] 1668 	jra	00102$
+                                   1669 ;	main.c: 526: }
+      008B4A 81               [ 4] 1670 	ret
+                                   1671 	.area CODE
+                                   1672 	.area CONST
+                                   1673 	.area CONST
+      00802D                       1674 ___str_0:
+      00802D 0A                    1675 	.db 0x0a
+      00802E 63 68 61 72 20 2D 3E  1676 	.ascii "char -> "
              20
-      00809E 00                    1642 	.db 0x00
-                                   1643 	.area CODE
-                                   1644 	.area CONST
-      00809F                       1645 ___str_12:
-      00809F 42 52 52 32 20 2D 3E  1646 	.ascii "BRR2 -> "
-             20
-      0080A7 00                    1647 	.db 0x00
-                                   1648 	.area CODE
-                                   1649 	.area CONST
-      0080A8                       1650 ___str_13:
-      0080A8 43 52 33 20 2D 3E 20  1651 	.ascii "CR3 -> "
-      0080AF 00                    1652 	.db 0x00
-                                   1653 	.area CODE
-                                   1654 	.area CONST
-      0080B0                       1655 ___str_14:
-      0080B0 43 52 34 20 2D 3E 20  1656 	.ascii "CR4 -> "
-      0080B7 00                    1657 	.db 0x00
-                                   1658 	.area CODE
-                                   1659 	.area CONST
-      0080B8                       1660 ___str_15:
-      0080B8 43 52 35 20 2D 3E 20  1661 	.ascii "CR5 -> "
-      0080BF 00                    1662 	.db 0x00
-                                   1663 	.area CODE
-                                   1664 	.area CONST
-      0080C0                       1665 ___str_16:
-      0080C0 47 54 52 20 2D 3E 20  1666 	.ascii "GTR -> "
-      0080C7 00                    1667 	.db 0x00
-                                   1668 	.area CODE
-                                   1669 	.area CONST
-      0080C8                       1670 ___str_17:
-      0080C8 50 53 43 52 20 2D 3E  1671 	.ascii "PSCR -> "
-             20
-      0080D0 00                    1672 	.db 0x00
-                                   1673 	.area CODE
-                                   1674 	.area CONST
-      0080D1                       1675 ___str_18:
-      0080D1 53 4D 20              1676 	.ascii "SM "
-      0080D4 00                    1677 	.db 0x00
+      008036 00                    1677 	.db 0x00
                                    1678 	.area CODE
                                    1679 	.area CONST
-      0080D5                       1680 ___str_19:
-      0080D5 0D                    1681 	.db 0x0d
-      0080D6 0A                    1682 	.db 0x0a
-      0080D7 00                    1683 	.db 0x00
+      008037                       1680 ___str_1:
+      008037 20 3C 2D              1681 	.ascii " <-"
+      00803A 0A                    1682 	.db 0x0a
+      00803B 00                    1683 	.db 0x00
                                    1684 	.area CODE
                                    1685 	.area CONST
-      0080D8                       1686 ___str_20:
-      0080D8 52 4D                 1687 	.ascii "RM"
-      0080DA 0A                    1688 	.db 0x0a
-      0080DB 00                    1689 	.db 0x00
+      00803C                       1686 ___str_2:
+      00803C 0A                    1687 	.db 0x0a
+      00803D 72 65 73 75 6C 74 20  1688 	.ascii "result -> "
+             2D 3E 20
+      008047 00                    1689 	.db 0x00
                                    1690 	.area CODE
                                    1691 	.area CONST
-      0080DC                       1692 ___str_21:
-      0080DC 53 54                 1693 	.ascii "ST"
-      0080DE 0A                    1694 	.db 0x0a
-      0080DF 00                    1695 	.db 0x00
+      008048                       1692 ___str_3:
+      008048 0A                    1693 	.db 0x0a
+      008049 69 20 77 68 69 6C 65  1694 	.ascii "i while-> -> "
+             2D 3E 20 2D 3E 20
+      008056 00                    1695 	.db 0x00
                                    1696 	.area CODE
                                    1697 	.area CONST
-      0080E0                       1698 ___str_22:
-      0080E0 53 57 20              1699 	.ascii "SW "
-      0080E3 00                    1700 	.db 0x00
-                                   1701 	.area CODE
-                                   1702 	.area CONST
-      0080E4                       1703 ___str_23:
-      0080E4 20                    1704 	.ascii " "
-      0080E5 00                    1705 	.db 0x00
-                                   1706 	.area CODE
-                                   1707 	.area CONST
-      0080E6                       1708 ___str_24:
-      0080E6 53 4D                 1709 	.ascii "SM"
-      0080E8 00                    1710 	.db 0x00
-                                   1711 	.area CODE
-                                   1712 	.area CONST
-      0080E9                       1713 ___str_25:
-      0080E9 53 4E                 1714 	.ascii "SN"
-      0080EB 00                    1715 	.db 0x00
-                                   1716 	.area CODE
-                                   1717 	.area CONST
-      0080EC                       1718 ___str_26:
-      0080EC 53 54                 1719 	.ascii "ST"
-      0080EE 00                    1720 	.db 0x00
-                                   1721 	.area CODE
-                                   1722 	.area CONST
-      0080EF                       1723 ___str_27:
-      0080EF 52 4D                 1724 	.ascii "RM"
-      0080F1 00                    1725 	.db 0x00
-                                   1726 	.area CODE
-                                   1727 	.area CONST
-      0080F2                       1728 ___str_28:
-      0080F2 44 42                 1729 	.ascii "DB"
-      0080F4 00                    1730 	.db 0x00
-                                   1731 	.area CODE
-                                   1732 	.area CONST
-      0080F5                       1733 ___str_29:
-      0080F5 53 52                 1734 	.ascii "SR"
-      0080F7 00                    1735 	.db 0x00
-                                   1736 	.area CODE
-                                   1737 	.area CONST
-      0080F8                       1738 ___str_30:
-      0080F8 53 57                 1739 	.ascii "SW"
-      0080FA 00                    1740 	.db 0x00
-                                   1741 	.area CODE
-                                   1742 	.area CONST
-      0080FB                       1743 ___str_31:
-      0080FB 53 53                 1744 	.ascii "SS"
-      0080FD 0A                    1745 	.db 0x0a
-      0080FE 00                    1746 	.db 0x00
-                                   1747 	.area CODE
-                                   1748 	.area INITIALIZER
-      0080FF                       1749 __xinit__buffer:
-      0080FF 00                    1750 	.db #0x00	; 0
-      008100 00                    1751 	.db 0x00
-      008101 00                    1752 	.db 0x00
-      008102 00                    1753 	.db 0x00
-      008103 00                    1754 	.db 0x00
-      008104 00                    1755 	.db 0x00
-      008105 00                    1756 	.db 0x00
-      008106 00                    1757 	.db 0x00
-      008107 00                    1758 	.db 0x00
-      008108 00                    1759 	.db 0x00
-      008109 00                    1760 	.db 0x00
-      00810A 00                    1761 	.db 0x00
-      00810B 00                    1762 	.db 0x00
-      00810C 00                    1763 	.db 0x00
-      00810D 00                    1764 	.db 0x00
-      00810E 00                    1765 	.db 0x00
-      00810F 00                    1766 	.db 0x00
-      008110 00                    1767 	.db 0x00
-      008111 00                    1768 	.db 0x00
-      008112 00                    1769 	.db 0x00
-      008113 00                    1770 	.db 0x00
-      008114 00                    1771 	.db 0x00
-      008115 00                    1772 	.db 0x00
-      008116 00                    1773 	.db 0x00
-      008117 00                    1774 	.db 0x00
-      008118 00                    1775 	.db 0x00
-      008119 00                    1776 	.db 0x00
-      00811A 00                    1777 	.db 0x00
-      00811B 00                    1778 	.db 0x00
-      00811C 00                    1779 	.db 0x00
-      00811D 00                    1780 	.db 0x00
-      00811E 00                    1781 	.db 0x00
-      00811F 00                    1782 	.db 0x00
-      008120 00                    1783 	.db 0x00
-      008121 00                    1784 	.db 0x00
-      008122 00                    1785 	.db 0x00
-      008123 00                    1786 	.db 0x00
-      008124 00                    1787 	.db 0x00
-      008125 00                    1788 	.db 0x00
-      008126 00                    1789 	.db 0x00
-      008127 00                    1790 	.db 0x00
-      008128 00                    1791 	.db 0x00
-      008129 00                    1792 	.db 0x00
-      00812A 00                    1793 	.db 0x00
-      00812B 00                    1794 	.db 0x00
-      00812C 00                    1795 	.db 0x00
-      00812D 00                    1796 	.db 0x00
-      00812E 00                    1797 	.db 0x00
-      00812F 00                    1798 	.db 0x00
-      008130 00                    1799 	.db 0x00
-      008131 00                    1800 	.db 0x00
-      008132 00                    1801 	.db 0x00
-      008133 00                    1802 	.db 0x00
-      008134 00                    1803 	.db 0x00
-      008135 00                    1804 	.db 0x00
-      008136 00                    1805 	.db 0x00
-      008137 00                    1806 	.db 0x00
-      008138 00                    1807 	.db 0x00
-      008139 00                    1808 	.db 0x00
-      00813A 00                    1809 	.db 0x00
-      00813B 00                    1810 	.db 0x00
-      00813C 00                    1811 	.db 0x00
-      00813D 00                    1812 	.db 0x00
-      00813E 00                    1813 	.db 0x00
-      00813F 00                    1814 	.db 0x00
-      008140 00                    1815 	.db 0x00
-      008141 00                    1816 	.db 0x00
-      008142 00                    1817 	.db 0x00
-      008143 00                    1818 	.db 0x00
-      008144 00                    1819 	.db 0x00
-      008145 00                    1820 	.db 0x00
-      008146 00                    1821 	.db 0x00
-      008147 00                    1822 	.db 0x00
-      008148 00                    1823 	.db 0x00
-      008149 00                    1824 	.db 0x00
-      00814A 00                    1825 	.db 0x00
-      00814B 00                    1826 	.db 0x00
-      00814C 00                    1827 	.db 0x00
-      00814D 00                    1828 	.db 0x00
-      00814E 00                    1829 	.db 0x00
-      00814F 00                    1830 	.db 0x00
-      008150 00                    1831 	.db 0x00
-      008151 00                    1832 	.db 0x00
-      008152 00                    1833 	.db 0x00
-      008153 00                    1834 	.db 0x00
-      008154 00                    1835 	.db 0x00
-      008155 00                    1836 	.db 0x00
-      008156 00                    1837 	.db 0x00
-      008157 00                    1838 	.db 0x00
-      008158 00                    1839 	.db 0x00
-      008159 00                    1840 	.db 0x00
-      00815A 00                    1841 	.db 0x00
-      00815B 00                    1842 	.db 0x00
-      00815C 00                    1843 	.db 0x00
-      00815D 00                    1844 	.db 0x00
-      00815E 00                    1845 	.db 0x00
-      00815F 00                    1846 	.db 0x00
-      008160 00                    1847 	.db 0x00
-      008161 00                    1848 	.db 0x00
-      008162 00                    1849 	.db 0x00
-      008163 00                    1850 	.db 0x00
-      008164 00                    1851 	.db 0x00
-      008165 00                    1852 	.db 0x00
-      008166 00                    1853 	.db 0x00
-      008167 00                    1854 	.db 0x00
-      008168 00                    1855 	.db 0x00
-      008169 00                    1856 	.db 0x00
-      00816A 00                    1857 	.db 0x00
-      00816B 00                    1858 	.db 0x00
-      00816C 00                    1859 	.db 0x00
-      00816D 00                    1860 	.db 0x00
-      00816E 00                    1861 	.db 0x00
-      00816F 00                    1862 	.db 0x00
-      008170 00                    1863 	.db 0x00
-      008171 00                    1864 	.db 0x00
-      008172 00                    1865 	.db 0x00
-      008173 00                    1866 	.db 0x00
-      008174 00                    1867 	.db 0x00
-      008175 00                    1868 	.db 0x00
-      008176 00                    1869 	.db 0x00
-      008177 00                    1870 	.db 0x00
-      008178 00                    1871 	.db 0x00
-      008179 00                    1872 	.db 0x00
-      00817A 00                    1873 	.db 0x00
-      00817B 00                    1874 	.db 0x00
-      00817C 00                    1875 	.db 0x00
-      00817D 00                    1876 	.db 0x00
-      00817E 00                    1877 	.db 0x00
-      00817F 00                    1878 	.db 0x00
-      008180 00                    1879 	.db 0x00
-      008181 00                    1880 	.db 0x00
-      008182 00                    1881 	.db 0x00
-      008183 00                    1882 	.db 0x00
-      008184 00                    1883 	.db 0x00
-      008185 00                    1884 	.db 0x00
-      008186 00                    1885 	.db 0x00
-      008187 00                    1886 	.db 0x00
-      008188 00                    1887 	.db 0x00
-      008189 00                    1888 	.db 0x00
-      00818A 00                    1889 	.db 0x00
-      00818B 00                    1890 	.db 0x00
-      00818C 00                    1891 	.db 0x00
-      00818D 00                    1892 	.db 0x00
-      00818E 00                    1893 	.db 0x00
-      00818F 00                    1894 	.db 0x00
-      008190 00                    1895 	.db 0x00
-      008191 00                    1896 	.db 0x00
-      008192 00                    1897 	.db 0x00
-      008193 00                    1898 	.db 0x00
-      008194 00                    1899 	.db 0x00
-      008195 00                    1900 	.db 0x00
-      008196 00                    1901 	.db 0x00
-      008197 00                    1902 	.db 0x00
-      008198 00                    1903 	.db 0x00
-      008199 00                    1904 	.db 0x00
-      00819A 00                    1905 	.db 0x00
-      00819B 00                    1906 	.db 0x00
-      00819C 00                    1907 	.db 0x00
-      00819D 00                    1908 	.db 0x00
-      00819E 00                    1909 	.db 0x00
-      00819F 00                    1910 	.db 0x00
-      0081A0 00                    1911 	.db 0x00
-      0081A1 00                    1912 	.db 0x00
-      0081A2 00                    1913 	.db 0x00
-      0081A3 00                    1914 	.db 0x00
-      0081A4 00                    1915 	.db 0x00
-      0081A5 00                    1916 	.db 0x00
-      0081A6 00                    1917 	.db 0x00
-      0081A7 00                    1918 	.db 0x00
-      0081A8 00                    1919 	.db 0x00
-      0081A9 00                    1920 	.db 0x00
-      0081AA 00                    1921 	.db 0x00
-      0081AB 00                    1922 	.db 0x00
-      0081AC 00                    1923 	.db 0x00
-      0081AD 00                    1924 	.db 0x00
-      0081AE 00                    1925 	.db 0x00
-      0081AF 00                    1926 	.db 0x00
-      0081B0 00                    1927 	.db 0x00
-      0081B1 00                    1928 	.db 0x00
-      0081B2 00                    1929 	.db 0x00
-      0081B3 00                    1930 	.db 0x00
-      0081B4 00                    1931 	.db 0x00
-      0081B5 00                    1932 	.db 0x00
-      0081B6 00                    1933 	.db 0x00
-      0081B7 00                    1934 	.db 0x00
-      0081B8 00                    1935 	.db 0x00
-      0081B9 00                    1936 	.db 0x00
-      0081BA 00                    1937 	.db 0x00
-      0081BB 00                    1938 	.db 0x00
-      0081BC 00                    1939 	.db 0x00
-      0081BD 00                    1940 	.db 0x00
-      0081BE 00                    1941 	.db 0x00
-      0081BF 00                    1942 	.db 0x00
-      0081C0 00                    1943 	.db 0x00
-      0081C1 00                    1944 	.db 0x00
-      0081C2 00                    1945 	.db 0x00
-      0081C3 00                    1946 	.db 0x00
-      0081C4 00                    1947 	.db 0x00
-      0081C5 00                    1948 	.db 0x00
-      0081C6 00                    1949 	.db 0x00
-      0081C7 00                    1950 	.db 0x00
-      0081C8 00                    1951 	.db 0x00
-      0081C9 00                    1952 	.db 0x00
-      0081CA 00                    1953 	.db 0x00
-      0081CB 00                    1954 	.db 0x00
-      0081CC 00                    1955 	.db 0x00
-      0081CD 00                    1956 	.db 0x00
-      0081CE 00                    1957 	.db 0x00
-      0081CF 00                    1958 	.db 0x00
-      0081D0 00                    1959 	.db 0x00
-      0081D1 00                    1960 	.db 0x00
-      0081D2 00                    1961 	.db 0x00
-      0081D3 00                    1962 	.db 0x00
-      0081D4 00                    1963 	.db 0x00
-      0081D5 00                    1964 	.db 0x00
-      0081D6 00                    1965 	.db 0x00
-      0081D7 00                    1966 	.db 0x00
-      0081D8 00                    1967 	.db 0x00
-      0081D9 00                    1968 	.db 0x00
-      0081DA 00                    1969 	.db 0x00
-      0081DB 00                    1970 	.db 0x00
-      0081DC 00                    1971 	.db 0x00
-      0081DD 00                    1972 	.db 0x00
-      0081DE 00                    1973 	.db 0x00
-      0081DF 00                    1974 	.db 0x00
-      0081E0 00                    1975 	.db 0x00
-      0081E1 00                    1976 	.db 0x00
-      0081E2 00                    1977 	.db 0x00
-      0081E3 00                    1978 	.db 0x00
-      0081E4 00                    1979 	.db 0x00
-      0081E5 00                    1980 	.db 0x00
-      0081E6 00                    1981 	.db 0x00
-      0081E7 00                    1982 	.db 0x00
-      0081E8 00                    1983 	.db 0x00
-      0081E9 00                    1984 	.db 0x00
-      0081EA 00                    1985 	.db 0x00
-      0081EB 00                    1986 	.db 0x00
-      0081EC 00                    1987 	.db 0x00
-      0081ED 00                    1988 	.db 0x00
-      0081EE 00                    1989 	.db 0x00
-      0081EF 00                    1990 	.db 0x00
-      0081F0 00                    1991 	.db 0x00
-      0081F1 00                    1992 	.db 0x00
-      0081F2 00                    1993 	.db 0x00
-      0081F3 00                    1994 	.db 0x00
-      0081F4 00                    1995 	.db 0x00
-      0081F5 00                    1996 	.db 0x00
-      0081F6 00                    1997 	.db 0x00
-      0081F7 00                    1998 	.db 0x00
-      0081F8 00                    1999 	.db 0x00
-      0081F9 00                    2000 	.db 0x00
-      0081FA 00                    2001 	.db 0x00
-      0081FB 00                    2002 	.db 0x00
-      0081FC 00                    2003 	.db 0x00
-      0081FD 00                    2004 	.db 0x00
-      0081FE 00                    2005 	.db 0x00
-      0081FF                       2006 __xinit__a:
-      0081FF 00                    2007 	.db #0x00	; 0
-      008200 00                    2008 	.db 0x00
-      008201 00                    2009 	.db 0x00
-      008202                       2010 __xinit__d_addr:
-      008202 00                    2011 	.db #0x00	; 0
-      008203                       2012 __xinit__p_size:
-      008203 00                    2013 	.db #0x00	; 0
-      008204                       2014 __xinit__d_size:
-      008204 00                    2015 	.db #0x00	; 0
-      008205                       2016 __xinit__p_bytes:
-      008205 00                    2017 	.db #0x00	; 0
-      008206                       2018 __xinit__data_buf:
-      008206 00                    2019 	.db #0x00	; 0
-      008207 00                    2020 	.db 0x00
-      008208 00                    2021 	.db 0x00
-      008209 00                    2022 	.db 0x00
-      00820A 00                    2023 	.db 0x00
-      00820B 00                    2024 	.db 0x00
-      00820C 00                    2025 	.db 0x00
-      00820D 00                    2026 	.db 0x00
-      00820E 00                    2027 	.db 0x00
-      00820F 00                    2028 	.db 0x00
-      008210 00                    2029 	.db 0x00
-      008211 00                    2030 	.db 0x00
-      008212 00                    2031 	.db 0x00
-      008213 00                    2032 	.db 0x00
-      008214 00                    2033 	.db 0x00
-      008215 00                    2034 	.db 0x00
-      008216 00                    2035 	.db 0x00
-      008217 00                    2036 	.db 0x00
-      008218 00                    2037 	.db 0x00
-      008219 00                    2038 	.db 0x00
-      00821A 00                    2039 	.db 0x00
-      00821B 00                    2040 	.db 0x00
-      00821C 00                    2041 	.db 0x00
-      00821D 00                    2042 	.db 0x00
-      00821E 00                    2043 	.db 0x00
-      00821F 00                    2044 	.db 0x00
-      008220 00                    2045 	.db 0x00
-      008221 00                    2046 	.db 0x00
-      008222 00                    2047 	.db 0x00
-      008223 00                    2048 	.db 0x00
-      008224 00                    2049 	.db 0x00
-      008225 00                    2050 	.db 0x00
-      008226 00                    2051 	.db 0x00
-      008227 00                    2052 	.db 0x00
-      008228 00                    2053 	.db 0x00
-      008229 00                    2054 	.db 0x00
-      00822A 00                    2055 	.db 0x00
-      00822B 00                    2056 	.db 0x00
-      00822C 00                    2057 	.db 0x00
-      00822D 00                    2058 	.db 0x00
-      00822E 00                    2059 	.db 0x00
-      00822F 00                    2060 	.db 0x00
-      008230 00                    2061 	.db 0x00
-      008231 00                    2062 	.db 0x00
-      008232 00                    2063 	.db 0x00
-      008233 00                    2064 	.db 0x00
-      008234 00                    2065 	.db 0x00
-      008235 00                    2066 	.db 0x00
-      008236 00                    2067 	.db 0x00
-      008237 00                    2068 	.db 0x00
-      008238 00                    2069 	.db 0x00
-      008239 00                    2070 	.db 0x00
-      00823A 00                    2071 	.db 0x00
-      00823B 00                    2072 	.db 0x00
-      00823C 00                    2073 	.db 0x00
-      00823D 00                    2074 	.db 0x00
-      00823E 00                    2075 	.db 0x00
-      00823F 00                    2076 	.db 0x00
-      008240 00                    2077 	.db 0x00
-      008241 00                    2078 	.db 0x00
-      008242 00                    2079 	.db 0x00
-      008243 00                    2080 	.db 0x00
-      008244 00                    2081 	.db 0x00
-      008245 00                    2082 	.db 0x00
-      008246 00                    2083 	.db 0x00
-      008247 00                    2084 	.db 0x00
-      008248 00                    2085 	.db 0x00
-      008249 00                    2086 	.db 0x00
-      00824A 00                    2087 	.db 0x00
-      00824B 00                    2088 	.db 0x00
-      00824C 00                    2089 	.db 0x00
-      00824D 00                    2090 	.db 0x00
-      00824E 00                    2091 	.db 0x00
-      00824F 00                    2092 	.db 0x00
-      008250 00                    2093 	.db 0x00
-      008251 00                    2094 	.db 0x00
-      008252 00                    2095 	.db 0x00
-      008253 00                    2096 	.db 0x00
-      008254 00                    2097 	.db 0x00
-      008255 00                    2098 	.db 0x00
-      008256 00                    2099 	.db 0x00
-      008257 00                    2100 	.db 0x00
-      008258 00                    2101 	.db 0x00
-      008259 00                    2102 	.db 0x00
-      00825A 00                    2103 	.db 0x00
-      00825B 00                    2104 	.db 0x00
-      00825C 00                    2105 	.db 0x00
-      00825D 00                    2106 	.db 0x00
-      00825E 00                    2107 	.db 0x00
-      00825F 00                    2108 	.db 0x00
-      008260 00                    2109 	.db 0x00
-      008261 00                    2110 	.db 0x00
-      008262 00                    2111 	.db 0x00
-      008263 00                    2112 	.db 0x00
-      008264 00                    2113 	.db 0x00
-      008265 00                    2114 	.db 0x00
-      008266 00                    2115 	.db 0x00
-      008267 00                    2116 	.db 0x00
-      008268 00                    2117 	.db 0x00
-      008269 00                    2118 	.db 0x00
-      00826A 00                    2119 	.db 0x00
-      00826B 00                    2120 	.db 0x00
-      00826C 00                    2121 	.db 0x00
-      00826D 00                    2122 	.db 0x00
-      00826E 00                    2123 	.db 0x00
-      00826F 00                    2124 	.db 0x00
-      008270 00                    2125 	.db 0x00
-      008271 00                    2126 	.db 0x00
-      008272 00                    2127 	.db 0x00
-      008273 00                    2128 	.db 0x00
-      008274 00                    2129 	.db 0x00
-      008275 00                    2130 	.db 0x00
-      008276 00                    2131 	.db 0x00
-      008277 00                    2132 	.db 0x00
-      008278 00                    2133 	.db 0x00
-      008279 00                    2134 	.db 0x00
-      00827A 00                    2135 	.db 0x00
-      00827B 00                    2136 	.db 0x00
-      00827C 00                    2137 	.db 0x00
-      00827D 00                    2138 	.db 0x00
-      00827E 00                    2139 	.db 0x00
-      00827F 00                    2140 	.db 0x00
-      008280 00                    2141 	.db 0x00
-      008281 00                    2142 	.db 0x00
-      008282 00                    2143 	.db 0x00
-      008283 00                    2144 	.db 0x00
-      008284 00                    2145 	.db 0x00
-      008285 00                    2146 	.db 0x00
-      008286 00                    2147 	.db 0x00
-      008287 00                    2148 	.db 0x00
-      008288 00                    2149 	.db 0x00
-      008289 00                    2150 	.db 0x00
-      00828A 00                    2151 	.db 0x00
-      00828B 00                    2152 	.db 0x00
-      00828C 00                    2153 	.db 0x00
-      00828D 00                    2154 	.db 0x00
-      00828E 00                    2155 	.db 0x00
-      00828F 00                    2156 	.db 0x00
-      008290 00                    2157 	.db 0x00
-      008291 00                    2158 	.db 0x00
-      008292 00                    2159 	.db 0x00
-      008293 00                    2160 	.db 0x00
-      008294 00                    2161 	.db 0x00
-      008295 00                    2162 	.db 0x00
-      008296 00                    2163 	.db 0x00
-      008297 00                    2164 	.db 0x00
-      008298 00                    2165 	.db 0x00
-      008299 00                    2166 	.db 0x00
-      00829A 00                    2167 	.db 0x00
-      00829B 00                    2168 	.db 0x00
-      00829C 00                    2169 	.db 0x00
-      00829D 00                    2170 	.db 0x00
-      00829E 00                    2171 	.db 0x00
-      00829F 00                    2172 	.db 0x00
-      0082A0 00                    2173 	.db 0x00
-      0082A1 00                    2174 	.db 0x00
-      0082A2 00                    2175 	.db 0x00
-      0082A3 00                    2176 	.db 0x00
-      0082A4 00                    2177 	.db 0x00
-      0082A5 00                    2178 	.db 0x00
-      0082A6 00                    2179 	.db 0x00
-      0082A7 00                    2180 	.db 0x00
-      0082A8 00                    2181 	.db 0x00
-      0082A9 00                    2182 	.db 0x00
-      0082AA 00                    2183 	.db 0x00
-      0082AB 00                    2184 	.db 0x00
-      0082AC 00                    2185 	.db 0x00
-      0082AD 00                    2186 	.db 0x00
-      0082AE 00                    2187 	.db 0x00
-      0082AF 00                    2188 	.db 0x00
-      0082B0 00                    2189 	.db 0x00
-      0082B1 00                    2190 	.db 0x00
-      0082B2 00                    2191 	.db 0x00
-      0082B3 00                    2192 	.db 0x00
-      0082B4 00                    2193 	.db 0x00
-      0082B5 00                    2194 	.db 0x00
-      0082B6 00                    2195 	.db 0x00
-      0082B7 00                    2196 	.db 0x00
-      0082B8 00                    2197 	.db 0x00
-      0082B9 00                    2198 	.db 0x00
-      0082BA 00                    2199 	.db 0x00
-      0082BB 00                    2200 	.db 0x00
-      0082BC 00                    2201 	.db 0x00
-      0082BD 00                    2202 	.db 0x00
-      0082BE 00                    2203 	.db 0x00
-      0082BF 00                    2204 	.db 0x00
-      0082C0 00                    2205 	.db 0x00
-      0082C1 00                    2206 	.db 0x00
-      0082C2 00                    2207 	.db 0x00
-      0082C3 00                    2208 	.db 0x00
-      0082C4 00                    2209 	.db 0x00
-      0082C5 00                    2210 	.db 0x00
-      0082C6 00                    2211 	.db 0x00
-      0082C7 00                    2212 	.db 0x00
-      0082C8 00                    2213 	.db 0x00
-      0082C9 00                    2214 	.db 0x00
-      0082CA 00                    2215 	.db 0x00
-      0082CB 00                    2216 	.db 0x00
-      0082CC 00                    2217 	.db 0x00
-      0082CD 00                    2218 	.db 0x00
-      0082CE 00                    2219 	.db 0x00
-      0082CF 00                    2220 	.db 0x00
-      0082D0 00                    2221 	.db 0x00
-      0082D1 00                    2222 	.db 0x00
-      0082D2 00                    2223 	.db 0x00
-      0082D3 00                    2224 	.db 0x00
-      0082D4 00                    2225 	.db 0x00
-      0082D5 00                    2226 	.db 0x00
-      0082D6 00                    2227 	.db 0x00
-      0082D7 00                    2228 	.db 0x00
-      0082D8 00                    2229 	.db 0x00
-      0082D9 00                    2230 	.db 0x00
-      0082DA 00                    2231 	.db 0x00
-      0082DB 00                    2232 	.db 0x00
-      0082DC 00                    2233 	.db 0x00
-      0082DD 00                    2234 	.db 0x00
-      0082DE 00                    2235 	.db 0x00
-      0082DF 00                    2236 	.db 0x00
-      0082E0 00                    2237 	.db 0x00
-      0082E1 00                    2238 	.db 0x00
-      0082E2 00                    2239 	.db 0x00
-      0082E3 00                    2240 	.db 0x00
-      0082E4 00                    2241 	.db 0x00
-      0082E5 00                    2242 	.db 0x00
-      0082E6 00                    2243 	.db 0x00
-      0082E7 00                    2244 	.db 0x00
-      0082E8 00                    2245 	.db 0x00
-      0082E9 00                    2246 	.db 0x00
-      0082EA 00                    2247 	.db 0x00
-      0082EB 00                    2248 	.db 0x00
-      0082EC 00                    2249 	.db 0x00
-      0082ED 00                    2250 	.db 0x00
-      0082EE 00                    2251 	.db 0x00
-      0082EF 00                    2252 	.db 0x00
-      0082F0 00                    2253 	.db 0x00
-      0082F1 00                    2254 	.db 0x00
-      0082F2 00                    2255 	.db 0x00
-      0082F3 00                    2256 	.db 0x00
-      0082F4 00                    2257 	.db 0x00
-      0082F5 00                    2258 	.db 0x00
-      0082F6 00                    2259 	.db 0x00
-      0082F7 00                    2260 	.db 0x00
-      0082F8 00                    2261 	.db 0x00
-      0082F9 00                    2262 	.db 0x00
-      0082FA 00                    2263 	.db 0x00
-      0082FB 00                    2264 	.db 0x00
-      0082FC 00                    2265 	.db 0x00
-      0082FD 00                    2266 	.db 0x00
-      0082FE 00                    2267 	.db 0x00
-      0082FF 00                    2268 	.db 0x00
-      008300 00                    2269 	.db 0x00
-      008301 00                    2270 	.db 0x00
-      008302 00                    2271 	.db 0x00
-      008303 00                    2272 	.db 0x00
-      008304 00                    2273 	.db 0x00
-      008305 00                    2274 	.db 0x00
-      008306                       2275 __xinit__current_dev:
-      008306 00                    2276 	.db #0x00	; 0
-                                   2277 	.area CABS (ABS)
+      008057                       1698 ___str_4:
+      008057 0A                    1699 	.db 0x0a
+      008058 69 20 2D 3E 20 2D 3E  1700 	.ascii "i -> -> "
+             20
+      008060 00                    1701 	.db 0x00
+                                   1702 	.area CODE
+                                   1703 	.area CONST
+      008061                       1704 ___str_5:
+      008061 0A                    1705 	.db 0x0a
+      008062 49 32 43 5F 52 45 47  1706 	.ascii "I2C_REGS >.<"
+             53 20 3E 2E 3C
+      00806E 0A                    1707 	.db 0x0a
+      00806F 00                    1708 	.db 0x00
+                                   1709 	.area CODE
+                                   1710 	.area CONST
+      008070                       1711 ___str_6:
+      008070 0A                    1712 	.db 0x0a
+      008071 53 52 31 20 2D 3E 20  1713 	.ascii "SR1 -> "
+      008078 00                    1714 	.db 0x00
+                                   1715 	.area CODE
+                                   1716 	.area CONST
+      008079                       1717 ___str_7:
+      008079 53 52 32 20 2D 3E 20  1718 	.ascii "SR2 -> "
+      008080 00                    1719 	.db 0x00
+                                   1720 	.area CODE
+                                   1721 	.area CONST
+      008081                       1722 ___str_8:
+      008081 53 52 33 20 2D 3E 20  1723 	.ascii "SR3 -> "
+      008088 00                    1724 	.db 0x00
+                                   1725 	.area CODE
+                                   1726 	.area CONST
+      008089                       1727 ___str_9:
+      008089 43 52 31 20 2D 3E 20  1728 	.ascii "CR1 -> "
+      008090 00                    1729 	.db 0x00
+                                   1730 	.area CODE
+                                   1731 	.area CONST
+      008091                       1732 ___str_10:
+      008091 43 52 32 20 2D 3E 20  1733 	.ascii "CR2 -> "
+      008098 00                    1734 	.db 0x00
+                                   1735 	.area CODE
+                                   1736 	.area CONST
+      008099                       1737 ___str_11:
+      008099 44 52 20 2D 3E 20     1738 	.ascii "DR -> "
+      00809F 00                    1739 	.db 0x00
+                                   1740 	.area CODE
+                                   1741 	.area CONST
+      0080A0                       1742 ___str_12:
+      0080A0 55 41 52 54 5F 52 45  1743 	.ascii "UART_REGS >.<"
+             47 53 20 3E 2E 3C
+      0080AD 0A                    1744 	.db 0x0a
+      0080AE 00                    1745 	.db 0x00
+                                   1746 	.area CODE
+                                   1747 	.area CONST
+      0080AF                       1748 ___str_13:
+      0080AF 0A                    1749 	.db 0x0a
+      0080B0 53 52 20 2D 3E 20     1750 	.ascii "SR -> "
+      0080B6 00                    1751 	.db 0x00
+                                   1752 	.area CODE
+                                   1753 	.area CONST
+      0080B7                       1754 ___str_14:
+      0080B7 42 52 52 31 20 2D 3E  1755 	.ascii "BRR1 -> "
+             20
+      0080BF 00                    1756 	.db 0x00
+                                   1757 	.area CODE
+                                   1758 	.area CONST
+      0080C0                       1759 ___str_15:
+      0080C0 42 52 52 32 20 2D 3E  1760 	.ascii "BRR2 -> "
+             20
+      0080C8 00                    1761 	.db 0x00
+                                   1762 	.area CODE
+                                   1763 	.area CONST
+      0080C9                       1764 ___str_16:
+      0080C9 43 52 33 20 2D 3E 20  1765 	.ascii "CR3 -> "
+      0080D0 00                    1766 	.db 0x00
+                                   1767 	.area CODE
+                                   1768 	.area CONST
+      0080D1                       1769 ___str_17:
+      0080D1 43 52 34 20 2D 3E 20  1770 	.ascii "CR4 -> "
+      0080D8 00                    1771 	.db 0x00
+                                   1772 	.area CODE
+                                   1773 	.area CONST
+      0080D9                       1774 ___str_18:
+      0080D9 43 52 35 20 2D 3E 20  1775 	.ascii "CR5 -> "
+      0080E0 00                    1776 	.db 0x00
+                                   1777 	.area CODE
+                                   1778 	.area CONST
+      0080E1                       1779 ___str_19:
+      0080E1 47 54 52 20 2D 3E 20  1780 	.ascii "GTR -> "
+      0080E8 00                    1781 	.db 0x00
+                                   1782 	.area CODE
+                                   1783 	.area CONST
+      0080E9                       1784 ___str_20:
+      0080E9 50 53 43 52 20 2D 3E  1785 	.ascii "PSCR -> "
+             20
+      0080F1 00                    1786 	.db 0x00
+                                   1787 	.area CODE
+                                   1788 	.area CONST
+      0080F2                       1789 ___str_21:
+      0080F2 53 4D 20              1790 	.ascii "SM "
+      0080F5 00                    1791 	.db 0x00
+                                   1792 	.area CODE
+                                   1793 	.area CONST
+      0080F6                       1794 ___str_22:
+      0080F6 0D                    1795 	.db 0x0d
+      0080F7 0A                    1796 	.db 0x0a
+      0080F8 00                    1797 	.db 0x00
+                                   1798 	.area CODE
+                                   1799 	.area CONST
+      0080F9                       1800 ___str_23:
+      0080F9 52 4D                 1801 	.ascii "RM"
+      0080FB 0A                    1802 	.db 0x0a
+      0080FC 00                    1803 	.db 0x00
+                                   1804 	.area CODE
+                                   1805 	.area CONST
+      0080FD                       1806 ___str_24:
+      0080FD 53 54                 1807 	.ascii "ST"
+      0080FF 0A                    1808 	.db 0x0a
+      008100 00                    1809 	.db 0x00
+                                   1810 	.area CODE
+                                   1811 	.area CONST
+      008101                       1812 ___str_25:
+      008101 53 57 20              1813 	.ascii "SW "
+      008104 00                    1814 	.db 0x00
+                                   1815 	.area CODE
+                                   1816 	.area CONST
+      008105                       1817 ___str_26:
+      008105 20                    1818 	.ascii " "
+      008106 00                    1819 	.db 0x00
+                                   1820 	.area CODE
+                                   1821 	.area CONST
+      008107                       1822 ___str_27:
+      008107 53 4D                 1823 	.ascii "SM"
+      008109 00                    1824 	.db 0x00
+                                   1825 	.area CODE
+                                   1826 	.area CONST
+      00810A                       1827 ___str_28:
+      00810A 53 4E                 1828 	.ascii "SN"
+      00810C 00                    1829 	.db 0x00
+                                   1830 	.area CODE
+                                   1831 	.area CONST
+      00810D                       1832 ___str_29:
+      00810D 53 54                 1833 	.ascii "ST"
+      00810F 00                    1834 	.db 0x00
+                                   1835 	.area CODE
+                                   1836 	.area CONST
+      008110                       1837 ___str_30:
+      008110 52 4D                 1838 	.ascii "RM"
+      008112 00                    1839 	.db 0x00
+                                   1840 	.area CODE
+                                   1841 	.area CONST
+      008113                       1842 ___str_31:
+      008113 44 42                 1843 	.ascii "DB"
+      008115 00                    1844 	.db 0x00
+                                   1845 	.area CODE
+                                   1846 	.area CONST
+      008116                       1847 ___str_32:
+      008116 53 52                 1848 	.ascii "SR"
+      008118 00                    1849 	.db 0x00
+                                   1850 	.area CODE
+                                   1851 	.area CONST
+      008119                       1852 ___str_33:
+      008119 53 57                 1853 	.ascii "SW"
+      00811B 00                    1854 	.db 0x00
+                                   1855 	.area CODE
+                                   1856 	.area CONST
+      00811C                       1857 ___str_34:
+      00811C 53 53                 1858 	.ascii "SS"
+      00811E 0A                    1859 	.db 0x0a
+      00811F 00                    1860 	.db 0x00
+                                   1861 	.area CODE
+                                   1862 	.area INITIALIZER
+      008120                       1863 __xinit__buffer:
+      008120 00                    1864 	.db #0x00	; 0
+      008121 00                    1865 	.db 0x00
+      008122 00                    1866 	.db 0x00
+      008123 00                    1867 	.db 0x00
+      008124 00                    1868 	.db 0x00
+      008125 00                    1869 	.db 0x00
+      008126 00                    1870 	.db 0x00
+      008127 00                    1871 	.db 0x00
+      008128 00                    1872 	.db 0x00
+      008129 00                    1873 	.db 0x00
+      00812A 00                    1874 	.db 0x00
+      00812B 00                    1875 	.db 0x00
+      00812C 00                    1876 	.db 0x00
+      00812D 00                    1877 	.db 0x00
+      00812E 00                    1878 	.db 0x00
+      00812F 00                    1879 	.db 0x00
+      008130 00                    1880 	.db 0x00
+      008131 00                    1881 	.db 0x00
+      008132 00                    1882 	.db 0x00
+      008133 00                    1883 	.db 0x00
+      008134 00                    1884 	.db 0x00
+      008135 00                    1885 	.db 0x00
+      008136 00                    1886 	.db 0x00
+      008137 00                    1887 	.db 0x00
+      008138 00                    1888 	.db 0x00
+      008139 00                    1889 	.db 0x00
+      00813A 00                    1890 	.db 0x00
+      00813B 00                    1891 	.db 0x00
+      00813C 00                    1892 	.db 0x00
+      00813D 00                    1893 	.db 0x00
+      00813E 00                    1894 	.db 0x00
+      00813F 00                    1895 	.db 0x00
+      008140 00                    1896 	.db 0x00
+      008141 00                    1897 	.db 0x00
+      008142 00                    1898 	.db 0x00
+      008143 00                    1899 	.db 0x00
+      008144 00                    1900 	.db 0x00
+      008145 00                    1901 	.db 0x00
+      008146 00                    1902 	.db 0x00
+      008147 00                    1903 	.db 0x00
+      008148 00                    1904 	.db 0x00
+      008149 00                    1905 	.db 0x00
+      00814A 00                    1906 	.db 0x00
+      00814B 00                    1907 	.db 0x00
+      00814C 00                    1908 	.db 0x00
+      00814D 00                    1909 	.db 0x00
+      00814E 00                    1910 	.db 0x00
+      00814F 00                    1911 	.db 0x00
+      008150 00                    1912 	.db 0x00
+      008151 00                    1913 	.db 0x00
+      008152 00                    1914 	.db 0x00
+      008153 00                    1915 	.db 0x00
+      008154 00                    1916 	.db 0x00
+      008155 00                    1917 	.db 0x00
+      008156 00                    1918 	.db 0x00
+      008157 00                    1919 	.db 0x00
+      008158 00                    1920 	.db 0x00
+      008159 00                    1921 	.db 0x00
+      00815A 00                    1922 	.db 0x00
+      00815B 00                    1923 	.db 0x00
+      00815C 00                    1924 	.db 0x00
+      00815D 00                    1925 	.db 0x00
+      00815E 00                    1926 	.db 0x00
+      00815F 00                    1927 	.db 0x00
+      008160 00                    1928 	.db 0x00
+      008161 00                    1929 	.db 0x00
+      008162 00                    1930 	.db 0x00
+      008163 00                    1931 	.db 0x00
+      008164 00                    1932 	.db 0x00
+      008165 00                    1933 	.db 0x00
+      008166 00                    1934 	.db 0x00
+      008167 00                    1935 	.db 0x00
+      008168 00                    1936 	.db 0x00
+      008169 00                    1937 	.db 0x00
+      00816A 00                    1938 	.db 0x00
+      00816B 00                    1939 	.db 0x00
+      00816C 00                    1940 	.db 0x00
+      00816D 00                    1941 	.db 0x00
+      00816E 00                    1942 	.db 0x00
+      00816F 00                    1943 	.db 0x00
+      008170 00                    1944 	.db 0x00
+      008171 00                    1945 	.db 0x00
+      008172 00                    1946 	.db 0x00
+      008173 00                    1947 	.db 0x00
+      008174 00                    1948 	.db 0x00
+      008175 00                    1949 	.db 0x00
+      008176 00                    1950 	.db 0x00
+      008177 00                    1951 	.db 0x00
+      008178 00                    1952 	.db 0x00
+      008179 00                    1953 	.db 0x00
+      00817A 00                    1954 	.db 0x00
+      00817B 00                    1955 	.db 0x00
+      00817C 00                    1956 	.db 0x00
+      00817D 00                    1957 	.db 0x00
+      00817E 00                    1958 	.db 0x00
+      00817F 00                    1959 	.db 0x00
+      008180 00                    1960 	.db 0x00
+      008181 00                    1961 	.db 0x00
+      008182 00                    1962 	.db 0x00
+      008183 00                    1963 	.db 0x00
+      008184 00                    1964 	.db 0x00
+      008185 00                    1965 	.db 0x00
+      008186 00                    1966 	.db 0x00
+      008187 00                    1967 	.db 0x00
+      008188 00                    1968 	.db 0x00
+      008189 00                    1969 	.db 0x00
+      00818A 00                    1970 	.db 0x00
+      00818B 00                    1971 	.db 0x00
+      00818C 00                    1972 	.db 0x00
+      00818D 00                    1973 	.db 0x00
+      00818E 00                    1974 	.db 0x00
+      00818F 00                    1975 	.db 0x00
+      008190 00                    1976 	.db 0x00
+      008191 00                    1977 	.db 0x00
+      008192 00                    1978 	.db 0x00
+      008193 00                    1979 	.db 0x00
+      008194 00                    1980 	.db 0x00
+      008195 00                    1981 	.db 0x00
+      008196 00                    1982 	.db 0x00
+      008197 00                    1983 	.db 0x00
+      008198 00                    1984 	.db 0x00
+      008199 00                    1985 	.db 0x00
+      00819A 00                    1986 	.db 0x00
+      00819B 00                    1987 	.db 0x00
+      00819C 00                    1988 	.db 0x00
+      00819D 00                    1989 	.db 0x00
+      00819E 00                    1990 	.db 0x00
+      00819F 00                    1991 	.db 0x00
+      0081A0 00                    1992 	.db 0x00
+      0081A1 00                    1993 	.db 0x00
+      0081A2 00                    1994 	.db 0x00
+      0081A3 00                    1995 	.db 0x00
+      0081A4 00                    1996 	.db 0x00
+      0081A5 00                    1997 	.db 0x00
+      0081A6 00                    1998 	.db 0x00
+      0081A7 00                    1999 	.db 0x00
+      0081A8 00                    2000 	.db 0x00
+      0081A9 00                    2001 	.db 0x00
+      0081AA 00                    2002 	.db 0x00
+      0081AB 00                    2003 	.db 0x00
+      0081AC 00                    2004 	.db 0x00
+      0081AD 00                    2005 	.db 0x00
+      0081AE 00                    2006 	.db 0x00
+      0081AF 00                    2007 	.db 0x00
+      0081B0 00                    2008 	.db 0x00
+      0081B1 00                    2009 	.db 0x00
+      0081B2 00                    2010 	.db 0x00
+      0081B3 00                    2011 	.db 0x00
+      0081B4 00                    2012 	.db 0x00
+      0081B5 00                    2013 	.db 0x00
+      0081B6 00                    2014 	.db 0x00
+      0081B7 00                    2015 	.db 0x00
+      0081B8 00                    2016 	.db 0x00
+      0081B9 00                    2017 	.db 0x00
+      0081BA 00                    2018 	.db 0x00
+      0081BB 00                    2019 	.db 0x00
+      0081BC 00                    2020 	.db 0x00
+      0081BD 00                    2021 	.db 0x00
+      0081BE 00                    2022 	.db 0x00
+      0081BF 00                    2023 	.db 0x00
+      0081C0 00                    2024 	.db 0x00
+      0081C1 00                    2025 	.db 0x00
+      0081C2 00                    2026 	.db 0x00
+      0081C3 00                    2027 	.db 0x00
+      0081C4 00                    2028 	.db 0x00
+      0081C5 00                    2029 	.db 0x00
+      0081C6 00                    2030 	.db 0x00
+      0081C7 00                    2031 	.db 0x00
+      0081C8 00                    2032 	.db 0x00
+      0081C9 00                    2033 	.db 0x00
+      0081CA 00                    2034 	.db 0x00
+      0081CB 00                    2035 	.db 0x00
+      0081CC 00                    2036 	.db 0x00
+      0081CD 00                    2037 	.db 0x00
+      0081CE 00                    2038 	.db 0x00
+      0081CF 00                    2039 	.db 0x00
+      0081D0 00                    2040 	.db 0x00
+      0081D1 00                    2041 	.db 0x00
+      0081D2 00                    2042 	.db 0x00
+      0081D3 00                    2043 	.db 0x00
+      0081D4 00                    2044 	.db 0x00
+      0081D5 00                    2045 	.db 0x00
+      0081D6 00                    2046 	.db 0x00
+      0081D7 00                    2047 	.db 0x00
+      0081D8 00                    2048 	.db 0x00
+      0081D9 00                    2049 	.db 0x00
+      0081DA 00                    2050 	.db 0x00
+      0081DB 00                    2051 	.db 0x00
+      0081DC 00                    2052 	.db 0x00
+      0081DD 00                    2053 	.db 0x00
+      0081DE 00                    2054 	.db 0x00
+      0081DF 00                    2055 	.db 0x00
+      0081E0 00                    2056 	.db 0x00
+      0081E1 00                    2057 	.db 0x00
+      0081E2 00                    2058 	.db 0x00
+      0081E3 00                    2059 	.db 0x00
+      0081E4 00                    2060 	.db 0x00
+      0081E5 00                    2061 	.db 0x00
+      0081E6 00                    2062 	.db 0x00
+      0081E7 00                    2063 	.db 0x00
+      0081E8 00                    2064 	.db 0x00
+      0081E9 00                    2065 	.db 0x00
+      0081EA 00                    2066 	.db 0x00
+      0081EB 00                    2067 	.db 0x00
+      0081EC 00                    2068 	.db 0x00
+      0081ED 00                    2069 	.db 0x00
+      0081EE 00                    2070 	.db 0x00
+      0081EF 00                    2071 	.db 0x00
+      0081F0 00                    2072 	.db 0x00
+      0081F1 00                    2073 	.db 0x00
+      0081F2 00                    2074 	.db 0x00
+      0081F3 00                    2075 	.db 0x00
+      0081F4 00                    2076 	.db 0x00
+      0081F5 00                    2077 	.db 0x00
+      0081F6 00                    2078 	.db 0x00
+      0081F7 00                    2079 	.db 0x00
+      0081F8 00                    2080 	.db 0x00
+      0081F9 00                    2081 	.db 0x00
+      0081FA 00                    2082 	.db 0x00
+      0081FB 00                    2083 	.db 0x00
+      0081FC 00                    2084 	.db 0x00
+      0081FD 00                    2085 	.db 0x00
+      0081FE 00                    2086 	.db 0x00
+      0081FF 00                    2087 	.db 0x00
+      008200 00                    2088 	.db 0x00
+      008201 00                    2089 	.db 0x00
+      008202 00                    2090 	.db 0x00
+      008203 00                    2091 	.db 0x00
+      008204 00                    2092 	.db 0x00
+      008205 00                    2093 	.db 0x00
+      008206 00                    2094 	.db 0x00
+      008207 00                    2095 	.db 0x00
+      008208 00                    2096 	.db 0x00
+      008209 00                    2097 	.db 0x00
+      00820A 00                    2098 	.db 0x00
+      00820B 00                    2099 	.db 0x00
+      00820C 00                    2100 	.db 0x00
+      00820D 00                    2101 	.db 0x00
+      00820E 00                    2102 	.db 0x00
+      00820F 00                    2103 	.db 0x00
+      008210 00                    2104 	.db 0x00
+      008211 00                    2105 	.db 0x00
+      008212 00                    2106 	.db 0x00
+      008213 00                    2107 	.db 0x00
+      008214 00                    2108 	.db 0x00
+      008215 00                    2109 	.db 0x00
+      008216 00                    2110 	.db 0x00
+      008217 00                    2111 	.db 0x00
+      008218 00                    2112 	.db 0x00
+      008219 00                    2113 	.db 0x00
+      00821A 00                    2114 	.db 0x00
+      00821B 00                    2115 	.db 0x00
+      00821C 00                    2116 	.db 0x00
+      00821D 00                    2117 	.db 0x00
+      00821E 00                    2118 	.db 0x00
+      00821F                       2119 __xinit__a:
+      00821F 00                    2120 	.db #0x00	; 0
+      008220 00                    2121 	.db 0x00
+      008221 00                    2122 	.db 0x00
+      008222                       2123 __xinit__d_addr:
+      008222 00                    2124 	.db #0x00	; 0
+      008223                       2125 __xinit__p_size:
+      008223 00                    2126 	.db #0x00	; 0
+      008224                       2127 __xinit__d_size:
+      008224 00                    2128 	.db #0x00	; 0
+      008225                       2129 __xinit__p_bytes:
+      008225 00                    2130 	.db #0x00	; 0
+      008226                       2131 __xinit__data_buf:
+      008226 00                    2132 	.db #0x00	; 0
+      008227 00                    2133 	.db 0x00
+      008228 00                    2134 	.db 0x00
+      008229 00                    2135 	.db 0x00
+      00822A 00                    2136 	.db 0x00
+      00822B 00                    2137 	.db 0x00
+      00822C 00                    2138 	.db 0x00
+      00822D 00                    2139 	.db 0x00
+      00822E 00                    2140 	.db 0x00
+      00822F 00                    2141 	.db 0x00
+      008230 00                    2142 	.db 0x00
+      008231 00                    2143 	.db 0x00
+      008232 00                    2144 	.db 0x00
+      008233 00                    2145 	.db 0x00
+      008234 00                    2146 	.db 0x00
+      008235 00                    2147 	.db 0x00
+      008236 00                    2148 	.db 0x00
+      008237 00                    2149 	.db 0x00
+      008238 00                    2150 	.db 0x00
+      008239 00                    2151 	.db 0x00
+      00823A 00                    2152 	.db 0x00
+      00823B 00                    2153 	.db 0x00
+      00823C 00                    2154 	.db 0x00
+      00823D 00                    2155 	.db 0x00
+      00823E 00                    2156 	.db 0x00
+      00823F 00                    2157 	.db 0x00
+      008240 00                    2158 	.db 0x00
+      008241 00                    2159 	.db 0x00
+      008242 00                    2160 	.db 0x00
+      008243 00                    2161 	.db 0x00
+      008244 00                    2162 	.db 0x00
+      008245 00                    2163 	.db 0x00
+      008246 00                    2164 	.db 0x00
+      008247 00                    2165 	.db 0x00
+      008248 00                    2166 	.db 0x00
+      008249 00                    2167 	.db 0x00
+      00824A 00                    2168 	.db 0x00
+      00824B 00                    2169 	.db 0x00
+      00824C 00                    2170 	.db 0x00
+      00824D 00                    2171 	.db 0x00
+      00824E 00                    2172 	.db 0x00
+      00824F 00                    2173 	.db 0x00
+      008250 00                    2174 	.db 0x00
+      008251 00                    2175 	.db 0x00
+      008252 00                    2176 	.db 0x00
+      008253 00                    2177 	.db 0x00
+      008254 00                    2178 	.db 0x00
+      008255 00                    2179 	.db 0x00
+      008256 00                    2180 	.db 0x00
+      008257 00                    2181 	.db 0x00
+      008258 00                    2182 	.db 0x00
+      008259 00                    2183 	.db 0x00
+      00825A 00                    2184 	.db 0x00
+      00825B 00                    2185 	.db 0x00
+      00825C 00                    2186 	.db 0x00
+      00825D 00                    2187 	.db 0x00
+      00825E 00                    2188 	.db 0x00
+      00825F 00                    2189 	.db 0x00
+      008260 00                    2190 	.db 0x00
+      008261 00                    2191 	.db 0x00
+      008262 00                    2192 	.db 0x00
+      008263 00                    2193 	.db 0x00
+      008264 00                    2194 	.db 0x00
+      008265 00                    2195 	.db 0x00
+      008266 00                    2196 	.db 0x00
+      008267 00                    2197 	.db 0x00
+      008268 00                    2198 	.db 0x00
+      008269 00                    2199 	.db 0x00
+      00826A 00                    2200 	.db 0x00
+      00826B 00                    2201 	.db 0x00
+      00826C 00                    2202 	.db 0x00
+      00826D 00                    2203 	.db 0x00
+      00826E 00                    2204 	.db 0x00
+      00826F 00                    2205 	.db 0x00
+      008270 00                    2206 	.db 0x00
+      008271 00                    2207 	.db 0x00
+      008272 00                    2208 	.db 0x00
+      008273 00                    2209 	.db 0x00
+      008274 00                    2210 	.db 0x00
+      008275 00                    2211 	.db 0x00
+      008276 00                    2212 	.db 0x00
+      008277 00                    2213 	.db 0x00
+      008278 00                    2214 	.db 0x00
+      008279 00                    2215 	.db 0x00
+      00827A 00                    2216 	.db 0x00
+      00827B 00                    2217 	.db 0x00
+      00827C 00                    2218 	.db 0x00
+      00827D 00                    2219 	.db 0x00
+      00827E 00                    2220 	.db 0x00
+      00827F 00                    2221 	.db 0x00
+      008280 00                    2222 	.db 0x00
+      008281 00                    2223 	.db 0x00
+      008282 00                    2224 	.db 0x00
+      008283 00                    2225 	.db 0x00
+      008284 00                    2226 	.db 0x00
+      008285 00                    2227 	.db 0x00
+      008286 00                    2228 	.db 0x00
+      008287 00                    2229 	.db 0x00
+      008288 00                    2230 	.db 0x00
+      008289 00                    2231 	.db 0x00
+      00828A 00                    2232 	.db 0x00
+      00828B 00                    2233 	.db 0x00
+      00828C 00                    2234 	.db 0x00
+      00828D 00                    2235 	.db 0x00
+      00828E 00                    2236 	.db 0x00
+      00828F 00                    2237 	.db 0x00
+      008290 00                    2238 	.db 0x00
+      008291 00                    2239 	.db 0x00
+      008292 00                    2240 	.db 0x00
+      008293 00                    2241 	.db 0x00
+      008294 00                    2242 	.db 0x00
+      008295 00                    2243 	.db 0x00
+      008296 00                    2244 	.db 0x00
+      008297 00                    2245 	.db 0x00
+      008298 00                    2246 	.db 0x00
+      008299 00                    2247 	.db 0x00
+      00829A 00                    2248 	.db 0x00
+      00829B 00                    2249 	.db 0x00
+      00829C 00                    2250 	.db 0x00
+      00829D 00                    2251 	.db 0x00
+      00829E 00                    2252 	.db 0x00
+      00829F 00                    2253 	.db 0x00
+      0082A0 00                    2254 	.db 0x00
+      0082A1 00                    2255 	.db 0x00
+      0082A2 00                    2256 	.db 0x00
+      0082A3 00                    2257 	.db 0x00
+      0082A4 00                    2258 	.db 0x00
+      0082A5 00                    2259 	.db 0x00
+      0082A6 00                    2260 	.db 0x00
+      0082A7 00                    2261 	.db 0x00
+      0082A8 00                    2262 	.db 0x00
+      0082A9 00                    2263 	.db 0x00
+      0082AA 00                    2264 	.db 0x00
+      0082AB 00                    2265 	.db 0x00
+      0082AC 00                    2266 	.db 0x00
+      0082AD 00                    2267 	.db 0x00
+      0082AE 00                    2268 	.db 0x00
+      0082AF 00                    2269 	.db 0x00
+      0082B0 00                    2270 	.db 0x00
+      0082B1 00                    2271 	.db 0x00
+      0082B2 00                    2272 	.db 0x00
+      0082B3 00                    2273 	.db 0x00
+      0082B4 00                    2274 	.db 0x00
+      0082B5 00                    2275 	.db 0x00
+      0082B6 00                    2276 	.db 0x00
+      0082B7 00                    2277 	.db 0x00
+      0082B8 00                    2278 	.db 0x00
+      0082B9 00                    2279 	.db 0x00
+      0082BA 00                    2280 	.db 0x00
+      0082BB 00                    2281 	.db 0x00
+      0082BC 00                    2282 	.db 0x00
+      0082BD 00                    2283 	.db 0x00
+      0082BE 00                    2284 	.db 0x00
+      0082BF 00                    2285 	.db 0x00
+      0082C0 00                    2286 	.db 0x00
+      0082C1 00                    2287 	.db 0x00
+      0082C2 00                    2288 	.db 0x00
+      0082C3 00                    2289 	.db 0x00
+      0082C4 00                    2290 	.db 0x00
+      0082C5 00                    2291 	.db 0x00
+      0082C6 00                    2292 	.db 0x00
+      0082C7 00                    2293 	.db 0x00
+      0082C8 00                    2294 	.db 0x00
+      0082C9 00                    2295 	.db 0x00
+      0082CA 00                    2296 	.db 0x00
+      0082CB 00                    2297 	.db 0x00
+      0082CC 00                    2298 	.db 0x00
+      0082CD 00                    2299 	.db 0x00
+      0082CE 00                    2300 	.db 0x00
+      0082CF 00                    2301 	.db 0x00
+      0082D0 00                    2302 	.db 0x00
+      0082D1 00                    2303 	.db 0x00
+      0082D2 00                    2304 	.db 0x00
+      0082D3 00                    2305 	.db 0x00
+      0082D4 00                    2306 	.db 0x00
+      0082D5 00                    2307 	.db 0x00
+      0082D6 00                    2308 	.db 0x00
+      0082D7 00                    2309 	.db 0x00
+      0082D8 00                    2310 	.db 0x00
+      0082D9 00                    2311 	.db 0x00
+      0082DA 00                    2312 	.db 0x00
+      0082DB 00                    2313 	.db 0x00
+      0082DC 00                    2314 	.db 0x00
+      0082DD 00                    2315 	.db 0x00
+      0082DE 00                    2316 	.db 0x00
+      0082DF 00                    2317 	.db 0x00
+      0082E0 00                    2318 	.db 0x00
+      0082E1 00                    2319 	.db 0x00
+      0082E2 00                    2320 	.db 0x00
+      0082E3 00                    2321 	.db 0x00
+      0082E4 00                    2322 	.db 0x00
+      0082E5 00                    2323 	.db 0x00
+      0082E6 00                    2324 	.db 0x00
+      0082E7 00                    2325 	.db 0x00
+      0082E8 00                    2326 	.db 0x00
+      0082E9 00                    2327 	.db 0x00
+      0082EA 00                    2328 	.db 0x00
+      0082EB 00                    2329 	.db 0x00
+      0082EC 00                    2330 	.db 0x00
+      0082ED 00                    2331 	.db 0x00
+      0082EE 00                    2332 	.db 0x00
+      0082EF 00                    2333 	.db 0x00
+      0082F0 00                    2334 	.db 0x00
+      0082F1 00                    2335 	.db 0x00
+      0082F2 00                    2336 	.db 0x00
+      0082F3 00                    2337 	.db 0x00
+      0082F4 00                    2338 	.db 0x00
+      0082F5 00                    2339 	.db 0x00
+      0082F6 00                    2340 	.db 0x00
+      0082F7 00                    2341 	.db 0x00
+      0082F8 00                    2342 	.db 0x00
+      0082F9 00                    2343 	.db 0x00
+      0082FA 00                    2344 	.db 0x00
+      0082FB 00                    2345 	.db 0x00
+      0082FC 00                    2346 	.db 0x00
+      0082FD 00                    2347 	.db 0x00
+      0082FE 00                    2348 	.db 0x00
+      0082FF 00                    2349 	.db 0x00
+      008300 00                    2350 	.db 0x00
+      008301 00                    2351 	.db 0x00
+      008302 00                    2352 	.db 0x00
+      008303 00                    2353 	.db 0x00
+      008304 00                    2354 	.db 0x00
+      008305 00                    2355 	.db 0x00
+      008306 00                    2356 	.db 0x00
+      008307 00                    2357 	.db 0x00
+      008308 00                    2358 	.db 0x00
+      008309 00                    2359 	.db 0x00
+      00830A 00                    2360 	.db 0x00
+      00830B 00                    2361 	.db 0x00
+      00830C 00                    2362 	.db 0x00
+      00830D 00                    2363 	.db 0x00
+      00830E 00                    2364 	.db 0x00
+      00830F 00                    2365 	.db 0x00
+      008310 00                    2366 	.db 0x00
+      008311 00                    2367 	.db 0x00
+      008312 00                    2368 	.db 0x00
+      008313 00                    2369 	.db 0x00
+      008314 00                    2370 	.db 0x00
+      008315 00                    2371 	.db 0x00
+      008316 00                    2372 	.db 0x00
+      008317 00                    2373 	.db 0x00
+      008318 00                    2374 	.db 0x00
+      008319 00                    2375 	.db 0x00
+      00831A 00                    2376 	.db 0x00
+      00831B 00                    2377 	.db 0x00
+      00831C 00                    2378 	.db 0x00
+      00831D 00                    2379 	.db 0x00
+      00831E 00                    2380 	.db 0x00
+      00831F 00                    2381 	.db 0x00
+      008320 00                    2382 	.db 0x00
+      008321 00                    2383 	.db 0x00
+      008322 00                    2384 	.db 0x00
+      008323 00                    2385 	.db 0x00
+      008324 00                    2386 	.db 0x00
+      008325                       2387 __xinit__current_dev:
+      008325 77                    2388 	.db #0x77	; 119	'w'
+                                   2389 	.area CABS (ABS)

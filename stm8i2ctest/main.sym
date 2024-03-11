@@ -12,93 +12,96 @@ Symbol Table
     ___memcpy                                                      ****** GX
     ___sdcc_external_startup                                       ****** GX
   8 ___str_0                                                       000000 R
-  8 ___str_1                                                       00000E R
-  8 ___str_10                                                      000061 R
-  8 ___str_11                                                      000069 R
-  8 ___str_12                                                      000072 R
-  8 ___str_13                                                      00007B R
-  8 ___str_14                                                      000083 R
-  8 ___str_15                                                      00008B R
-  8 ___str_16                                                      000093 R
-  8 ___str_17                                                      00009B R
-  8 ___str_18                                                      0000A4 R
-  8 ___str_19                                                      0000A8 R
-  8 ___str_2                                                       000013 R
-  8 ___str_20                                                      0000AB R
-  8 ___str_21                                                      0000AF R
-  8 ___str_22                                                      0000B3 R
-  8 ___str_23                                                      0000B7 R
-  8 ___str_24                                                      0000B9 R
-  8 ___str_25                                                      0000BC R
-  8 ___str_26                                                      0000BF R
-  8 ___str_27                                                      0000C2 R
-  8 ___str_28                                                      0000C5 R
-  8 ___str_29                                                      0000C8 R
-  8 ___str_3                                                       000022 R
-  8 ___str_30                                                      0000CB R
-  8 ___str_31                                                      0000CE R
-  8 ___str_4                                                       00002B R
-  8 ___str_5                                                       000033 R
-  8 ___str_6                                                       00003B R
-  8 ___str_7                                                       000043 R
-  8 ___str_8                                                       00004B R
-  8 ___str_9                                                       000052 R
+  8 ___str_1                                                       00000A R
+  8 ___str_10                                                      000064 R
+  8 ___str_11                                                      00006C R
+  8 ___str_12                                                      000073 R
+  8 ___str_13                                                      000082 R
+  8 ___str_14                                                      00008A R
+  8 ___str_15                                                      000093 R
+  8 ___str_16                                                      00009C R
+  8 ___str_17                                                      0000A4 R
+  8 ___str_18                                                      0000AC R
+  8 ___str_19                                                      0000B4 R
+  8 ___str_2                                                       00000F R
+  8 ___str_20                                                      0000BC R
+  8 ___str_21                                                      0000C5 R
+  8 ___str_22                                                      0000C9 R
+  8 ___str_23                                                      0000CC R
+  8 ___str_24                                                      0000D0 R
+  8 ___str_25                                                      0000D4 R
+  8 ___str_26                                                      0000D8 R
+  8 ___str_27                                                      0000DA R
+  8 ___str_28                                                      0000DD R
+  8 ___str_29                                                      0000E0 R
+  8 ___str_3                                                       00001B R
+  8 ___str_30                                                      0000E3 R
+  8 ___str_31                                                      0000E6 R
+  8 ___str_32                                                      0000E9 R
+  8 ___str_33                                                      0000EC R
+  8 ___str_34                                                      0000EF R
+  8 ___str_4                                                       00002A R
+  8 ___str_5                                                       000034 R
+  8 ___str_6                                                       000043 R
+  8 ___str_7                                                       00004C R
+  8 ___str_8                                                       000054 R
+  8 ___str_9                                                       00005C R
     __divsint                                                      ****** GX
   5 __interrupt_vect                                               000000 R
     __modsint                                                      ****** GX
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000004 R
   3 __start__stack                                                 000000 R
-  9 __xinit__a                                                     000100 R
+  9 __xinit__a                                                     0000FF R
   9 __xinit__buffer                                                000000 R
-  9 __xinit__current_dev                                           000207 R
-  9 __xinit__d_addr                                                000103 R
-  9 __xinit__d_size                                                000105 R
-  9 __xinit__data_buf                                              000107 R
-  9 __xinit__p_bytes                                               000106 R
-  9 __xinit__p_size                                                000104 R
-  2 _a                                                             000100 GR
+  9 __xinit__current_dev                                           000205 R
+  9 __xinit__d_addr                                                000102 R
+  9 __xinit__d_size                                                000104 R
+  9 __xinit__data_buf                                              000106 R
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
+  9 __xinit__p_bytes                                               000105 R
+  9 __xinit__p_size                                                000103 R
+  2 _a                                                             0000FF GR
   2 _buffer                                                        000000 GR
-  A _char_buffer_to_int                                            000208 GR
-  A _cm_DB                                                         0005F3 GR
-  A _cm_RM                                                         0005E9 GR
-  A _cm_SM                                                         0005BD GR
-  A _cm_SN                                                         0005E3 GR
-  A _cm_SR                                                         000604 GR
-  A _cm_ST                                                         0005F6 GR
-  A _cm_SW                                                         000613 GR
-  A _command_switcher                                              00071F GR
+  A _char_buffer_to_int                                            000260 GR
+  A _cm_DB                                                         000696 GR
+  A _cm_RM                                                         00068C GR
+  A _cm_SM                                                         000660 GR
+  A _cm_SN                                                         000686 GR
+  A _cm_SR                                                         0006A7 GR
+  A _cm_ST                                                         000699 GR
+  A _cm_SW                                                         0006B6 GR
+  A _command_switcher                                              0007C2 GR
   A _convert_chars_to_int                                          000126 GR
-  A _convert_int_to_binary                                         00014C GR
+  A _convert_int_to_binary                                         000189 GR
   A _convert_int_to_chars                                          0000A1 GR
-  2 _current_dev                                                   000207 GR
-  2 _d_addr                                                        000103 GR
-  2 _d_size                                                        000105 GR
-  2 _data_buf                                                      000107 GR
-  A _data_handler                                                  00065B GR
+  2 _current_dev                                                   000205 GR
+  2 _d_addr                                                        000102 GR
+  2 _d_size                                                        000104 GR
+  2 _data_buf                                                      000106 GR
+  A _data_handler                                                  0006FE GR
   A _delay                                                         000000 GR
-  A _get_addr_from_buff                                            000184 GR
-  A _get_size_from_buff                                            0001C4 GR
-  A _i2c_init                                                      0004D0 GR
-  A _i2c_read                                                      00053C GR
-  A _i2c_scan                                                      000585 GR
-  A _i2c_send_address                                              0004FB GR
-  A _i2c_start                                                     0004F1 GR
-  A _i2c_stop                                                      00050B GR
-  A _i2c_write                                                     000510 GR
-  A _main                                                          00076D GR
+  A _get_addr_from_buff                                            0001C1 GR
+  A _get_size_from_buff                                            000206 GR
+  A _i2c_init                                                      000573 GR
+  A _i2c_read                                                      0005DF GR
+  A _i2c_scan                                                      000628 GR
+  A _i2c_send_address                                              00059E GR
+  A _i2c_start                                                     000594 GR
+  A _i2c_stop                                                      0005AE GR
+  A _i2c_write                                                     0005B3 GR
+  A _main                                                          000810 GR
     _memcmp                                                        ****** GX
     _memset                                                        ****** GX
-  2 _p_bytes                                                       000106 GR
-  2 _p_size                                                        000104 GR
-  A _status_check                                                  000292 GR
+  2 _p_bytes                                                       000105 GR
+  2 _p_size                                                        000103 GR
+  A _status_check                                                  000335 GR
     _strlen                                                        ****** GX
-  A _uart_init                                                     0004B3 GR
+  A _uart_init                                                     000556 GR
   A _uart_read                                                     00006B GR
   A _uart_write                                                    000040 GR
     l_DATA                                                         ****** GX
@@ -115,14 +118,14 @@ Area Table
 
    0 _CODE                                      size      0   flags    0
    1 DATA                                       size      0   flags    0
-   2 INITIALIZED                                size    208   flags    0
+   2 INITIALIZED                                size    206   flags    0
    3 SSEG                                       size      1   flags    0
    4 DABS                                       size      0   flags    8
    5 HOME                                       size      7   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
-   8 CONST                                      size     D2   flags    0
-   9 INITIALIZER                                size    208   flags    0
-   A CODE                                       size    782   flags    0
+   8 CONST                                      size     F3   flags    0
+   9 INITIALIZER                                size    206   flags    0
+   A CODE                                       size    825   flags    0
    B CABS                                       size      0   flags    8
 

@@ -21,42 +21,42 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     000000D2  l_CONST                         
-     00000208  l_INITIALIZED                   
-     00000208  l_INITIALIZER                   
-     00000209  s_SSEG                          
-     00000878  l_CODE                          
+     000000F3  l_CONST                         
+     00000206  l_INITIALIZED                   
+     00000206  l_INITIALIZER                   
+     00000207  s_SSEG                          
+     0000091B  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     000080FF  s_INITIALIZER                   
-     00008307  s_CODE                          
+     00008120  s_INITIALIZER                   
+     00008326  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000001    00000208 =         520. bytes (REL,CON)
+INITIALIZED                         00000001    00000206 =         518. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000001  _buffer                            main
-     00000101  _a                                 main
-     00000104  _d_addr                            main
-     00000105  _p_size                            main
-     00000106  _d_size                            main
-     00000107  _p_bytes                           main
-     00000108  _data_buf                          main
-     00000208  _current_dev                       main
+     00000100  _a                                 main
+     00000103  _d_addr                            main
+     00000104  _p_size                            main
+     00000105  _d_size                            main
+     00000106  _p_bytes                           main
+     00000107  _data_buf                          main
+     00000206  _current_dev                       main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 3.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000209    00000001 =           1. bytes (REL,CON)
+SSEG                                00000207    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -92,7 +92,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    000000D2 =         210. bytes (REL,CON)
+CONST                               0000802D    000000F3 =         243. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -101,7 +101,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         000080FF    00000208 =         520. bytes (REL,CON)
+INITIALIZER                         00008120    00000206 =         518. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -110,48 +110,48 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008307    00000878 =        2168. bytes (REL,CON)
+CODE                                00008326    0000091B =        2331. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008307  _delay                             main
-     00008335  _UART_TX                           main
-     0000833E  _UART_RX                           main
-     00008347  _uart_write                        main
-     00008372  _uart_read                         main
-     000083A8  _convert_int_to_chars              main
-     0000842D  _convert_chars_to_int              main
-     00008453  _convert_int_to_binary             main
-     0000848B  _get_addr_from_buff                main
-     000084CB  _get_size_from_buff                main
-     0000850F  _char_buffer_to_int                main
-     00008599  _status_check                      main
-     000087BA  _uart_init                         main
-     000087D7  _i2c_init                          main
-     000087F8  _i2c_start                         main
-     00008802  _i2c_send_address                  main
-     00008812  _i2c_stop                          main
-     00008817  _i2c_write                         main
-     00008843  _i2c_read                          main
-     0000888C  _i2c_scan                          main
-     000088C4  _cm_SM                             main
-     000088EA  _cm_SN                             main
-     000088F0  _cm_RM                             main
-     000088FA  _cm_DB                             main
-     000088FD  _cm_ST                             main
-     0000890B  _cm_SR                             main
-     0000891A  _cm_SW                             main
-     00008962  _data_handler                      main
-     00008A26  _command_switcher                  main
-     00008A74  _main                              main
-     00008A89  _memcmp                            _memcmp
-     00008ACC  ___memcpy                          
-     00008ACC  _memcpy                            
-     00008B1F  _memset                            _memset
-     00008B41  ___sdcc_external_startup           _startup
-     00008B43  _strlen                            _strlen
-     00008B50  __modsint                          
-     00008B68  __divsint                          
+     00008326  _delay                             main
+     00008354  _UART_TX                           main
+     0000835D  _UART_RX                           main
+     00008366  _uart_write                        main
+     00008391  _uart_read                         main
+     000083C7  _convert_int_to_chars              main
+     0000844C  _convert_chars_to_int              main
+     000084AF  _convert_int_to_binary             main
+     000084E7  _get_addr_from_buff                main
+     0000852C  _get_size_from_buff                main
+     00008586  _char_buffer_to_int                main
+     0000865B  _status_check                      main
+     0000887C  _uart_init                         main
+     00008899  _i2c_init                          main
+     000088BA  _i2c_start                         main
+     000088C4  _i2c_send_address                  main
+     000088D4  _i2c_stop                          main
+     000088D9  _i2c_write                         main
+     00008905  _i2c_read                          main
+     0000894E  _i2c_scan                          main
+     00008986  _cm_SM                             main
+     000089AC  _cm_SN                             main
+     000089B2  _cm_RM                             main
+     000089BC  _cm_DB                             main
+     000089BF  _cm_ST                             main
+     000089CD  _cm_SR                             main
+     000089DC  _cm_SW                             main
+     00008A24  _data_handler                      main
+     00008AE8  _command_switcher                  main
+     00008B36  _main                              main
+     00008B4B  _memcmp                            _memcmp
+     00008B8E  ___memcpy                          
+     00008B8E  _memcpy                            
+     00008BE1  _memset                            _memset
+     00008C03  ___sdcc_external_startup           _startup
+     00008C05  _strlen                            _strlen
+     00008C12  __modsint                          
+     00008C2A  __divsint                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
