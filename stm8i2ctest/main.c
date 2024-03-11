@@ -99,7 +99,7 @@ void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
     }
 }
 
-int convert_chars_to_int(char* rx_chars_int) {
+uint8_t convert_chars_to_int(char* rx_chars_int) {
     uint8_t result = 0;
 
     for (int i = 0; i < 3; i++) {
@@ -166,31 +166,37 @@ void char_buffer_to_int(void)
     uint8_t counter = d_size;
     uint8_t i = p_bytes;
     uint8_t buf_i = 0;
-    while(counter > 0)
+    while(counter > 0) // 
     {
-        if(buffer[i] == 32)
+        if(buffer[i] == ' ')
         {
             uint8_t buf_counter = 0;
             while(1)
             {
-                if(buffer[i+1] == 32)
+                i++;
+                if(buffer[i] == ' ' || buffer[i] == '\r\n')
                 break;
                 buf_counter++;
             }
-            char ar[4]={0};
             memcpy(a, &buffer[i], buf_counter);
+            //uart_write("AAAA\n");
+            //uart_write(a + '\0');
+            //uart_write("\nBBBB\n");
             data_buf[buf_i] = convert_chars_to_int(a);
             counter--;
             buf_i++;
-            convert_int_to_chars(data_buf[buf_i], ar);
-            uart_write(ar);
         }
-        else if(buffer[i] == 10)
+        else if(buffer[i] == '\r\n')
         {
+            convert_int_to_chars(buf_i, a);
+            uart_write("buf count -> ");
+            uart_write(a);
+            uart_write(" <-\n");
             break;
         }
+        else
         i++;
-        uart_write("while");
+
     }
 
 }
@@ -327,37 +333,25 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
-    I2C_DR = d_addr; // Отправка адреса устройства с битом на запись
-    uart_write("flag1\r");
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
-        uart_write(".");
-    uart_write("flag2\r");
+    I2C_DR = d_addr; // Отправка адреса регистра
     for(int i = 0;i < d_size;i++)
     {
-        uart_write("flag3\r");
         I2C_DR = data_buf[i];
-        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
-            uart_write(".");
-        uart_write("flag4\r");
+        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
     }
 }
 
 void i2c_read(void){
     I2C_DR = (current_dev << 1) & (1 << 0);
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
-        uart_write(".");
-    uart_write("\r\n");
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+
     I2C_DR = d_addr;
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
-        uart_write(".");
-    uart_write("\r\n");
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
     i2c_stop();
     for(int i = 0;i < d_size;i++)
     {
         data_buf[i] = I2C_DR;
-        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)))
-            uart_write(".");
-        uart_write("\r\n");
+        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 
     }
 }
@@ -424,15 +418,10 @@ void cm_SR(void)
 void cm_SW(void)
 {
     char ar[4]={0};
-    uart_write("f1");
     i2c_start();
-    uart_write("f2");
     i2c_send_address(current_dev);
-    uart_write("f3");
     i2c_write();
-    uart_write("f4");
     i2c_stop();
-    uart_write("f5");
     uart_write("SW ");
     convert_int_to_chars(d_addr, ar);
     uart_write(ar);
@@ -447,13 +436,14 @@ void cm_SW(void)
 | | | |/ _ \ | | / _ \   | |_| | / _ \ |  \| | | | | |   |  _| | |_) |
 | |_| / ___ \| |/ ___ \  |  _  |/ ___ \| |\  | |_| | |___| |___|  _ < 
 |____/_/   \_\_/_/   \_\ |_| |_/_/   \_\_| \_|____/|_____|_____|_| \_\
-// */
+*/
 int data_handler(void)
 {
     p_size = 0;
     p_bytes = 0;
     d_addr = 0;
     d_size = 0;
+    memset(a, 0, sizeof(a));
     memset(data_buf, 0, sizeof(data_buf));
     if(memcmp(&buffer[0],"SM",2) == 0)
         return 1;
@@ -484,12 +474,7 @@ void command_switcher(void)
 {
     char ar[4]={0};
 
-    int af = data_handler();
-    convert_int_to_chars(af, ar);
-    uart_write("preswitch\n");
-    uart_write(ar);
-    uart_write("\n");
-    switch(af)
+    switch(data_handler())
     {
         case 1:
             cm_SM();
@@ -501,7 +486,6 @@ void command_switcher(void)
             cm_SR();
         break;
         case 4:
-            uart_write("switch\n");
             cm_SW();
         break;
         case 5:
