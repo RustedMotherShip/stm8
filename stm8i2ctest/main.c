@@ -21,7 +21,7 @@ uint8_t p_size = 0;
 uint8_t d_size = 0;
 uint8_t p_bytes = 0;
 uint8_t data_buf[255] = {0};
-uint8_t current_dev = 119;
+uint8_t current_dev = 0;
 /* Simple busy loop delay */
 void delay(unsigned long count) {
     while (count--)
@@ -204,31 +204,31 @@ void char_buffer_to_int(void)
 void status_check(void){
     char rx_binary_chars[9]={0};
     uart_write("\nI2C_REGS >.<\n");
-    // convert_int_to_binary(I2C_SR1, rx_binary_chars);
-    // uart_write("\nSR1 -> ");
-    // uart_write(rx_binary_chars);
-    // uart_write(" <-\n");
-    // convert_int_to_binary(I2C_SR2, rx_binary_chars);
-    // uart_write("SR2 -> ");
-    // uart_write(rx_binary_chars);
-    // uart_write(" <-\n");
-    // convert_int_to_binary(I2C_SR3, rx_binary_chars);
-    // uart_write("SR3 -> ");
-    // uart_write(rx_binary_chars);
-    // uart_write(" <-\n");
-    // convert_int_to_binary(I2C_CR1, rx_binary_chars);
-    // uart_write("CR1 -> ");
-    // uart_write(rx_binary_chars);
-    // uart_write(" <-\n");
-    // convert_int_to_binary(I2C_CR2, rx_binary_chars);
-    // uart_write("CR2 -> ");
-    // uart_write(rx_binary_chars);
-    // uart_write(" <-\n");
+    convert_int_to_binary(I2C_SR1, rx_binary_chars);
+    uart_write("\nSR1 -> ");
+    uart_write(rx_binary_chars);
+    uart_write(" <-\n");
+    convert_int_to_binary(I2C_SR2, rx_binary_chars);
+    uart_write("SR2 -> ");
+    uart_write(rx_binary_chars);
+    uart_write(" <-\n");
+    convert_int_to_binary(I2C_SR3, rx_binary_chars);
+    uart_write("SR3 -> ");
+    uart_write(rx_binary_chars);
+    uart_write(" <-\n");
+    convert_int_to_binary(I2C_CR1, rx_binary_chars);
+    uart_write("CR1 -> ");
+    uart_write(rx_binary_chars);
+    uart_write(" <-\n");
+    convert_int_to_binary(I2C_CR2, rx_binary_chars);
+    uart_write("CR2 -> ");
+    uart_write(rx_binary_chars);
+    uart_write(" <-\n");
     convert_int_to_binary(I2C_DR, rx_binary_chars);
     uart_write("DR -> ");
     uart_write(rx_binary_chars);
     uart_write(" <-\n");
-    // uart_write("UART_REGS >.<\n");
+    uart_write("UART_REGS >.<\n");
     // convert_int_to_binary(UART1_SR, rx_binary_chars);
     // uart_write("\nSR -> ");
     // uart_write(rx_binary_chars);
@@ -319,7 +319,7 @@ void i2c_start(void) {
 
 void i2c_send_address(uint8_t address) {
     I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
-    status_check();
+    //status_check();
     while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 }
 
@@ -329,27 +329,34 @@ void i2c_stop(void) {
 }
 void i2c_write(void){
     I2C_DR = d_addr;
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
+    status_check();
+    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
+    status_check();
     for(int i = 0;i < d_size;i++)
     {
         I2C_DR = data_buf[i];
         status_check();
-        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+        while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2)));
+        status_check();
     }
 }
 
 void i2c_read(void){
     I2C_DR = (current_dev << 1) & (1 << 0);
+    status_check();
     while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 
     I2C_DR = d_addr;
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+    status_check();
+    while (!(I2C_SR1 & (1 << 6)) && !(I2C_SR2 & (1 << 2)));
     i2c_stop();
     for(int i = 0;i < d_size;i++)
     {
+        status_check();
         data_buf[i] = I2C_DR;
-        while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-
+        status_check();
+        while (!(I2C_SR1 & (1 << 6)) && !(I2C_SR2 & (1 << 2)));
+        status_check();
     }
 }
 void i2c_scan(void) {
