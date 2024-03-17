@@ -324,7 +324,7 @@ void i2c_send_address(uint8_t address) {
 }
 
 void i2c_stop(void) {
-    I2C_CR2 = I2C_CR2 | (1 << 1); // Отправка стопового сигнала
+    I2C_CR2 = I2C_CR2 | (1 << 1);// Отправка стопового сигнала
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
@@ -342,20 +342,22 @@ void i2c_write(void){
 }
 
 void i2c_read(void){
-    I2C_DR = (current_dev << 1) & (1 << 0);
-    status_check();
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
-
     I2C_DR = d_addr;
     status_check();
-    while (!(I2C_SR1 & (1 << 6)) && !(I2C_SR2 & (1 << 2)));
+    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
     i2c_stop();
+    i2c_start();
+    I2C_DR = (current_dev << 1) | (1 << 0);
+    status_check();
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+    status_check();
+
     for(int i = 0;i < d_size;i++)
     {
         status_check();
         data_buf[i] = I2C_DR;
         status_check();
-        while (!(I2C_SR1 & (1 << 6)) && !(I2C_SR2 & (1 << 2)));
+        while (!(I2C_SR1 & (1 << 6)));
         status_check();
     }
 }
