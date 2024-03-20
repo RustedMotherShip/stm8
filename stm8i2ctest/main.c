@@ -13,14 +13,15 @@ ST (addr) - set dev addr manually
 RM - set dev number 0
 DB - all registers check
 */
-char buffer[255] = {0};
+uint8_t status_registers[256] = {0};
+char buffer[256] = {0};
 char a[3] = {0};
 #define addr_p 3;
 uint8_t d_addr = 0;
 uint8_t p_size = 0;
 uint8_t d_size = 0;
 uint8_t p_bytes = 0;
-uint8_t data_buf[255] = {0};
+uint8_t data_buf[256] = {0};
 uint8_t current_dev = 0;
 /* Simple busy loop delay */
 void delay(unsigned long count) {
@@ -39,27 +40,35 @@ void UART_TX(unsigned char value)
     UART1_DR = value;
     while(!(UART1_SR & UART_SR_TXE));
 }
-unsigned char UART_RX(void)
-{
-    while(!(UART1_SR & UART_SR_TXE));
-    return UART1_DR;
-}
+
 int uart_write(const char *str) {
     char i;
     for(i = 0; i < strlen(str); i++) {
          // !Transmit data register empty
         UART_TX(str[i]);
     }
+    
     return(i); // Bytes sent
+}
+unsigned char UART_RX(void)
+{
+    //uart_write("RX_start\n");
+    while(!(UART1_SR & UART_SR_TXE));
+    //uart_write("while end\n");
+    return UART1_DR;
 }
 int uart_read(void)
 {
+    //uart_write("Start reading\n");
     memset(buffer, 0, sizeof(buffer));
+    //uart_write("memset\n");
     int i = 0;
     while(i<256)
     {
+        
         if(UART1_SR & UART_SR_RXNE)
         {
+        //uart_write("if\n");
         buffer[i] = UART_RX();
         if(buffer[i] == '\r\n' )
         {
@@ -69,6 +78,7 @@ int uart_read(void)
         i++;
         }
     }
+    //uart_write("end\n");
     return 0;
 }
 /*
@@ -201,6 +211,14 @@ void char_buffer_to_int(void)
  ___) || | | |  | | (_) | | |_| | |___|  _|  ___) |
 |____/ |_| |_|  |_|\___/  |____/|_____|_|   |____/ 
 */
+void reg_check(void)
+{
+    status_registers[0] = I2C_SR1;
+    status_registers[1] = I2C_SR2;
+    status_registers[2] = I2C_SR3;
+}
+
+
 void status_check(void){
     char rx_binary_chars[9]={0};
     uart_write("\nI2C_REGS >.<\n");
@@ -319,8 +337,9 @@ void i2c_start(void) {
 
 void i2c_send_address(uint8_t address) {
     I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
-    //status_check();
+    reg_check();
     while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+    
 }
 
 void i2c_stop(void) {
@@ -328,28 +347,28 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
+    I2C_DR = 0;
+    reg_check();
     I2C_DR = d_addr;
-    status_check();
-    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
-    status_check();
+    reg_check();
+    while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
     for(int i = 0;i < d_size;i++)
     {
         I2C_DR = data_buf[i];
-        status_check();
-        while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2)));
-        status_check();
+        reg_check();
+        while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)));
     }
 }
 
 void i2c_read(void){
     I2C_DR = d_addr;
     status_check();
-    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR2 & (1 << 2))); // Отправка адреса регистра
+    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
     i2c_stop();
     i2c_start();
     I2C_DR = (current_dev << 1) | (1 << 0);
     status_check();
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR1 & (1 << 2)));
     status_check();
 
     for(int i = 0;i < d_size;i++)
