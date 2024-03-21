@@ -213,9 +213,19 @@ void char_buffer_to_int(void)
 */
 void reg_check(void)
 {
+    char rx_binary_chars[9]={0};
+    convert_int_to_binary(I2C_SR1, rx_binary_chars);
     status_registers[0] = I2C_SR1;
+    convert_int_to_binary(I2C_SR2, rx_binary_chars);
     status_registers[1] = I2C_SR2;
+    convert_int_to_binary(I2C_SR3, rx_binary_chars);
     status_registers[2] = I2C_SR3;
+    convert_int_to_binary(I2C_CR1, rx_binary_chars);
+    status_registers[3] = I2C_CR1;
+    convert_int_to_binary(I2C_CR2, rx_binary_chars);
+    status_registers[4] = I2C_CR2;
+    convert_int_to_binary(I2C_DR, rx_binary_chars);
+    status_registers[5] = I2C_DR;
 }
 
 
@@ -246,7 +256,7 @@ void status_check(void){
     uart_write("DR -> ");
     uart_write(rx_binary_chars);
     uart_write(" <-\n");
-    uart_write("UART_REGS >.<\n");
+    //uart_write("UART_REGS >.<\n");
     // convert_int_to_binary(UART1_SR, rx_binary_chars);
     // uart_write("\nSR -> ");
     // uart_write(rx_binary_chars);
@@ -356,29 +366,33 @@ void i2c_write(void){
     {
         I2C_DR = data_buf[i];
         reg_check();
-        while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)));
+        while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2)));
+        reg_check();
     }
 }
 
 void i2c_read(void){
+    I2C_CR2 = I2C_CR2 | (1 << 2);
+    I2C_DR = 0;
+    reg_check();
     I2C_DR = d_addr;
-    status_check();
-    while (!(I2C_SR1 & (1 << 7)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
-    i2c_stop();
+    reg_check();
+    while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+
+    //Начало чтения
     i2c_start();
     I2C_DR = (current_dev << 1) | (1 << 0);
-    status_check();
-    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR1 & (1 << 2)));
-    status_check();
-
+    reg_check();
+    while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR1 & (1 << 2)) && !(I2C_SR1 & (1 << 6)));
+    reg_check();
     for(int i = 0;i < d_size;i++)
     {
-        status_check();
         data_buf[i] = I2C_DR;
-        status_check();
         while (!(I2C_SR1 & (1 << 6)));
-        status_check();
     }
+    reg_check();
+    I2C_CR2 = I2C_CR2 & ~(1 << 2);
+    reg_check();
 }
 void i2c_scan(void) {
     for (uint8_t addr = current_dev; addr < 127; addr++) {
