@@ -70,12 +70,14 @@ int uart_read(void)
         {
         //uart_write("if\n");
         buffer[i] = UART_RX();
-        if(buffer[i] == '\r\n' )
+        if(buffer[i] == '\r')
         {
             return 1;
             break;
         }
-        i++;
+        if(buffer[i] < 32 || buffer[i] > 126);
+        else
+            i++;
         }
     }
     //uart_write("end\n");

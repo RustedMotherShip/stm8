@@ -259,13 +259,13 @@ _uart_read:
 	call	_memset
 ;	main.c: 66: while(i<256)
 	clrw	x
-00105$:
+00109$:
 	cpw	x, #0x0100
-	jrsge	00107$
+	jrsge	00111$
 ;	main.c: 69: if(UART1_SR & UART_SR_RXNE)
 	ld	a, 0x5230
 	bcp	a, #0x20
-	jreq	00105$
+	jreq	00109$
 ;	main.c: 72: buffer[i] = UART_RX();
 	ldw	y, x
 	addw	y, #(_buffer+0)
@@ -275,7 +275,7 @@ _uart_read:
 	popw	y
 	popw	x
 	ld	(y), a
-;	main.c: 73: if(buffer[i] == '\r\n' )
+;	main.c: 73: if(buffer[i] == '\r')
 	cp	a, #0x0d
 	jrne	00102$
 ;	main.c: 75: return 1;
@@ -284,15 +284,21 @@ _uart_read:
 	ret
 ;	main.c: 76: break;
 00102$:
-;	main.c: 78: i++;
+;	main.c: 78: if(buffer[i] < 32 || buffer[i] > 126);
+	ld	a, (y)
+	cp	a, #0x20
+	jrc	00109$
+	cp	a, #0x7e
+	jrugt	00109$
+;	main.c: 80: i++;
 	incw	x
-	jra	00105$
-00107$:
-;	main.c: 82: return 0;
+	jra	00109$
+00111$:
+;	main.c: 84: return 0;
 	clrw	x
-;	main.c: 83: }
+;	main.c: 85: }
 	ret
-;	main.c: 92: void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
+;	main.c: 94: void convert_int_to_chars(uint8_t num, char* rx_int_chars) {
 ;	-----------------------------------------
 ;	 function convert_int_to_chars
 ;	-----------------------------------------
@@ -300,24 +306,24 @@ _convert_int_to_chars:
 	sub	sp, #13
 	ld	(0x0d, sp), a
 	ldw	(0x0b, sp), x
-;	main.c: 95: rx_int_chars[0] = num / 100 + '0';
+;	main.c: 97: rx_int_chars[0] = num / 100 + '0';
 	ld	a, (0x0d, sp)
 	ld	(0x02, sp), a
 	clr	(0x01, sp)
-;	main.c: 96: rx_int_chars[1] = num / 10 % 10 + '0';
+;	main.c: 98: rx_int_chars[1] = num / 10 % 10 + '0';
 	ldw	x, (0x0b, sp)
 	incw	x
 	ldw	(0x03, sp), x
-;	main.c: 97: rx_int_chars[2] = num % 10 + '0';
+;	main.c: 99: rx_int_chars[2] = num % 10 + '0';
 	ldw	x, (0x0b, sp)
 	incw	x
 	incw	x
 	ldw	(0x05, sp), x
-;	main.c: 96: rx_int_chars[1] = num / 10 % 10 + '0';
+;	main.c: 98: rx_int_chars[1] = num / 10 % 10 + '0';
 	push	#0x0a
 	push	#0x00
 	ldw	x, (0x03, sp)
-;	main.c: 97: rx_int_chars[2] = num % 10 + '0';
+;	main.c: 99: rx_int_chars[2] = num % 10 + '0';
 	call	__divsint
 	ldw	(0x07, sp), x
 	push	#0x0a
@@ -327,11 +333,11 @@ _convert_int_to_chars:
 	ld	a, xl
 	add	a, #0x30
 	ld	(0x09, sp), a
-;	main.c: 93: if (num > 99) {
+;	main.c: 95: if (num > 99) {
 	ld	a, (0x0d, sp)
 	cp	a, #0x63
 	jrule	00105$
-;	main.c: 95: rx_int_chars[0] = num / 100 + '0';
+;	main.c: 97: rx_int_chars[0] = num / 100 + '0';
 	push	#0x64
 	push	#0x00
 	ldw	x, (0x03, sp)
@@ -340,7 +346,7 @@ _convert_int_to_chars:
 	add	a, #0x30
 	ldw	x, (0x0b, sp)
 	ld	(x), a
-;	main.c: 96: rx_int_chars[1] = num / 10 % 10 + '0';
+;	main.c: 98: rx_int_chars[1] = num / 10 % 10 + '0';
 	push	#0x0a
 	push	#0x00
 	ldw	x, (0x09, sp)
@@ -349,61 +355,61 @@ _convert_int_to_chars:
 	add	a, #0x30
 	ldw	x, (0x03, sp)
 	ld	(x), a
-;	main.c: 97: rx_int_chars[2] = num % 10 + '0';
+;	main.c: 99: rx_int_chars[2] = num % 10 + '0';
 	ldw	x, (0x05, sp)
 	ld	a, (0x09, sp)
 	ld	(x), a
-;	main.c: 98: rx_int_chars[3] ='\0';
+;	main.c: 100: rx_int_chars[3] ='\0';
 	ldw	x, (0x0b, sp)
 	clr	(0x0003, x)
 	jra	00107$
 00105$:
-;	main.c: 100: } else if (num > 9) {
+;	main.c: 102: } else if (num > 9) {
 	ld	a, (0x0d, sp)
 	cp	a, #0x09
 	jrule	00102$
-;	main.c: 102: rx_int_chars[0] = num / 10 + '0';
+;	main.c: 104: rx_int_chars[0] = num / 10 + '0';
 	ld	a, (0x08, sp)
 	ld	(0x0a, sp), a
 	add	a, #0x30
 	ldw	x, (0x0b, sp)
 	ld	(x), a
-;	main.c: 103: rx_int_chars[1] = num % 10 + '0';
+;	main.c: 105: rx_int_chars[1] = num % 10 + '0';
 	ldw	x, (0x03, sp)
 	ld	a, (0x09, sp)
 	ld	(x), a
-;	main.c: 104: rx_int_chars[2] ='\0'; // Заканчиваем строку символом конца строки
+;	main.c: 106: rx_int_chars[2] ='\0'; // Заканчиваем строку символом конца строки
 	ldw	x, (0x05, sp)
 	clr	(x)
 	jra	00107$
 00102$:
-;	main.c: 107: rx_int_chars[0] = num + '0';
+;	main.c: 109: rx_int_chars[0] = num + '0';
 	ld	a, (0x0d, sp)
 	add	a, #0x30
 	ldw	x, (0x0b, sp)
 	ld	(x), a
-;	main.c: 108: rx_int_chars[1] ='\0';
+;	main.c: 110: rx_int_chars[1] ='\0';
 	ldw	x, (0x03, sp)
 	clr	(x)
 00107$:
-;	main.c: 110: }
+;	main.c: 112: }
 	addw	sp, #13
 	ret
-;	main.c: 112: uint8_t convert_chars_to_int(char* rx_chars_int, const int i) {
+;	main.c: 114: uint8_t convert_chars_to_int(char* rx_chars_int, const int i) {
 ;	-----------------------------------------
 ;	 function convert_chars_to_int
 ;	-----------------------------------------
 _convert_chars_to_int:
 	sub	sp, #3
 	ldw	(0x02, sp), x
-;	main.c: 113: uint8_t result = 0;
+;	main.c: 115: uint8_t result = 0;
 	clr	a
-;	main.c: 115: for (int o = 0; o < i; o++) {
+;	main.c: 117: for (int o = 0; o < i; o++) {
 	clrw	x
 00103$:
 	cpw	x, (0x06, sp)
 	jrsge	00101$
-;	main.c: 117: result = (result * 10) + (rx_chars_int[o] - '0');
+;	main.c: 119: result = (result * 10) + (rx_chars_int[o] - '0');
 	ld	yl, a
 	ld	a, #0x0a
 	mul	y, a
@@ -415,29 +421,29 @@ _convert_chars_to_int:
 	ld	a, (y)
 	sub	a, #0x30
 	add	a, (0x01, sp)
-;	main.c: 115: for (int o = 0; o < i; o++) {
+;	main.c: 117: for (int o = 0; o < i; o++) {
 	incw	x
 	jra	00103$
 00101$:
-;	main.c: 120: return result;
-;	main.c: 121: }
+;	main.c: 122: return result;
+;	main.c: 123: }
 	ldw	x, (4, sp)
 	addw	sp, #7
 	jp	(x)
-;	main.c: 124: void convert_int_to_binary(int num, char* rx_binary_chars) {
+;	main.c: 126: void convert_int_to_binary(int num, char* rx_binary_chars) {
 ;	-----------------------------------------
 ;	 function convert_int_to_binary
 ;	-----------------------------------------
 _convert_int_to_binary:
 	sub	sp, #4
 	ldw	(0x01, sp), x
-;	main.c: 126: for(int i = 7; i >= 0; i--) {
+;	main.c: 128: for(int i = 7; i >= 0; i--) {
 	ldw	x, #0x0007
 	ldw	(0x03, sp), x
 00103$:
 	tnz	(0x03, sp)
 	jrmi	00101$
-;	main.c: 128: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
+;	main.c: 130: rx_binary_chars[7 - i] = ((num >> i) & 1) + '0';
 	ldw	x, #0x0007
 	subw	x, (0x03, sp)
 	addw	x, (0x07, sp)
@@ -453,31 +459,31 @@ _convert_int_to_binary:
 	and	a, #0x01
 	add	a, #0x30
 	ld	(x), a
-;	main.c: 126: for(int i = 7; i >= 0; i--) {
+;	main.c: 128: for(int i = 7; i >= 0; i--) {
 	ldw	x, (0x03, sp)
 	decw	x
 	ldw	(0x03, sp), x
 	jra	00103$
 00101$:
-;	main.c: 130: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
+;	main.c: 132: rx_binary_chars[8] = '\0'; // Добавляем символ конца строки
 	ldw	x, (0x07, sp)
 	clr	(0x0008, x)
-;	main.c: 131: }
+;	main.c: 133: }
 	ldw	x, (5, sp)
 	addw	sp, #8
 	jp	(x)
-;	main.c: 140: void get_addr_from_buff(void)
+;	main.c: 142: void get_addr_from_buff(void)
 ;	-----------------------------------------
 ;	 function get_addr_from_buff
 ;	-----------------------------------------
 _get_addr_from_buff:
 	sub	sp, #2
-;	main.c: 144: while(1)
+;	main.c: 146: while(1)
 	ld	a, #0x03
 	ld	(0x01, sp), a
 	clr	(0x02, sp)
 00105$:
-;	main.c: 146: if(buffer[i] == ' ' || buffer[i] == '\r\n')
+;	main.c: 148: if(buffer[i] == ' ' || buffer[i] == '\r\n')
 	clrw	x
 	ld	a, (0x01, sp)
 	ld	xl, a
@@ -487,20 +493,20 @@ _get_addr_from_buff:
 	cp	a, #0x0d
 	jrne	00102$
 00101$:
-;	main.c: 148: p_size = i+1;
+;	main.c: 150: p_size = i+1;
 	ld	a, (0x01, sp)
 	inc	a
 	ld	_p_size+0, a
-;	main.c: 149: break;
+;	main.c: 151: break;
 	jra	00106$
 00102$:
-;	main.c: 151: i++;
+;	main.c: 153: i++;
 	inc	(0x01, sp)
-;	main.c: 152: counter++;
+;	main.c: 154: counter++;
 	inc	(0x02, sp)
 	jra	00105$
 00106$:
-;	main.c: 154: memcpy(a, &buffer[3], counter);
+;	main.c: 156: memcpy(a, &buffer[3], counter);
 	clrw	x
 	ld	a, (0x02, sp)
 	ld	xl, a
@@ -509,7 +515,7 @@ _get_addr_from_buff:
 	push	#((_buffer+3) >> 8)
 	ldw	x, #(_a+0)
 	call	___memcpy
-;	main.c: 155: d_addr = convert_chars_to_int(a, counter);
+;	main.c: 157: d_addr = convert_chars_to_int(a, counter);
 	clrw	x
 	ld	a, (0x02, sp)
 	ld	xl, a
@@ -517,29 +523,29 @@ _get_addr_from_buff:
 	ldw	x, #(_a+0)
 	call	_convert_chars_to_int
 	ld	_d_addr+0, a
-;	main.c: 156: }
+;	main.c: 158: }
 	addw	sp, #2
 	ret
-;	main.c: 158: void get_size_from_buff(void)
+;	main.c: 160: void get_size_from_buff(void)
 ;	-----------------------------------------
 ;	 function get_size_from_buff
 ;	-----------------------------------------
 _get_size_from_buff:
 	sub	sp, #2
-;	main.c: 160: memset(a, 0, sizeof(a));
+;	main.c: 162: memset(a, 0, sizeof(a));
 	push	#0x03
 	push	#0x00
 	clrw	x
 	pushw	x
 	ldw	x, #(_a+0)
 	call	_memset
-;	main.c: 162: uint8_t i = p_size;
+;	main.c: 164: uint8_t i = p_size;
 	ld	a, _p_size+0
 	ld	(0x01, sp), a
-;	main.c: 163: while(1)
+;	main.c: 165: while(1)
 	clr	(0x02, sp)
 00105$:
-;	main.c: 165: if(buffer[i] == ' ' || buffer[i] == '\r\n')
+;	main.c: 167: if(buffer[i] == ' ' || buffer[i] == '\r\n')
 	clrw	x
 	ld	a, (0x01, sp)
 	ld	xl, a
@@ -549,20 +555,20 @@ _get_size_from_buff:
 	cp	a, #0x0d
 	jrne	00102$
 00101$:
-;	main.c: 168: p_bytes = i+1;
+;	main.c: 170: p_bytes = i+1;
 	ld	a, (0x01, sp)
 	inc	a
 	ld	_p_bytes+0, a
-;	main.c: 169: break;
+;	main.c: 171: break;
 	jra	00106$
 00102$:
-;	main.c: 171: i++;
+;	main.c: 173: i++;
 	inc	(0x01, sp)
-;	main.c: 172: counter++;
+;	main.c: 174: counter++;
 	inc	(0x02, sp)
 	jra	00105$
 00106$:
-;	main.c: 175: memcpy(a, &buffer[p_size], counter);
+;	main.c: 177: memcpy(a, &buffer[p_size], counter);
 	clrw	y
 	ld	a, (0x02, sp)
 	ld	yl, a
@@ -574,7 +580,7 @@ _get_size_from_buff:
 	pushw	x
 	ldw	x, #(_a+0)
 	call	___memcpy
-;	main.c: 176: d_size = convert_chars_to_int(a, counter);
+;	main.c: 178: d_size = convert_chars_to_int(a, counter);
 	clrw	x
 	ld	a, (0x02, sp)
 	ld	xl, a
@@ -582,29 +588,29 @@ _get_size_from_buff:
 	ldw	x, #(_a+0)
 	call	_convert_chars_to_int
 	ld	_d_size+0, a
-;	main.c: 177: }
+;	main.c: 179: }
 	addw	sp, #2
 	ret
-;	main.c: 178: void char_buffer_to_int(void)
+;	main.c: 180: void char_buffer_to_int(void)
 ;	-----------------------------------------
 ;	 function char_buffer_to_int
 ;	-----------------------------------------
 _char_buffer_to_int:
 	sub	sp, #8
-;	main.c: 180: memset(a, 0, sizeof(a));
+;	main.c: 182: memset(a, 0, sizeof(a));
 	push	#0x03
 	push	#0x00
 	clrw	x
 	pushw	x
 	ldw	x, #(_a+0)
 	call	_memset
-;	main.c: 181: uint8_t counter = d_size;
+;	main.c: 183: uint8_t counter = d_size;
 	ld	a, _d_size+0
 	ld	(0x01, sp), a
-;	main.c: 182: uint8_t i = p_bytes;
+;	main.c: 184: uint8_t i = p_bytes;
 	ld	a, _p_bytes+0
 	ld	(0x03, sp), a
-;	main.c: 185: for(int o = 0; o < counter;o++)
+;	main.c: 187: for(int o = 0; o < counter;o++)
 	clr	(0x04, sp)
 	clrw	x
 	ldw	(0x05, sp), x
@@ -615,39 +621,39 @@ _char_buffer_to_int:
 	ldw	x, (0x05, sp)
 	cpw	x, (0x07, sp)
 	jrsge	00114$
-;	main.c: 187: uint8_t number_counter = 0;
+;	main.c: 189: uint8_t number_counter = 0;
 	clr	(0x02, sp)
-;	main.c: 188: while(1)
+;	main.c: 190: while(1)
 	ld	a, (0x03, sp)
 	ld	(0x07, sp), a
 	clr	(0x08, sp)
 00108$:
-;	main.c: 190: if(buffer[i] == ' ')
+;	main.c: 192: if(buffer[i] == ' ')
 	clrw	x
 	ld	a, (0x07, sp)
 	ld	xl, a
 	ld	a, (_buffer+0, x)
 	cp	a, #0x20
 	jrne	00105$
-;	main.c: 192: i++;
+;	main.c: 194: i++;
 	inc	(0x03, sp)
-;	main.c: 193: break;
+;	main.c: 195: break;
 	jra	00109$
 00105$:
-;	main.c: 195: else if(buffer[i] == '\r\n')
+;	main.c: 197: else if(buffer[i] == '\r\n')
 	cp	a, #0x0d
 	jreq	00109$
-;	main.c: 198: i++;
+;	main.c: 200: i++;
 	inc	(0x07, sp)
 	ld	a, (0x07, sp)
 	ld	(0x03, sp), a
-;	main.c: 200: number_counter++;
+;	main.c: 202: number_counter++;
 	inc	(0x08, sp)
 	ld	a, (0x08, sp)
 	ld	(0x02, sp), a
 	jra	00108$
 00109$:
-;	main.c: 202: memcpy(a, &buffer[i - number_counter], number_counter);
+;	main.c: 204: memcpy(a, &buffer[i - number_counter], number_counter);
 	clrw	y
 	ld	a, (0x02, sp)
 	ld	yl, a
@@ -663,7 +669,7 @@ _char_buffer_to_int:
 	pushw	x
 	ldw	x, #(_a+0)
 	call	___memcpy
-;	main.c: 203: data_buf[int_buf_i] = convert_chars_to_int(a, number_counter);
+;	main.c: 205: data_buf[int_buf_i] = convert_chars_to_int(a, number_counter);
 	clrw	x
 	ld	a, (0x04, sp)
 	ld	xl, a
@@ -675,24 +681,24 @@ _char_buffer_to_int:
 	call	_convert_chars_to_int
 	popw	x
 	ld	(x), a
-;	main.c: 204: int_buf_i++;
+;	main.c: 206: int_buf_i++;
 	inc	(0x04, sp)
-;	main.c: 185: for(int o = 0; o < counter;o++)
+;	main.c: 187: for(int o = 0; o < counter;o++)
 	ldw	x, (0x05, sp)
 	incw	x
 	ldw	(0x05, sp), x
 	jra	00112$
 00114$:
-;	main.c: 206: }
+;	main.c: 208: }
 	addw	sp, #8
 	ret
-;	main.c: 214: void reg_check(void)
+;	main.c: 216: void reg_check(void)
 ;	-----------------------------------------
 ;	 function reg_check
 ;	-----------------------------------------
 _reg_check:
 	sub	sp, #9
-;	main.c: 216: char rx_binary_chars[9]={0};
+;	main.c: 218: char rx_binary_chars[9]={0};
 	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
@@ -702,7 +708,7 @@ _reg_check:
 	clr	(0x07, sp)
 	clr	(0x08, sp)
 	clr	(0x09, sp)
-;	main.c: 217: convert_int_to_binary(I2C_SR1, rx_binary_chars);
+;	main.c: 219: convert_int_to_binary(I2C_SR1, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -711,9 +717,9 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 218: status_registers[0] = I2C_SR1;
+;	main.c: 220: status_registers[0] = I2C_SR1;
 	mov	_status_registers+0, 0x5217
-;	main.c: 219: convert_int_to_binary(I2C_SR2, rx_binary_chars);
+;	main.c: 221: convert_int_to_binary(I2C_SR2, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -722,9 +728,9 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 220: status_registers[1] = I2C_SR2;
+;	main.c: 222: status_registers[1] = I2C_SR2;
 	mov	_status_registers+1, 0x5218
-;	main.c: 221: convert_int_to_binary(I2C_SR3, rx_binary_chars);
+;	main.c: 223: convert_int_to_binary(I2C_SR3, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -733,9 +739,9 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 222: status_registers[2] = I2C_SR3;
+;	main.c: 224: status_registers[2] = I2C_SR3;
 	mov	_status_registers+2, 0x5219
-;	main.c: 223: convert_int_to_binary(I2C_CR1, rx_binary_chars);
+;	main.c: 225: convert_int_to_binary(I2C_CR1, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -744,9 +750,9 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 224: status_registers[3] = I2C_CR1;
+;	main.c: 226: status_registers[3] = I2C_CR1;
 	mov	_status_registers+3, 0x5210
-;	main.c: 225: convert_int_to_binary(I2C_CR2, rx_binary_chars);
+;	main.c: 227: convert_int_to_binary(I2C_CR2, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -755,9 +761,9 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 226: status_registers[4] = I2C_CR2;
+;	main.c: 228: status_registers[4] = I2C_CR2;
 	mov	_status_registers+4, 0x5211
-;	main.c: 227: convert_int_to_binary(I2C_DR, rx_binary_chars);
+;	main.c: 229: convert_int_to_binary(I2C_DR, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -766,18 +772,18 @@ _reg_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 228: status_registers[5] = I2C_DR;
+;	main.c: 230: status_registers[5] = I2C_DR;
 	mov	_status_registers+5, 0x5216
-;	main.c: 229: }
+;	main.c: 231: }
 	addw	sp, #9
 	ret
-;	main.c: 232: void status_check(void){
+;	main.c: 234: void status_check(void){
 ;	-----------------------------------------
 ;	 function status_check
 ;	-----------------------------------------
 _status_check:
 	sub	sp, #9
-;	main.c: 233: char rx_binary_chars[9]={0};
+;	main.c: 235: char rx_binary_chars[9]={0};
 	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
@@ -787,10 +793,10 @@ _status_check:
 	clr	(0x07, sp)
 	clr	(0x08, sp)
 	clr	(0x09, sp)
-;	main.c: 234: uart_write("\nI2C_REGS >.<\n");
+;	main.c: 236: uart_write("\nI2C_REGS >.<\n");
 	ldw	x, #(___str_0+0)
 	call	_uart_write
-;	main.c: 235: convert_int_to_binary(I2C_SR1, rx_binary_chars);
+;	main.c: 237: convert_int_to_binary(I2C_SR1, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -799,17 +805,17 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 236: uart_write("\nSR1 -> ");
+;	main.c: 238: uart_write("\nSR1 -> ");
 	ldw	x, #(___str_1+0)
 	call	_uart_write
-;	main.c: 237: uart_write(rx_binary_chars);
+;	main.c: 239: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 238: uart_write(" <-\n");
+;	main.c: 240: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 239: convert_int_to_binary(I2C_SR2, rx_binary_chars);
+;	main.c: 241: convert_int_to_binary(I2C_SR2, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -818,17 +824,17 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 240: uart_write("SR2 -> ");
+;	main.c: 242: uart_write("SR2 -> ");
 	ldw	x, #(___str_3+0)
 	call	_uart_write
-;	main.c: 241: uart_write(rx_binary_chars);
+;	main.c: 243: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 242: uart_write(" <-\n");
+;	main.c: 244: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 243: convert_int_to_binary(I2C_SR3, rx_binary_chars);
+;	main.c: 245: convert_int_to_binary(I2C_SR3, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -837,17 +843,17 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 244: uart_write("SR3 -> ");
+;	main.c: 246: uart_write("SR3 -> ");
 	ldw	x, #(___str_4+0)
 	call	_uart_write
-;	main.c: 245: uart_write(rx_binary_chars);
+;	main.c: 247: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 246: uart_write(" <-\n");
+;	main.c: 248: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 247: convert_int_to_binary(I2C_CR1, rx_binary_chars);
+;	main.c: 249: convert_int_to_binary(I2C_CR1, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -856,17 +862,17 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 248: uart_write("CR1 -> ");
+;	main.c: 250: uart_write("CR1 -> ");
 	ldw	x, #(___str_5+0)
 	call	_uart_write
-;	main.c: 249: uart_write(rx_binary_chars);
+;	main.c: 251: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 250: uart_write(" <-\n");
+;	main.c: 252: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 251: convert_int_to_binary(I2C_CR2, rx_binary_chars);
+;	main.c: 253: convert_int_to_binary(I2C_CR2, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -875,17 +881,17 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 252: uart_write("CR2 -> ");
+;	main.c: 254: uart_write("CR2 -> ");
 	ldw	x, #(___str_6+0)
 	call	_uart_write
-;	main.c: 253: uart_write(rx_binary_chars);
+;	main.c: 255: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 254: uart_write(" <-\n");
+;	main.c: 256: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 255: convert_int_to_binary(I2C_DR, rx_binary_chars);
+;	main.c: 257: convert_int_to_binary(I2C_DR, rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	exgw	x, y
@@ -894,122 +900,122 @@ _status_check:
 	pushw	y
 	ld	xl, a
 	call	_convert_int_to_binary
-;	main.c: 256: uart_write("DR -> ");
+;	main.c: 258: uart_write("DR -> ");
 	ldw	x, #(___str_7+0)
 	call	_uart_write
-;	main.c: 257: uart_write(rx_binary_chars);
+;	main.c: 259: uart_write(rx_binary_chars);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 258: uart_write(" <-\n");
+;	main.c: 260: uart_write(" <-\n");
 	ldw	x, #(___str_2+0)
 	call	_uart_write
-;	main.c: 304: }
+;	main.c: 306: }
 	addw	sp, #9
 	ret
-;	main.c: 306: void uart_init(void){
+;	main.c: 308: void uart_init(void){
 ;	-----------------------------------------
 ;	 function uart_init
 ;	-----------------------------------------
 _uart_init:
-;	main.c: 307: CLK_CKDIVR = 0;
+;	main.c: 309: CLK_CKDIVR = 0;
 	mov	0x50c6+0, #0x00
-;	main.c: 310: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
+;	main.c: 312: UART1_CR2 |= UART_CR2_TEN; // Transmitter enable
 	bset	0x5235, #3
-;	main.c: 311: UART1_CR2 |= UART_CR2_REN; // Receiver enable
+;	main.c: 313: UART1_CR2 |= UART_CR2_REN; // Receiver enable
 	bset	0x5235, #2
-;	main.c: 312: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+;	main.c: 314: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
 	ld	a, 0x5236
 	and	a, #0xcf
 	ld	0x5236, a
-;	main.c: 314: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
+;	main.c: 316: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 0x0683 coded funky way (see ref manual)
 	mov	0x5233+0, #0x03
 	mov	0x5232+0, #0x68
-;	main.c: 315: }
+;	main.c: 317: }
 	ret
-;	main.c: 319: void i2c_init(void) {
+;	main.c: 321: void i2c_init(void) {
 ;	-----------------------------------------
 ;	 function i2c_init
 ;	-----------------------------------------
 _i2c_init:
-;	main.c: 325: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
+;	main.c: 327: I2C_CR1 = I2C_CR1 & ~0x01;      // PE=0, disable I2C before setup
 	bres	0x5210, #0
-;	main.c: 326: I2C_FREQR= 16;                  // peripheral frequence =16MHz
+;	main.c: 328: I2C_FREQR= 16;                  // peripheral frequence =16MHz
 	mov	0x5212+0, #0x10
-;	main.c: 327: I2C_CCRH = 0;                   // =0
+;	main.c: 329: I2C_CCRH = 0;                   // =0
 	mov	0x521c+0, #0x00
-;	main.c: 328: I2C_CCRL = 80;                  // 100kHz for I2C
+;	main.c: 330: I2C_CCRL = 80;                  // 100kHz for I2C
 	mov	0x521b+0, #0x50
-;	main.c: 329: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
+;	main.c: 331: I2C_CCRH = I2C_CCRH & ~0x80;    // set standart mode(100кHz)
 	bres	0x521c, #7
-;	main.c: 330: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
+;	main.c: 332: I2C_OARH = I2C_OARH & ~0x80;    // 7-bit address mode
 	bres	0x5214, #7
-;	main.c: 331: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
+;	main.c: 333: I2C_OARH = I2C_OARH | 0x40;     // see reference manual
 	bset	0x5214, #6
-;	main.c: 332: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
+;	main.c: 334: I2C_CR1 = I2C_CR1 | 0x01;       // PE=1, enable I2C
 	bset	0x5210, #0
-;	main.c: 333: }
+;	main.c: 335: }
 	ret
-;	main.c: 342: void i2c_start(void) {
+;	main.c: 344: void i2c_start(void) {
 ;	-----------------------------------------
 ;	 function i2c_start
 ;	-----------------------------------------
 _i2c_start:
-;	main.c: 343: I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
+;	main.c: 345: I2C_CR2 = I2C_CR2 | (1 << 0); // Отправляем стартовый сигнал
 	bset	0x5211, #0
-;	main.c: 344: while(!(I2C_SR1 & (1 << 0)));
+;	main.c: 346: while(!(I2C_SR1 & (1 << 0)));
 00101$:
 	btjf	0x5217, #0, 00101$
-;	main.c: 346: }
+;	main.c: 348: }
 	ret
-;	main.c: 348: void i2c_send_address(uint8_t address) {
+;	main.c: 350: void i2c_send_address(uint8_t address) {
 ;	-----------------------------------------
 ;	 function i2c_send_address
 ;	-----------------------------------------
 _i2c_send_address:
-;	main.c: 349: I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
+;	main.c: 351: I2C_DR = address << 1; // Отправка адреса устройства с битом на запись
 	sll	a
 	ld	0x5216, a
-;	main.c: 350: reg_check();
+;	main.c: 352: reg_check();
 	call	_reg_check
-;	main.c: 351: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
+;	main.c: 353: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 00102$:
 	btjf	0x5217, #1, 00117$
 	ret
 00117$:
 	btjf	0x5218, #2, 00102$
-;	main.c: 353: }
+;	main.c: 355: }
 	ret
-;	main.c: 355: void i2c_stop(void) {
+;	main.c: 357: void i2c_stop(void) {
 ;	-----------------------------------------
 ;	 function i2c_stop
 ;	-----------------------------------------
 _i2c_stop:
-;	main.c: 356: I2C_CR2 = I2C_CR2 | (1 << 1);// Отправка стопового сигнала
+;	main.c: 358: I2C_CR2 = I2C_CR2 | (1 << 1);// Отправка стопового сигнала
 	bset	0x5211, #1
-;	main.c: 358: }
+;	main.c: 360: }
 	ret
-;	main.c: 359: void i2c_write(void){
+;	main.c: 361: void i2c_write(void){
 ;	-----------------------------------------
 ;	 function i2c_write
 ;	-----------------------------------------
 _i2c_write:
 	sub	sp, #2
-;	main.c: 360: I2C_DR = 0;
+;	main.c: 362: I2C_DR = 0;
 	mov	0x5216+0, #0x00
-;	main.c: 361: reg_check();
-	call	_reg_check
-;	main.c: 362: I2C_DR = d_addr;
-	mov	0x5216+0, _d_addr+0
 ;	main.c: 363: reg_check();
 	call	_reg_check
-;	main.c: 364: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+;	main.c: 364: I2C_DR = d_addr;
+	mov	0x5216+0, _d_addr+0
+;	main.c: 365: reg_check();
+	call	_reg_check
+;	main.c: 366: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
 00103$:
 	ld	a, 0x5217
 	jrmi	00124$
 	btjf	0x5218, #2, 00124$
 	btjf	0x5217, #2, 00103$
-;	main.c: 365: for(int i = 0;i < d_size;i++)
+;	main.c: 367: for(int i = 0;i < d_size;i++)
 00124$:
 	clrw	x
 00113$:
@@ -1018,73 +1024,73 @@ _i2c_write:
 	clr	(0x01, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00115$
-;	main.c: 367: I2C_DR = data_buf[i];
+;	main.c: 369: I2C_DR = data_buf[i];
 	ldw	y, x
 	ld	a, (_data_buf+0, y)
 	ld	0x5216, a
-;	main.c: 368: reg_check();
+;	main.c: 370: reg_check();
 	pushw	x
 	call	_reg_check
 	popw	x
-;	main.c: 369: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2)));
+;	main.c: 371: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2)));
 00108$:
 	ld	a, 0x5217
 	jrmi	00110$
 	btjf	0x5218, #2, 00110$
 	btjf	0x5217, #2, 00108$
 00110$:
-;	main.c: 370: reg_check();
+;	main.c: 372: reg_check();
 	pushw	x
 	call	_reg_check
 	popw	x
-;	main.c: 365: for(int i = 0;i < d_size;i++)
+;	main.c: 367: for(int i = 0;i < d_size;i++)
 	incw	x
 	jra	00113$
 00115$:
-;	main.c: 372: }
+;	main.c: 374: }
 	addw	sp, #2
 	ret
-;	main.c: 374: void i2c_read(void){
+;	main.c: 376: void i2c_read(void){
 ;	-----------------------------------------
 ;	 function i2c_read
 ;	-----------------------------------------
 _i2c_read:
 	sub	sp, #2
-;	main.c: 375: I2C_CR2 = I2C_CR2 | (1 << 2);
+;	main.c: 377: I2C_CR2 = I2C_CR2 | (1 << 2);
 	bset	0x5211, #2
-;	main.c: 376: I2C_DR = 0;
+;	main.c: 378: I2C_DR = 0;
 	mov	0x5216+0, #0x00
-;	main.c: 377: reg_check();
-	call	_reg_check
-;	main.c: 378: I2C_DR = d_addr;
-	mov	0x5216+0, _d_addr+0
 ;	main.c: 379: reg_check();
 	call	_reg_check
-;	main.c: 380: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+;	main.c: 380: I2C_DR = d_addr;
+	mov	0x5216+0, _d_addr+0
+;	main.c: 381: reg_check();
+	call	_reg_check
+;	main.c: 382: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
 00103$:
 	ld	a, 0x5217
 	jrmi	00105$
 	btjf	0x5218, #2, 00105$
 	btjf	0x5217, #2, 00103$
 00105$:
-;	main.c: 383: i2c_start();
+;	main.c: 385: i2c_start();
 	call	_i2c_start
-;	main.c: 384: I2C_DR = (current_dev << 1) | (1 << 0);
+;	main.c: 386: I2C_DR = (current_dev << 1) | (1 << 0);
 	ld	a, _current_dev+0
 	sll	a
 	or	a, #0x01
 	ld	0x5216, a
-;	main.c: 385: reg_check();
+;	main.c: 387: reg_check();
 	call	_reg_check
-;	main.c: 386: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR1 & (1 << 2)) && !(I2C_SR1 & (1 << 6)));
+;	main.c: 388: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR1 & (1 << 2)) && !(I2C_SR1 & (1 << 6)));
 00108$:
 	btjt	0x5217, #1, 00110$
 	btjt	0x5217, #2, 00110$
 	btjf	0x5217, #6, 00108$
 00110$:
-;	main.c: 387: reg_check();
+;	main.c: 389: reg_check();
 	call	_reg_check
-;	main.c: 388: for(int i = 0;i < d_size;i++)
+;	main.c: 390: for(int i = 0;i < d_size;i++)
 	clrw	x
 00116$:
 	ld	a, _d_size+0
@@ -1092,35 +1098,35 @@ _i2c_read:
 	clr	(0x01, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00114$
-;	main.c: 390: data_buf[i] = I2C_DR;
+;	main.c: 392: data_buf[i] = I2C_DR;
 	ldw	y, x
 	addw	y, #(_data_buf+0)
 	ld	a, 0x5216
 	ld	(y), a
-;	main.c: 391: while (!(I2C_SR1 & (1 << 6)));
+;	main.c: 393: while (!(I2C_SR1 & (1 << 6)));
 00111$:
 	btjf	0x5217, #6, 00111$
-;	main.c: 388: for(int i = 0;i < d_size;i++)
+;	main.c: 390: for(int i = 0;i < d_size;i++)
 	incw	x
 	jra	00116$
 00114$:
-;	main.c: 393: reg_check();
+;	main.c: 395: reg_check();
 	call	_reg_check
-;	main.c: 394: I2C_CR2 = I2C_CR2 & ~(1 << 2);
+;	main.c: 396: I2C_CR2 = I2C_CR2 & ~(1 << 2);
 	ld	a, 0x5211
 	and	a, #0xfb
 	ld	0x5211, a
-;	main.c: 395: reg_check();
+;	main.c: 397: reg_check();
 	addw	sp, #2
-;	main.c: 396: }
+;	main.c: 398: }
 	jp	_reg_check
-;	main.c: 397: void i2c_scan(void) {
+;	main.c: 399: void i2c_scan(void) {
 ;	-----------------------------------------
 ;	 function i2c_scan
 ;	-----------------------------------------
 _i2c_scan:
 	sub	sp, #2
-;	main.c: 398: for (uint8_t addr = current_dev; addr < 127; addr++) {
+;	main.c: 400: for (uint8_t addr = current_dev; addr < 127; addr++) {
 	ld	a, _current_dev+0
 	ld	(0x01, sp), a
 	ld	(0x02, sp), a
@@ -1128,141 +1134,141 @@ _i2c_scan:
 	ld	a, (0x02, sp)
 	cp	a, #0x7f
 	jrnc	00107$
-;	main.c: 399: i2c_start();
+;	main.c: 401: i2c_start();
 	call	_i2c_start
-;	main.c: 400: i2c_send_address(addr);
+;	main.c: 402: i2c_send_address(addr);
 	ld	a, (0x02, sp)
 	call	_i2c_send_address
-;	main.c: 401: if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
+;	main.c: 403: if (!(I2C_SR2 & (1 << 2))) { // Проверка на ACK
 	btjt	0x5218, #2, 00102$
-;	main.c: 403: current_dev = addr;
+;	main.c: 405: current_dev = addr;
 	ld	a, (0x01, sp)
 	ld	_current_dev+0, a
-;	main.c: 404: i2c_stop();
+;	main.c: 406: i2c_stop();
 	addw	sp, #2
-;	main.c: 405: break;
+;	main.c: 407: break;
 	jp	_i2c_stop
 00102$:
-;	main.c: 407: i2c_stop();
+;	main.c: 409: i2c_stop();
 	call	_i2c_stop
-;	main.c: 408: I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
+;	main.c: 410: I2C_SR2 = I2C_SR2 & ~(1 << 2); // Очистка флага ошибки
 	bres	0x5218, #2
-;	main.c: 398: for (uint8_t addr = current_dev; addr < 127; addr++) {
+;	main.c: 400: for (uint8_t addr = current_dev; addr < 127; addr++) {
 	inc	(0x02, sp)
 	ld	a, (0x02, sp)
 	ld	(0x01, sp), a
 	jra	00105$
 00107$:
-;	main.c: 410: }
+;	main.c: 412: }
 	addw	sp, #2
 	ret
-;	main.c: 420: void cm_SM(void)
+;	main.c: 422: void cm_SM(void)
 ;	-----------------------------------------
 ;	 function cm_SM
 ;	-----------------------------------------
 _cm_SM:
 	sub	sp, #4
-;	main.c: 422: char cur_dev[4]={0};
+;	main.c: 424: char cur_dev[4]={0};
 	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
 	clr	(0x04, sp)
-;	main.c: 423: convert_int_to_chars(current_dev, cur_dev);
+;	main.c: 425: convert_int_to_chars(current_dev, cur_dev);
 	ldw	x, sp
 	incw	x
 	ld	a, _current_dev+0
 	call	_convert_int_to_chars
-;	main.c: 424: uart_write("SM ");
+;	main.c: 426: uart_write("SM ");
 	ldw	x, #(___str_8+0)
 	call	_uart_write
-;	main.c: 425: uart_write(cur_dev);
+;	main.c: 427: uart_write(cur_dev);
 	ldw	x, sp
 	incw	x
 	call	_uart_write
-;	main.c: 426: uart_write("\r\n");
+;	main.c: 428: uart_write("\r\n");
 	ldw	x, #(___str_9+0)
 	call	_uart_write
-;	main.c: 427: }
+;	main.c: 429: }
 	addw	sp, #4
 	ret
-;	main.c: 428: void cm_SN(void)
+;	main.c: 430: void cm_SN(void)
 ;	-----------------------------------------
 ;	 function cm_SN
 ;	-----------------------------------------
 _cm_SN:
-;	main.c: 430: i2c_scan();
+;	main.c: 432: i2c_scan();
 	call	_i2c_scan
-;	main.c: 431: cm_SM();
-;	main.c: 432: }
+;	main.c: 433: cm_SM();
+;	main.c: 434: }
 	jp	_cm_SM
-;	main.c: 433: void cm_RM(void)
+;	main.c: 435: void cm_RM(void)
 ;	-----------------------------------------
 ;	 function cm_RM
 ;	-----------------------------------------
 _cm_RM:
-;	main.c: 435: current_dev = 0;
+;	main.c: 437: current_dev = 0;
 	clr	_current_dev+0
-;	main.c: 436: uart_write("RM\n");
+;	main.c: 438: uart_write("RM\n");
 	ldw	x, #(___str_10+0)
-;	main.c: 437: }
+;	main.c: 439: }
 	jp	_uart_write
-;	main.c: 439: void cm_DB(void)
+;	main.c: 441: void cm_DB(void)
 ;	-----------------------------------------
 ;	 function cm_DB
 ;	-----------------------------------------
 _cm_DB:
-;	main.c: 441: status_check();
-;	main.c: 442: }
+;	main.c: 443: status_check();
+;	main.c: 444: }
 	jp	_status_check
-;	main.c: 444: void cm_ST(void)
+;	main.c: 446: void cm_ST(void)
 ;	-----------------------------------------
 ;	 function cm_ST
 ;	-----------------------------------------
 _cm_ST:
-;	main.c: 446: get_addr_from_buff();
+;	main.c: 448: get_addr_from_buff();
 	call	_get_addr_from_buff
-;	main.c: 447: current_dev = d_addr;
+;	main.c: 449: current_dev = d_addr;
 	mov	_current_dev+0, _d_addr+0
-;	main.c: 448: uart_write("ST\n");
+;	main.c: 450: uart_write("ST\n");
 	ldw	x, #(___str_11+0)
-;	main.c: 449: }
+;	main.c: 451: }
 	jp	_uart_write
-;	main.c: 450: void cm_SR(void)
+;	main.c: 452: void cm_SR(void)
 ;	-----------------------------------------
 ;	 function cm_SR
 ;	-----------------------------------------
 _cm_SR:
 	sub	sp, #4
-;	main.c: 452: i2c_start();
+;	main.c: 454: i2c_start();
 	call	_i2c_start
-;	main.c: 453: i2c_send_address(current_dev);
+;	main.c: 455: i2c_send_address(current_dev);
 	ld	a, _current_dev+0
 	call	_i2c_send_address
-;	main.c: 454: i2c_read();
+;	main.c: 456: i2c_read();
 	call	_i2c_read
-;	main.c: 455: i2c_stop();
+;	main.c: 457: i2c_stop();
 	call	_i2c_stop
-;	main.c: 456: uart_write("SR ");
+;	main.c: 458: uart_write("SR ");
 	ldw	x, #(___str_12+0)
 	call	_uart_write
-;	main.c: 457: convert_int_to_chars(d_addr, a);
+;	main.c: 459: convert_int_to_chars(d_addr, a);
 	ldw	x, #(_a+0)
 	ld	a, _d_addr+0
 	call	_convert_int_to_chars
-;	main.c: 458: uart_write(a);
+;	main.c: 460: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 459: uart_write(" ");
+;	main.c: 461: uart_write(" ");
 	ldw	x, #(___str_13+0)
 	call	_uart_write
-;	main.c: 460: convert_int_to_chars(d_size, a);
+;	main.c: 462: convert_int_to_chars(d_size, a);
 	ldw	x, #(_a+0)
 	ld	a, _d_size+0
 	call	_convert_int_to_chars
-;	main.c: 461: uart_write(a);
+;	main.c: 463: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 462: for(int i = 0;i < d_size;i++)
+;	main.c: 464: for(int i = 0;i < d_size;i++)
 	clrw	x
 	ldw	(0x03, sp), x
 00103$:
@@ -1272,64 +1278,64 @@ _cm_SR:
 	ldw	x, (0x03, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00101$
-;	main.c: 464: uart_write(" ");
+;	main.c: 466: uart_write(" ");
 	ldw	x, #(___str_13+0)
 	call	_uart_write
-;	main.c: 465: convert_int_to_chars(data_buf[i], a);
+;	main.c: 467: convert_int_to_chars(data_buf[i], a);
 	ldw	x, (0x03, sp)
 	ld	a, (_data_buf+0, x)
 	ldw	x, #(_a+0)
 	call	_convert_int_to_chars
-;	main.c: 466: uart_write(a);
+;	main.c: 468: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 462: for(int i = 0;i < d_size;i++)
+;	main.c: 464: for(int i = 0;i < d_size;i++)
 	ldw	x, (0x03, sp)
 	incw	x
 	ldw	(0x03, sp), x
 	jra	00103$
 00101$:
-;	main.c: 469: uart_write("\r\n");
+;	main.c: 471: uart_write("\r\n");
 	ldw	x, #(___str_9+0)
 	addw	sp, #4
-;	main.c: 470: }
+;	main.c: 472: }
 	jp	_uart_write
-;	main.c: 471: void cm_SW(void)
+;	main.c: 473: void cm_SW(void)
 ;	-----------------------------------------
 ;	 function cm_SW
 ;	-----------------------------------------
 _cm_SW:
 	sub	sp, #4
-;	main.c: 473: i2c_start();
+;	main.c: 475: i2c_start();
 	call	_i2c_start
-;	main.c: 474: i2c_send_address(current_dev);
+;	main.c: 476: i2c_send_address(current_dev);
 	ld	a, _current_dev+0
 	call	_i2c_send_address
-;	main.c: 475: i2c_write();
+;	main.c: 477: i2c_write();
 	call	_i2c_write
-;	main.c: 476: i2c_stop();
+;	main.c: 478: i2c_stop();
 	call	_i2c_stop
-;	main.c: 477: uart_write("SW ");
+;	main.c: 479: uart_write("SW ");
 	ldw	x, #(___str_14+0)
 	call	_uart_write
-;	main.c: 478: convert_int_to_chars(d_addr, a);
+;	main.c: 480: convert_int_to_chars(d_addr, a);
 	ldw	x, #(_a+0)
 	ld	a, _d_addr+0
 	call	_convert_int_to_chars
-;	main.c: 479: uart_write(a);
+;	main.c: 481: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 480: uart_write(" ");
+;	main.c: 482: uart_write(" ");
 	ldw	x, #(___str_13+0)
 	call	_uart_write
-;	main.c: 481: convert_int_to_chars(d_size, a);
+;	main.c: 483: convert_int_to_chars(d_size, a);
 	ldw	x, #(_a+0)
 	ld	a, _d_size+0
 	call	_convert_int_to_chars
-;	main.c: 482: uart_write(a);
+;	main.c: 484: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 483: for(int i = 0;i < d_size;i++)
+;	main.c: 485: for(int i = 0;i < d_size;i++)
 	clrw	x
 	ldw	(0x03, sp), x
 00103$:
@@ -1339,69 +1345,69 @@ _cm_SW:
 	ldw	x, (0x03, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00101$
-;	main.c: 485: uart_write(" ");
+;	main.c: 487: uart_write(" ");
 	ldw	x, #(___str_13+0)
 	call	_uart_write
-;	main.c: 486: convert_int_to_chars(data_buf[i], a);
+;	main.c: 488: convert_int_to_chars(data_buf[i], a);
 	ldw	x, (0x03, sp)
 	ld	a, (_data_buf+0, x)
 	ldw	x, #(_a+0)
 	call	_convert_int_to_chars
-;	main.c: 487: uart_write(a);
+;	main.c: 489: uart_write(a);
 	ldw	x, #(_a+0)
 	call	_uart_write
-;	main.c: 483: for(int i = 0;i < d_size;i++)
+;	main.c: 485: for(int i = 0;i < d_size;i++)
 	ldw	x, (0x03, sp)
 	incw	x
 	ldw	(0x03, sp), x
 	jra	00103$
 00101$:
-;	main.c: 490: uart_write("\r\n");
+;	main.c: 492: uart_write("\r\n");
 	ldw	x, #(___str_9+0)
 	addw	sp, #4
-;	main.c: 491: }
+;	main.c: 493: }
 	jp	_uart_write
-;	main.c: 499: int data_handler(void)
+;	main.c: 501: int data_handler(void)
 ;	-----------------------------------------
 ;	 function data_handler
 ;	-----------------------------------------
 _data_handler:
-;	main.c: 501: p_size = 0;
+;	main.c: 503: p_size = 0;
 	clr	_p_size+0
-;	main.c: 502: p_bytes = 0;
+;	main.c: 504: p_bytes = 0;
 	clr	_p_bytes+0
-;	main.c: 503: d_addr = 0;
+;	main.c: 505: d_addr = 0;
 	clr	_d_addr+0
-;	main.c: 504: d_size = 0;
+;	main.c: 506: d_size = 0;
 	clr	_d_size+0
-;	main.c: 505: memset(a, 0, sizeof(a));
+;	main.c: 507: memset(a, 0, sizeof(a));
 	push	#0x03
 	push	#0x00
 	clrw	x
 	pushw	x
 	ldw	x, #(_a+0)
 	call	_memset
-;	main.c: 506: memset(data_buf, 0, sizeof(data_buf));
+;	main.c: 508: memset(data_buf, 0, sizeof(data_buf));
 	push	#0x00
 	push	#0x01
 	clrw	x
 	pushw	x
 	ldw	x, #(_data_buf+0)
 	call	_memset
-;	main.c: 507: if(memcmp(&buffer[0],"SM",2) == 0)
+;	main.c: 509: if(memcmp(&buffer[0],"SM",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_15+0)
 	push	#((___str_15+0) >> 8)
 	ldw	x, #(_buffer+0)
 	call	_memcmp
-;	main.c: 508: return 1;
+;	main.c: 510: return 1;
 	tnzw	x
 	jrne	00102$
 	incw	x
 	ret
 00102$:
-;	main.c: 509: if(memcmp(&buffer[0],"SN",2) == 0)
+;	main.c: 511: if(memcmp(&buffer[0],"SN",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_16+0)
@@ -1410,11 +1416,11 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00104$
-;	main.c: 510: return 2;
+;	main.c: 512: return 2;
 	ldw	x, #0x0002
 	ret
 00104$:
-;	main.c: 511: if(memcmp(&buffer[0],"ST",2) == 0)
+;	main.c: 513: if(memcmp(&buffer[0],"ST",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_17+0)
@@ -1423,11 +1429,11 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00106$
-;	main.c: 512: return 5;
+;	main.c: 514: return 5;
 	ldw	x, #0x0005
 	ret
 00106$:
-;	main.c: 513: if(memcmp(&buffer[0],"RM",2) == 0)
+;	main.c: 515: if(memcmp(&buffer[0],"RM",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_18+0)
@@ -1436,11 +1442,11 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00108$
-;	main.c: 514: return 6;
+;	main.c: 516: return 6;
 	ldw	x, #0x0006
 	ret
 00108$:
-;	main.c: 515: if(memcmp(&buffer[0],"DB",2) == 0)
+;	main.c: 517: if(memcmp(&buffer[0],"DB",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_19+0)
@@ -1449,15 +1455,15 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00110$
-;	main.c: 516: return 7;
+;	main.c: 518: return 7;
 	ldw	x, #0x0007
 	ret
 00110$:
-;	main.c: 518: get_addr_from_buff();
+;	main.c: 520: get_addr_from_buff();
 	call	_get_addr_from_buff
-;	main.c: 519: get_size_from_buff();
+;	main.c: 521: get_size_from_buff();
 	call	_get_size_from_buff
-;	main.c: 521: if(memcmp(&buffer[0],"SR",2) == 0)
+;	main.c: 523: if(memcmp(&buffer[0],"SR",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_20+0)
@@ -1466,13 +1472,13 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00112$
-;	main.c: 522: return 3;
+;	main.c: 524: return 3;
 	ldw	x, #0x0003
 	ret
 00112$:
-;	main.c: 524: char_buffer_to_int();
+;	main.c: 526: char_buffer_to_int();
 	call	_char_buffer_to_int
-;	main.c: 526: if(memcmp(&buffer[0],"SW",2) == 0)
+;	main.c: 528: if(memcmp(&buffer[0],"SW",2) == 0)
 	push	#0x02
 	push	#0x00
 	push	#<(___str_21+0)
@@ -1481,26 +1487,26 @@ _data_handler:
 	call	_memcmp
 	tnzw	x
 	jrne	00114$
-;	main.c: 527: return 4;
+;	main.c: 529: return 4;
 	ldw	x, #0x0004
 	ret
 00114$:
-;	main.c: 528: return 0;
+;	main.c: 530: return 0;
 	clrw	x
-;	main.c: 530: }
+;	main.c: 532: }
 	ret
-;	main.c: 532: void command_switcher(void)
+;	main.c: 534: void command_switcher(void)
 ;	-----------------------------------------
 ;	 function command_switcher
 ;	-----------------------------------------
 _command_switcher:
 	sub	sp, #4
-;	main.c: 534: char ar[4]={0};
+;	main.c: 536: char ar[4]={0};
 	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
 	clr	(0x04, sp)
-;	main.c: 536: switch(data_handler())
+;	main.c: 538: switch(data_handler())
 	call	_data_handler
 	tnzw	x
 	jrmi	00109$
@@ -1518,71 +1524,71 @@ _command_switcher:
 	.dw	#00105$
 	.dw	#00106$
 	.dw	#00107$
-;	main.c: 538: case 1:
+;	main.c: 540: case 1:
 00101$:
-;	main.c: 539: cm_SM();
+;	main.c: 541: cm_SM();
 	call	_cm_SM
-;	main.c: 540: break;
+;	main.c: 542: break;
 	jra	00109$
-;	main.c: 541: case 2:
+;	main.c: 543: case 2:
 00102$:
-;	main.c: 542: cm_SN();
+;	main.c: 544: cm_SN();
 	call	_cm_SN
-;	main.c: 543: break;
+;	main.c: 545: break;
 	jra	00109$
-;	main.c: 544: case 3:
+;	main.c: 546: case 3:
 00103$:
-;	main.c: 545: cm_SR();
+;	main.c: 547: cm_SR();
 	call	_cm_SR
-;	main.c: 546: break;
+;	main.c: 548: break;
 	jra	00109$
-;	main.c: 547: case 4:
+;	main.c: 549: case 4:
 00104$:
-;	main.c: 548: cm_SW();
+;	main.c: 550: cm_SW();
 	call	_cm_SW
-;	main.c: 549: break;
+;	main.c: 551: break;
 	jra	00109$
-;	main.c: 550: case 5:
+;	main.c: 552: case 5:
 00105$:
-;	main.c: 551: cm_ST();
+;	main.c: 553: cm_ST();
 	call	_cm_ST
-;	main.c: 552: break;
+;	main.c: 554: break;
 	jra	00109$
-;	main.c: 553: case 6:
+;	main.c: 555: case 6:
 00106$:
-;	main.c: 554: cm_RM();
+;	main.c: 556: cm_RM();
 	call	_cm_RM
-;	main.c: 555: break;
+;	main.c: 557: break;
 	jra	00109$
-;	main.c: 556: case 7:
+;	main.c: 558: case 7:
 00107$:
-;	main.c: 557: cm_DB();
+;	main.c: 559: cm_DB();
 	call	_cm_DB
-;	main.c: 559: }
+;	main.c: 561: }
 00109$:
-;	main.c: 560: }
+;	main.c: 562: }
 	addw	sp, #4
 	ret
-;	main.c: 563: void main(void)
+;	main.c: 565: void main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	main.c: 565: uart_init();
+;	main.c: 567: uart_init();
 	call	_uart_init
-;	main.c: 566: i2c_init();
+;	main.c: 568: i2c_init();
 	call	_i2c_init
-;	main.c: 567: uart_write("SS\n");
+;	main.c: 569: uart_write("SS\n");
 	ldw	x, #(___str_22+0)
 	call	_uart_write
-;	main.c: 568: while(1)
+;	main.c: 570: while(1)
 00102$:
-;	main.c: 570: uart_read();
+;	main.c: 572: uart_read();
 	call	_uart_read
-;	main.c: 571: command_switcher();
+;	main.c: 573: command_switcher();
 	call	_command_switcher
 	jra	00102$
-;	main.c: 573: }
+;	main.c: 575: }
 	ret
 	.area CODE
 	.area CONST
