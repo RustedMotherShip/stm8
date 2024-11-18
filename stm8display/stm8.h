@@ -50,53 +50,7 @@
 #define PD_CR1 *(volatile unsigned char *)0x5012
 #define PD_CR2 *(volatile unsigned char *)0x5013
 
-/* UART */
-#define UART1_SR *(volatile unsigned char *)0x5230
-#define UART1_DR *(volatile unsigned char *)0x5231
-#define UART1_BRR1 *(volatile unsigned char *)0x5232
-#define UART1_BRR2 *(volatile unsigned char *)0x5233
-#define UART1_CR1 *(volatile unsigned char *)0x5234
-#define UART1_CR2 *(volatile unsigned char *)0x5235
-#define UART1_CR3 *(volatile unsigned char *)0x5236
-#define UART1_CR4 *(volatile unsigned char *)0x5237
-#define UART1_CR5 *(volatile unsigned char *)0x5238
-#define UART1_GTR *(volatile unsigned char *)0x5239
-#define UART1_PSCR *(volatile unsigned char *)0x523A
 
-#define UART_SR_TXE (1 << 7)
-#define UART_SR_TC (1 << 6)
-#define UART_SR_RXNE (1 << 5)
-#define UART_SR_IDLE (1 << 4)
-#define UART_SR_OR (1 << 3)
-#define UART_SR_NF (1 << 2)
-#define UART_SR_FE (1 << 1)
-#define UART_SR_PE (1 << 0)
-
-#define UART_CR1_R8 (1 << 7)
-#define UART_CR1_T8 (1 << 6)
-#define UART_CR1_UARTD (1 << 5)
-#define UART_CR1_M (1 << 4)
-#define UART_CR1_WAKE (1 << 3)
-#define UART_CR1_PCEN (1 << 2)
-#define UART_CR1_PS (1 << 1)
-#define UART_CR1_PIEN (1 << 0)
-
-#define UART_CR2_TIEN (1 << 7)
-#define UART_CR2_TCIEN (1 << 6)
-#define UART_CR2_RIEN (1 << 5)
-#define UART_CR2_ILIEN (1 << 4)
-#define UART_CR2_TEN (1 << 3)
-#define UART_CR2_REN (1 << 2)
-#define UART_CR2_RWU (1 << 1)
-#define UART_CR2_SBK (1 << 0)
-
-#define UART_CR3_LINEN (1 << 6)
-#define UART_CR3_STOP2 (1 << 5)
-#define UART_CR3_STOP1 (1 << 4)
-#define UART_CR3_CLKEN (1 << 3)
-#define UART_CR3_CPOL (1 << 2)
-#define UART_CR3_CPHA (1 << 1)
-#define UART_CR3_LBCL (1 << 0)
 
 /* Timers */
 #define TIM1_CR1 *(volatile unsigned char *)0x5250

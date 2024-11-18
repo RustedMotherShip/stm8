@@ -1,3 +1,4 @@
+#include "uart_lib.c"
 struct I2C_CR1_
 {
 	uint8_t PE:1;
