@@ -24,14 +24,14 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000003  l_GSFINAL                       
      00000007  l_HOME                          
      00000023  l_GSINIT                        
-     0000004F  l_CONST                         
-     00000303  l_CODE                          
+     00000068  l_CONST                         
+     00000316  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
      0000802D  s_CONST                         
-     0000807C  s_CODE                          
-     0000807C  s_INITIALIZER                   
+     00008095  s_CODE                          
+     00008095  s_INITIALIZER                   
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -74,7 +74,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000802D    0000004F =          79. bytes (REL,CON)
+CONST                               0000802D    00000068 =         104. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -83,28 +83,28 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                0000807C    00000303 =         771. bytes (REL,CON)
+CODE                                00008095    00000316 =         790. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000807C  _uart_init                         main
-     0000817E  _uart_read_byte                    main
-     00008186  _uart_write_byte                   main
-     00008191  _uart_write                        main
-     000081B5  _uart_read                         main
-     000081DE  _delay                             main
-     000081E8  _trash_clean                       main
-     000081E9  _i2c_init                          main
-     00008214  _i2c_start                         main
-     0000821E  _i2c_send_byte                     main
-     0000824A  _i2c_read_byte                     main
-     00008251  _i2c_stop                          main
-     00008256  _i2c_send_address                  main
-     00008278  _i2c_write                         main
-     000082C7  _i2c_read                          main
-     00008306  _i2c_scan                          main
-     00008339  _main                              main
-     0000837D  ___sdcc_external_startup           _startup
+     00008095  _uart_init                         main
+     00008197  _uart_read_byte                    main
+     0000819F  _uart_write_byte                   main
+     000081AA  _uart_write                        main
+     000081CE  _uart_read                         main
+     000081F7  _delay                             main
+     00008201  _trash_clean                       main
+     00008202  _i2c_init                          main
+     0000822D  _i2c_start                         main
+     00008237  _i2c_send_byte                     main
+     00008261  _i2c_read_byte                     main
+     00008268  _i2c_stop                          main
+     0000826D  _i2c_send_address                  main
+     000082A6  _i2c_write                         main
+     000082F5  _i2c_read                          main
+     00008334  _i2c_scan                          main
+     0000836C  _main                              main
+     000083A9  ___sdcc_external_startup           _startup
 ASxxxx Linker V03.00/V05.40 + sdld,  page 8.
 
 Files Linked                              [ module(s) ]

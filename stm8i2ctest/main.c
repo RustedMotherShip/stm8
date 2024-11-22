@@ -216,16 +216,16 @@ void char_buffer_to_int(void)
 void reg_check(void)
 {
     char rx_binary_chars[9]={0};
-    convert_int_to_binary(I2C_SR1, rx_binary_chars);
-    status_registers[0] = I2C_SR1;
-    convert_int_to_binary(I2C_SR2, rx_binary_chars);
-    status_registers[1] = I2C_SR2;
+    //convert_int_to_binary(I2C_SR1, rx_binary_chars);
+    //status_registers[0] = I2C_SR1;
+    //convert_int_to_binary(I2C_SR2, rx_binary_chars);
+    //status_registers[1] = I2C_SR2;
     convert_int_to_binary(I2C_SR3, rx_binary_chars);
     status_registers[2] = I2C_SR3;
-    convert_int_to_binary(I2C_CR1, rx_binary_chars);
-    status_registers[3] = I2C_CR1;
-    convert_int_to_binary(I2C_CR2, rx_binary_chars);
-    status_registers[4] = I2C_CR2;
+    //convert_int_to_binary(I2C_CR1, rx_binary_chars);
+    //status_registers[3] = I2C_CR1;
+    //convert_int_to_binary(I2C_CR2, rx_binary_chars);
+    //status_registers[4] = I2C_CR2;
     convert_int_to_binary(I2C_DR, rx_binary_chars);
     status_registers[5] = I2C_DR;
 }
@@ -359,7 +359,7 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
-    I2C_DR = 0;
+    //I2C_DR = 0;
     reg_check();
     I2C_DR = d_addr;
     reg_check();
@@ -567,6 +567,16 @@ void main(void)
     uart_init();
     i2c_init();
     uart_write("SS\n");
+    current_dev = 0x3C;
+    d_addr = 0x55;
+    d_size = 3;
+    data_buf[0] = 1;
+    data_buf[1] = 2;
+    data_buf[2] = 3;
+    cm_SW();
+    cm_SW();
+    cm_SW();
+
     while(1)
     {
         uart_read();

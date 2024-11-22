@@ -116,18 +116,19 @@ struct I2C_TRISER_
 	uint8_t reserve:2;
 	
 } typedef I2C_TRISER_t;
+
 /* I2C */
-#define I2C_CR1 ((volatile I2C_CR1_t *)0x5210)
-#define I2C_CR2 ((volatile I2C_CR2_t *)0x5211)
-#define I2C_FREQR ((volatile I2C_FREQR_t *)0x5212)
-#define I2C_OARL ((volatile I2C_OARL_t *)0x5213)
-#define I2C_OARH ((volatile I2C_OARH_t *)0x5214)
-#define I2C_DR ((volatile I2C_DR_t *)0x5216)
-#define I2C_SR1 ((volatile I2C_SR1_t *)0x5217)
-#define I2C_SR2 ((volatile I2C_SR2_t *)0x5218)
-#define I2C_SR3 ((volatile I2C_SR3_t *)0x5219)
-#define I2C_ITR ((volatile I2C_ITR_t *)0x521A)
-#define I2C_CCRL ((volatile I2C_CCRL_t *)0x521B)
-#define I2C_CCRH ((volatile I2C_CCRH_t *)0x521C)
-#define I2C_TRISER ((volatile I2C_TRISER_t *)0x521D)
-#define I2C_PECR ((volatile I2C_PECR_t *)0x521E)
+#define I2C_CR1 ((I2C_CR1_t *)0x5210)
+#define I2C_CR2 ((I2C_CR2_t *)0x5211)
+#define I2C_FREQR ((I2C_FREQR_t *)0x5212)
+#define I2C_OARL ((I2C_OARL_t *)0x5213)
+#define I2C_OARH ((I2C_OARH_t *)0x5214)
+#define I2C_DR ((I2C_DR_t *)0x5216)
+#define I2C_SR1 ((I2C_SR1_t *)0x5217)
+#define I2C_SR2 ((I2C_SR2_t *)0x5218)
+#define I2C_SR3 ((I2C_SR3_t *)0x5219)
+#define I2C_ITR ((I2C_ITR_t *)0x521A)
+#define I2C_CCRL ((I2C_CCRL_t *)0x521B)
+#define I2C_CCRH ((I2C_CCRH_t *)0x521C)
+#define I2C_TRISER ((I2C_TRISER_t *)0x521D)
+#define I2C_PECR ((I2C_PECR_t *)0x521E)

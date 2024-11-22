@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler 
-; Version 4.3.0 #14184 (Linux)
+; Version 4.4.0 #14620 (Linux)
 ;--------------------------------------------------------
 	.module main
 	.optsdcc -mstm8
@@ -165,16 +165,16 @@ _delay:
 	ldw	y, (0x07, sp)
 	subw	y, #0x0001
 	ldw	(0x07, sp), y
-	jrnc	00117$
+	jrnc	00121$
 	decw	x
-00117$:
+00121$:
 	tnz	a
-	jrne	00118$
+	jrne	00122$
 	ldw	y, (0x02, sp)
-	jrne	00118$
+	jrne	00122$
 	tnz	(0x01, sp)
 	jreq	00104$
-00118$:
+00122$:
 ;	main.c: 29: nop();
 	nop
 	jra	00101$
@@ -258,23 +258,23 @@ _uart_read:
 	ldw	x, #(_buffer+0)
 	call	_memset
 ;	main.c: 66: while(i<256)
-	clrw	x
+	clrw	y
 00109$:
-	cpw	x, #0x0100
+	cpw	y, #0x0100
 	jrsge	00111$
 ;	main.c: 69: if(UART1_SR & UART_SR_RXNE)
 	ld	a, 0x5230
 	bcp	a, #0x20
 	jreq	00109$
 ;	main.c: 72: buffer[i] = UART_RX();
-	ldw	y, x
-	addw	y, #(_buffer+0)
+	ldw	x, y
+	addw	x, #(_buffer+0)
 	pushw	x
 	pushw	y
 	call	_UART_RX
 	popw	y
 	popw	x
-	ld	(y), a
+	ld	(x), a
 ;	main.c: 73: if(buffer[i] == '\r')
 	cp	a, #0x0d
 	jrne	00102$
@@ -285,13 +285,13 @@ _uart_read:
 ;	main.c: 76: break;
 00102$:
 ;	main.c: 78: if(buffer[i] < 32 || buffer[i] > 126);
-	ld	a, (y)
+	ld	a, (x)
 	cp	a, #0x20
 	jrc	00109$
 	cp	a, #0x7e
 	jrugt	00109$
 ;	main.c: 80: i++;
-	incw	x
+	incw	y
 	jra	00109$
 00111$:
 ;	main.c: 84: return 0;
@@ -449,12 +449,12 @@ _convert_int_to_binary:
 	addw	x, (0x07, sp)
 	ldw	y, (0x01, sp)
 	ld	a, (0x04, sp)
-	jreq	00120$
-00119$:
+	jreq	00124$
+00123$:
 	sraw	y
 	dec	a
-	jrne	00119$
-00120$:
+	jrne	00123$
+00124$:
 	ld	a, yl
 	and	a, #0x01
 	add	a, #0x30
@@ -708,28 +708,6 @@ _reg_check:
 	clr	(0x07, sp)
 	clr	(0x08, sp)
 	clr	(0x09, sp)
-;	main.c: 219: convert_int_to_binary(I2C_SR1, rx_binary_chars);
-	ldw	x, sp
-	incw	x
-	exgw	x, y
-	ld	a, 0x5217
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_convert_int_to_binary
-;	main.c: 220: status_registers[0] = I2C_SR1;
-	mov	_status_registers+0, 0x5217
-;	main.c: 221: convert_int_to_binary(I2C_SR2, rx_binary_chars);
-	ldw	x, sp
-	incw	x
-	exgw	x, y
-	ld	a, 0x5218
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_convert_int_to_binary
-;	main.c: 222: status_registers[1] = I2C_SR2;
-	mov	_status_registers+1, 0x5218
 ;	main.c: 223: convert_int_to_binary(I2C_SR3, rx_binary_chars);
 	ldw	x, sp
 	incw	x
@@ -741,28 +719,6 @@ _reg_check:
 	call	_convert_int_to_binary
 ;	main.c: 224: status_registers[2] = I2C_SR3;
 	mov	_status_registers+2, 0x5219
-;	main.c: 225: convert_int_to_binary(I2C_CR1, rx_binary_chars);
-	ldw	x, sp
-	incw	x
-	exgw	x, y
-	ld	a, 0x5210
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_convert_int_to_binary
-;	main.c: 226: status_registers[3] = I2C_CR1;
-	mov	_status_registers+3, 0x5210
-;	main.c: 227: convert_int_to_binary(I2C_CR2, rx_binary_chars);
-	ldw	x, sp
-	incw	x
-	exgw	x, y
-	ld	a, 0x5211
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_convert_int_to_binary
-;	main.c: 228: status_registers[4] = I2C_CR2;
-	mov	_status_registers+4, 0x5211
 ;	main.c: 229: convert_int_to_binary(I2C_DR, rx_binary_chars);
 	ldw	x, sp
 	incw	x
@@ -980,9 +936,9 @@ _i2c_send_address:
 	call	_reg_check
 ;	main.c: 353: while (!(I2C_SR1 & (1 << 1)) && !(I2C_SR2 & (1 << 2)));
 00102$:
-	btjf	0x5217, #1, 00117$
+	btjf	0x5217, #1, 00121$
 	ret
-00117$:
+00121$:
 	btjf	0x5218, #2, 00102$
 ;	main.c: 355: }
 	ret
@@ -1001,8 +957,6 @@ _i2c_stop:
 ;	-----------------------------------------
 _i2c_write:
 	sub	sp, #2
-;	main.c: 362: I2C_DR = 0;
-	mov	0x5216+0, #0x00
 ;	main.c: 363: reg_check();
 	call	_reg_check
 ;	main.c: 364: I2C_DR = d_addr;
@@ -1513,9 +1467,9 @@ _command_switcher:
 	cpw	x, #0x0007
 	jrsgt	00109$
 	sllw	x
-	ldw	x, (#00123$, x)
+	ldw	x, (#00127$, x)
 	jp	(x)
-00123$:
+00127$:
 	.dw	#00109$
 	.dw	#00101$
 	.dw	#00102$
@@ -1581,14 +1535,32 @@ _main:
 ;	main.c: 569: uart_write("SS\n");
 	ldw	x, #(___str_22+0)
 	call	_uart_write
-;	main.c: 570: while(1)
+;	main.c: 570: current_dev = 0x3C;
+	mov	_current_dev+0, #0x3c
+;	main.c: 571: d_addr = 0x55;
+	mov	_d_addr+0, #0x55
+;	main.c: 572: d_size = 3;
+	mov	_d_size+0, #0x03
+;	main.c: 573: data_buf[0] = 1;
+	mov	_data_buf+0, #0x01
+;	main.c: 574: data_buf[1] = 2;
+	mov	_data_buf+1, #0x02
+;	main.c: 575: data_buf[2] = 3;
+	mov	_data_buf+2, #0x03
+;	main.c: 576: cm_SW();
+	call	_cm_SW
+;	main.c: 577: cm_SW();
+	call	_cm_SW
+;	main.c: 578: cm_SW();
+	call	_cm_SW
+;	main.c: 580: while(1)
 00102$:
-;	main.c: 572: uart_read();
+;	main.c: 582: uart_read();
 	call	_uart_read
-;	main.c: 573: command_switcher();
+;	main.c: 583: command_switcher();
 	call	_command_switcher
 	jra	00102$
-;	main.c: 575: }
+;	main.c: 585: }
 	ret
 	.area CODE
 	.area CONST

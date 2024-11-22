@@ -17,10 +17,10 @@ void delay(uint16_t ticks)
 }
 void trash_clean(void)
 {
-    uint8_t trash_reg = (unsigned char)I2C_DR;
-    trash_reg = (unsigned char)I2C_SR1;
-    trash_reg = (unsigned char)I2C_SR2;
-    trash_reg = (unsigned char)I2C_SR3;
+    // uint8_t trash_reg = (uint8_t)I2C_DR;
+    // trash_reg = (uint8_t)I2C_SR1;
+    // trash_reg = (uint8_t)I2C_SR2;
+    // trash_reg = (uint8_t)I2C_SR3;
 }
 void i2c_init(void) {
     // Включение I2C
@@ -42,10 +42,10 @@ void i2c_start(void) {
 
 uint8_t i2c_send_byte(unsigned char data){
     uart_write("start send byte\n");
-    while (!(I2C_SR1 -> TXE));
-    uart_write("while passed\n");
     I2C_DR -> DR = data;
-    //while (!(I2C_SR1 -> TXE));
+    (uint8_t)I2C_SR3;
+    (uint8_t)I2C_DR;
+    while (!(I2C_SR1 ->TXE) && (I2C_SR2 -> AF) && !(I2C_SR1 -> BTF));
     uart_write("DR byte\n");
     int result = I2C_SR2 -> AF;
     return result;
@@ -76,10 +76,18 @@ uint8_t i2c_send_address(uint8_t address,uint8_t rw_type)
         address = address << 1; // Отправка адреса устройства с битом на запись
     break;
     }
-    I2C_DR -> DR = address;//Отправка адреса
-    delay(250);
+    I2C_DR -> DR = address;
+    int result = I2C_SR1 -> ADDR;//Отправка адреса
     (uint8_t)I2C_SR3;
-    int result = I2C_SR1 -> ADDR;
+    (uint8_t)I2C_DR;
+    uart_write("WHILE start\n");
+    while (!(I2C_SR1 -> ADDR) && (I2C_SR2 -> AF));
+    uart_write("WHILE passed\n");  
+    //delay(250);
+    
+    //(uint8_t)I2C_SR1;
+    (uint8_t)I2C_SR3;
+    (uint8_t)I2C_DR;
     return result;
 }
 
@@ -95,7 +103,9 @@ void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
             {
                 uart_write("error send byte\n");
                 break;
-            } 
+            }
+            (uint8_t)I2C_SR3;
+            (uint8_t)I2C_DR; 
             uart_write("if passed\n");    
         }
     }
@@ -120,7 +130,8 @@ uint8_t i2c_scan(void)
             i2c_stop();
             return addr;
         }
-        I2C_SR2 -> AF = 0; //Очистка флага ошибки
+        I2C_SR2 -> AF = 0;
+        uart_write("error addr\n"); //Очистка флага ошибки
     }
     i2c_stop();
     return 0;

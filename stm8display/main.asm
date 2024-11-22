@@ -398,7 +398,6 @@ _delay:
 ;	 function trash_clean
 ;	-----------------------------------------
 _trash_clean:
-;	libs/i2c_lib.c: 23: trash_reg = (unsigned char)I2C_SR3;
 ;	libs/i2c_lib.c: 24: }
 	ret
 ;	libs/i2c_lib.c: 25: void i2c_init(void) {
@@ -446,23 +445,21 @@ _i2c_start:
 ;	 function i2c_send_byte
 ;	-----------------------------------------
 _i2c_send_byte:
-	push	a
-	ld	(0x01, sp), a
 ;	libs/i2c_lib.c: 44: uart_write("start send byte\n");
+	push	a
 	ldw	x, #(___str_0+0)
 	call	_uart_write
-;	libs/i2c_lib.c: 45: while (!(I2C_SR1 -> TXE));
-00101$:
-	btjf	0x5217, #7, 00101$
-;	libs/i2c_lib.c: 46: uart_write("while passed\n");
-	ldw	x, #(___str_1+0)
-	call	_uart_write
-;	libs/i2c_lib.c: 47: I2C_DR -> DR = data;
-	ldw	x, #0x5216
-	ld	a, (0x01, sp)
-	ld	(x), a
+	pop	a
+;	libs/i2c_lib.c: 45: I2C_DR -> DR = data;
+	ld	0x5216, a
+;	libs/i2c_lib.c: 48: while (!(I2C_SR1 ->TXE) && (I2C_SR2 -> AF) && !(I2C_SR1 -> BTF));
+00103$:
+	btjt	0x5217, #7, 00105$
+	btjf	0x5218, #7, 00105$
+	btjf	0x5217, #2, 00103$
+00105$:
 ;	libs/i2c_lib.c: 49: uart_write("DR byte\n");
-	ldw	x, #(___str_2+0)
+	ldw	x, #(___str_1+0)
 	call	_uart_write
 ;	libs/i2c_lib.c: 50: int result = I2C_SR2 -> AF;
 	ld	a, 0x5218
@@ -473,7 +470,6 @@ _i2c_send_byte:
 	and	a, #0x01
 ;	libs/i2c_lib.c: 51: return result;
 ;	libs/i2c_lib.c: 52: }
-	addw	sp, #1
 	ret
 ;	libs/i2c_lib.c: 54: uint8_t i2c_read_byte(unsigned char *data){
 ;	-----------------------------------------
@@ -501,6 +497,7 @@ _i2c_stop:
 ;	 function i2c_send_address
 ;	-----------------------------------------
 _i2c_send_address:
+	push	a
 ;	libs/i2c_lib.c: 68: i2c_start();
 	push	a
 	call	_i2c_start
@@ -509,7 +506,7 @@ _i2c_send_address:
 	sll	a
 ;	libs/i2c_lib.c: 69: switch(rw_type)
 	push	a
-	ld	a, (0x04, sp)
+	ld	a, (0x05, sp)
 	dec	a
 	pop	a
 	jrne	00102$
@@ -521,35 +518,46 @@ _i2c_send_address:
 ;	libs/i2c_lib.c: 76: address = address << 1; // Отправка адреса устройства с битом на запись
 ;	libs/i2c_lib.c: 78: }
 00102$:
-;	libs/i2c_lib.c: 79: I2C_DR -> DR = address;//Отправка адреса
+;	libs/i2c_lib.c: 79: I2C_DR -> DR = address;
 	ld	0x5216, a
-;	libs/i2c_lib.c: 80: delay(250);
-	ldw	x, #0x00fa
-	call	_delay
-;	libs/i2c_lib.c: 82: int result = I2C_SR1 -> ADDR;
+;	libs/i2c_lib.c: 80: int result = I2C_SR1 -> ADDR;//Отправка адреса
 	ld	a, 0x5217
 	srl	a
 	and	a, #0x01
-;	libs/i2c_lib.c: 83: return result;
-;	libs/i2c_lib.c: 84: }
+	ld	(0x01, sp), a
+;	libs/i2c_lib.c: 83: uart_write("WHILE start\n");
+	ldw	x, #(___str_2+0)
+	call	_uart_write
+;	libs/i2c_lib.c: 84: while (!(I2C_SR1 -> ADDR) && (I2C_SR2 -> AF));
+00105$:
+	btjt	0x5217, #1, 00107$
+	btjt	0x5218, #7, 00105$
+00107$:
+;	libs/i2c_lib.c: 85: uart_write("WHILE passed\n");  
+	ldw	x, #(___str_3+0)
+	call	_uart_write
+;	libs/i2c_lib.c: 91: return result;
+	ld	a, (0x01, sp)
+;	libs/i2c_lib.c: 92: }
+	addw	sp, #1
 	popw	x
 	addw	sp, #1
 	jp	(x)
-;	libs/i2c_lib.c: 86: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
+;	libs/i2c_lib.c: 94: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
 ;	-----------------------------------------
 ;	 function i2c_write
 ;	-----------------------------------------
 _i2c_write:
 	sub	sp, #4
-;	libs/i2c_lib.c: 88: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
+;	libs/i2c_lib.c: 96: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
 	push	#0x00
 	call	_i2c_send_address
 	tnz	a
 	jreq	00105$
-;	libs/i2c_lib.c: 90: uart_write("PIVO\n");
-	ldw	x, #(___str_3+0)
+;	libs/i2c_lib.c: 98: uart_write("PIVO\n");
+	ldw	x, #(___str_4+0)
 	call	_uart_write
-;	libs/i2c_lib.c: 91: for(int i = 0;i < size;i++)
+;	libs/i2c_lib.c: 99: for(int i = 0;i < size;i++)
 	clrw	x
 	ldw	(0x03, sp), x
 00107$:
@@ -559,56 +567,56 @@ _i2c_write:
 	ldw	x, (0x03, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00105$
-;	libs/i2c_lib.c: 93: uart_write("for\n");
-	ldw	x, #(___str_4+0)
+;	libs/i2c_lib.c: 101: uart_write("for\n");
+	ldw	x, #(___str_5+0)
 	call	_uart_write
-;	libs/i2c_lib.c: 94: if(i2c_send_byte(data[i]))//Проверка на АСК бит
+;	libs/i2c_lib.c: 102: if(i2c_send_byte(data[i]))//Проверка на АСК бит
 	ldw	x, (0x08, sp)
 	addw	x, (0x03, sp)
 	ld	a, (x)
 	call	_i2c_send_byte
 	tnz	a
 	jreq	00102$
-;	libs/i2c_lib.c: 96: uart_write("error send byte\n");
-	ldw	x, #(___str_5+0)
-	call	_uart_write
-;	libs/i2c_lib.c: 97: break;
-	jra	00105$
-00102$:
-;	libs/i2c_lib.c: 99: uart_write("if passed\n");    
+;	libs/i2c_lib.c: 104: uart_write("error send byte\n");
 	ldw	x, #(___str_6+0)
 	call	_uart_write
-;	libs/i2c_lib.c: 91: for(int i = 0;i < size;i++)
+;	libs/i2c_lib.c: 105: break;
+	jra	00105$
+00102$:
+;	libs/i2c_lib.c: 109: uart_write("if passed\n");    
+	ldw	x, #(___str_7+0)
+	call	_uart_write
+;	libs/i2c_lib.c: 99: for(int i = 0;i < size;i++)
 	ldw	x, (0x03, sp)
 	incw	x
 	ldw	(0x03, sp), x
 	jra	00107$
 00105$:
-;	libs/i2c_lib.c: 102: i2c_stop();
+;	libs/i2c_lib.c: 112: i2c_stop();
 	ldw	x, (5, sp)
 	ldw	(8, sp), x
 	addw	sp, #7
-;	libs/i2c_lib.c: 103: }
+;	libs/i2c_lib.c: 113: }
 	jp	_i2c_stop
-;	libs/i2c_lib.c: 105: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){
+;	libs/i2c_lib.c: 115: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){
 ;	-----------------------------------------
 ;	 function i2c_read
 ;	-----------------------------------------
 _i2c_read:
 	sub	sp, #2
-;	libs/i2c_lib.c: 106: I2C_CR2 -> ACK = 1;
+;	libs/i2c_lib.c: 116: I2C_CR2 -> ACK = 1;
 	ldw	x, #0x5211
 	push	a
 	ld	a, (x)
 	or	a, #0x04
 	ld	(x), a
 	pop	a
-;	libs/i2c_lib.c: 107: if(i2c_send_address(dev_addr,1))
+;	libs/i2c_lib.c: 117: if(i2c_send_address(dev_addr,1))
 	push	#0x01
 	call	_i2c_send_address
 	tnz	a
 	jreq	00103$
-;	libs/i2c_lib.c: 108: for(int i = 0;i < size;i++)
+;	libs/i2c_lib.c: 118: for(int i = 0;i < size;i++)
 	clrw	x
 00105$:
 	ld	a, (0x05, sp)
@@ -616,7 +624,7 @@ _i2c_read:
 	clr	(0x01, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00103$
-;	libs/i2c_lib.c: 110: i2c_read_byte((unsigned char *)data[i]);
+;	libs/i2c_lib.c: 120: i2c_read_byte((unsigned char *)data[i]);
 	ldw	y, x
 	addw	y, (0x06, sp)
 	ld	a, (y)
@@ -626,62 +634,61 @@ _i2c_read:
 	ldw	x, y
 	call	_i2c_read_byte
 	popw	x
-;	libs/i2c_lib.c: 108: for(int i = 0;i < size;i++)
+;	libs/i2c_lib.c: 118: for(int i = 0;i < size;i++)
 	incw	x
 	jra	00105$
 00103$:
-;	libs/i2c_lib.c: 112: I2C_CR2 -> ACK = 0;
+;	libs/i2c_lib.c: 122: I2C_CR2 -> ACK = 0;
 	ld	a, 0x5211
 	and	a, #0xfb
 	ld	0x5211, a
-;	libs/i2c_lib.c: 113: }
+;	libs/i2c_lib.c: 123: }
 	ldw	x, (3, sp)
 	addw	sp, #7
 	jp	(x)
-;	libs/i2c_lib.c: 114: uint8_t i2c_scan(void) 
+;	libs/i2c_lib.c: 124: uint8_t i2c_scan(void) 
 ;	-----------------------------------------
 ;	 function i2c_scan
 ;	-----------------------------------------
 _i2c_scan:
 	sub	sp, #2
-;	libs/i2c_lib.c: 116: for (uint8_t addr = 1; addr < 127; addr++)
+;	libs/i2c_lib.c: 126: for (uint8_t addr = 1; addr < 127; addr++)
 	ld	a, #0x01
 	ld	(0x01, sp), a
+	ld	(0x02, sp), a
 00105$:
+	ld	a, (0x02, sp)
 	cp	a, #0x7f
 	jrnc	00103$
-;	libs/i2c_lib.c: 118: if(i2c_send_address(addr, 0))
-	push	a
+;	libs/i2c_lib.c: 128: if(i2c_send_address(addr, 0))
 	push	#0x00
+	ld	a, (0x03, sp)
 	call	_i2c_send_address
-	ld	(0x03, sp), a
-	pop	a
-	tnz	(0x02, sp)
+	tnz	a
 	jreq	00102$
-;	libs/i2c_lib.c: 120: i2c_stop();
+;	libs/i2c_lib.c: 130: i2c_stop();
 	call	_i2c_stop
-;	libs/i2c_lib.c: 121: return addr;
+;	libs/i2c_lib.c: 131: return addr;
 	ld	a, (0x01, sp)
 	jra	00107$
 00102$:
-;	libs/i2c_lib.c: 123: I2C_SR2 -> AF = 0; //Очистка флага ошибки
-	ldw	x, #0x5218
-	push	a
-	ld	a, (x)
-	and	a, #0x7f
-	ld	(x), a
-	pop	a
-;	libs/i2c_lib.c: 116: for (uint8_t addr = 1; addr < 127; addr++)
-	inc	a
+;	libs/i2c_lib.c: 133: I2C_SR2 -> AF = 0;
+	bres	0x5218, #7
+;	libs/i2c_lib.c: 134: uart_write("error addr\n"); //Очистка флага ошибки
+	ldw	x, #(___str_8+0)
+	call	_uart_write
+;	libs/i2c_lib.c: 126: for (uint8_t addr = 1; addr < 127; addr++)
+	inc	(0x02, sp)
+	ld	a, (0x02, sp)
 	ld	(0x01, sp), a
 	jra	00105$
 00103$:
-;	libs/i2c_lib.c: 125: i2c_stop();
+;	libs/i2c_lib.c: 136: i2c_stop();
 	call	_i2c_stop
-;	libs/i2c_lib.c: 126: return 0;
+;	libs/i2c_lib.c: 137: return 0;
 	clr	a
 00107$:
-;	libs/i2c_lib.c: 127: }
+;	libs/i2c_lib.c: 138: }
 	addw	sp, #2
 	ret
 ;	main.c: 3: int main(void)
@@ -689,7 +696,7 @@ _i2c_scan:
 ;	 function main
 ;	-----------------------------------------
 _main:
-	sub	sp, #2
+	push	a
 ;	main.c: 6: CLK_CKDIVR = 0;
 	mov	0x50c6+0, #0x00
 ;	main.c: 7: uart_init(9600,0);
@@ -698,6 +705,8 @@ _main:
 	call	_uart_init
 ;	main.c: 8: i2c_init();
 	call	_i2c_init
+;	main.c: 9: i2c_scan();
+	call	_i2c_scan
 ;	main.c: 11: buf[0] = 0xA4;
 	ld	a, #0xa4
 	ld	(0x01, sp), a
@@ -713,31 +722,23 @@ _main:
 00103$:
 	cpw	x, #0x0100
 	jrsge	00101$
-;	main.c: 15: buf[0] = i;
-	ld	a, xl
-	ld	(0x01, sp), a
-;	main.c: 16: buf[1] = 1;
-	ld	a, #0x01
-	ld	(0x02, sp), a
-;	main.c: 17: i2c_write(I2C_DISPLAY_ADDR,2,buf);
+;	main.c: 15: i2c_write(I2C_DISPLAY_ADDR,1,buf);
 	pushw	x
 	ldw	y, sp
 	addw	y, #3
 	pushw	y
-	push	#0x02
+	push	#0x01
 	ld	a, #0x3c
 	call	_i2c_write
 	popw	x
-;	main.c: 18: i++;
-	incw	x
 ;	main.c: 13: for(int i = 0;i < 256;i++)
 	incw	x
 	jra	00103$
 00101$:
-;	main.c: 20: return 0;
+;	main.c: 17: return 0;
 	clrw	x
-;	main.c: 21: }
-	addw	sp, #2
+;	main.c: 18: }
+	pop	a
 	ret
 	.area CODE
 	.area CONST
@@ -749,37 +750,49 @@ ___str_0:
 	.area CODE
 	.area CONST
 ___str_1:
-	.ascii "while passed"
-	.db 0x0a
-	.db 0x00
-	.area CODE
-	.area CONST
-___str_2:
 	.ascii "DR byte"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
+___str_2:
+	.ascii "WHILE start"
+	.db 0x0a
+	.db 0x00
+	.area CODE
+	.area CONST
 ___str_3:
-	.ascii "PIVO"
+	.ascii "WHILE passed"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
 ___str_4:
-	.ascii "for"
+	.ascii "PIVO"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
 ___str_5:
-	.ascii "error send byte"
+	.ascii "for"
 	.db 0x0a
 	.db 0x00
 	.area CODE
 	.area CONST
 ___str_6:
+	.ascii "error send byte"
+	.db 0x0a
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_7:
 	.ascii "if passed"
+	.db 0x0a
+	.db 0x00
+	.area CODE
+	.area CONST
+___str_8:
+	.ascii "error addr"
 	.db 0x0a
 	.db 0x00
 	.area CODE
