@@ -66,11 +66,11 @@ struct I2C_SR2_
 {
 	uint8_t BERR:1;
 	uint8_t ARLO:1;
-	uint8_t reserve:2;
-	uint8_t WUFH:1;
-	uint8_t reserve1:1;
-	uint8_t OVR:1;
 	uint8_t AF:1;
+	uint8_t OVR:1;
+	uint8_t reserve:1;
+	uint8_t WUFH:1;
+	uint8_t reserve1:2;
 
 } typedef I2C_SR2_t;
 

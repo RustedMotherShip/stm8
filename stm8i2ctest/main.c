@@ -359,16 +359,17 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
-    //I2C_DR = 0;
-    reg_check();
-    I2C_DR = d_addr;
-    reg_check();
-    while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+    // //I2C_DR = 0;
+    // reg_check();
+    // I2C_DR = d_addr;
+    // reg_check();
+    // while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+    //reg_check();
     for(int i = 0;i < d_size;i++)
     {
         I2C_DR = data_buf[i];
         reg_check();
-        while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2)));
+        while (!(I2C_SR1 & (1 << 7)) && I2C_SR2 & (1 << 2) && !(I2C_SR1 & (1 << 2)));
         reg_check();
     }
 }

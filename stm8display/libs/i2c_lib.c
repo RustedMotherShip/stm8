@@ -17,10 +17,11 @@ void delay(uint16_t ticks)
 }
 void trash_clean(void)
 {
-    // uint8_t trash_reg = (uint8_t)I2C_DR;
-    // trash_reg = (uint8_t)I2C_SR1;
-    // trash_reg = (uint8_t)I2C_SR2;
-    // trash_reg = (uint8_t)I2C_SR3;
+    uint8_t trash_reg = (uint8_t)I2C_SR3;
+    trash_reg = (uint8_t)I2C_DR;
+    trash_reg = (uint8_t)I2C_SR1;
+    trash_reg = (uint8_t)I2C_SR2;
+    
 }
 void i2c_init(void) {
     // Включение I2C
@@ -42,12 +43,27 @@ void i2c_start(void) {
 
 uint8_t i2c_send_byte(unsigned char data){
     uart_write("start send byte\n");
-    I2C_DR -> DR = data;
-    (uint8_t)I2C_SR3;
-    (uint8_t)I2C_DR;
-    while (!(I2C_SR1 ->TXE) && (I2C_SR2 -> AF) && !(I2C_SR1 -> BTF));
-    uart_write("DR byte\n");
+    //trash_clean();
+    data;
+    trash_clean();
+    uart_write("byte -");
+    uart_write((unsigned char *)I2C_DR);
+    uart_write("\n");
+    while (!(I2C_SR1 -> TXE));
+    I2C_DR -> DR = 0x28;
+    trash_clean();
+    uart_write("byte send\n");
+    while(!(I2C_SR1 -> BTF));
+    trash_clean();
+    //while (!(I2C_SR1 -> BTF));
     int result = I2C_SR2 -> AF;
+    uart_write("DR byte\n");
+    // (uint8_t)I2C_SR3;
+    // (uint8_t)I2C_DR;
+    //int result = 0;
+    uart_write("AF -> ");
+    uart_write((result ? "1" : "0"));
+    uart_write("\n");
     return result;
 }
 
@@ -65,7 +81,6 @@ void i2c_stop(void) {
     
 uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
 {
-    i2c_start();
     switch(rw_type)
     {
     case 1:
@@ -76,40 +91,43 @@ uint8_t i2c_send_address(uint8_t address,uint8_t rw_type)
         address = address << 1; // Отправка адреса устройства с битом на запись
     break;
     }
+    i2c_start();
     I2C_DR -> DR = address;
-    int result = I2C_SR1 -> ADDR;//Отправка адреса
-    (uint8_t)I2C_SR3;
-    (uint8_t)I2C_DR;
     uart_write("WHILE start\n");
-    while (!(I2C_SR1 -> ADDR) && (I2C_SR2 -> AF));
-    uart_write("WHILE passed\n");  
-    //delay(250);
-    
-    //(uint8_t)I2C_SR1;
+    while (!(I2C_SR1 -> ADDR) && !(I2C_SR2 -> AF));
     (uint8_t)I2C_SR3;
-    (uint8_t)I2C_DR;
-    return result;
+    uart_write("WHILE passed\n");  
+    return I2C_SR1 -> ADDR;
 }
 
 void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
 {
     if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
     {
+
         uart_write("PIVO\n");
-        for(int i = 0;i < size;i++)
+        uart_write("predfor\n");
+        //while (!(I2C_SR1 -> TXE));
+        data;
+        size;
+        for(int i = 0;i < 25;i++)
         {
             uart_write("for\n");
-            if(i2c_send_byte(data[i]))//Проверка на АСК бит
-            {
-                uart_write("error send byte\n");
-                break;
-            }
-            (uint8_t)I2C_SR3;
-            (uint8_t)I2C_DR; 
-            uart_write("if passed\n");    
+            i2c_send_byte(0x29);//Проверка на АСК бит
+            //uart_write("for2\n");
+            //i2c_send_byte(0x28);//Проверка на АСК бит
+            // {
+            //     uart_write("error send byte\n");
+            //     break;
+            // }
+            //uart_write("if passed\n");    
         }
+        uart_write("postforif\n");
     }
+    uart_write("predstop\n");
+    //while (!(I2C_SR1 -> TXE) && !(I2C_SR1 -> BTF));
     i2c_stop();
+    uart_write("poststop\n");
 }
 
 void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){

@@ -25,7 +25,7 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000308  l_INITIALIZED                   
      00000308  l_INITIALIZER                   
      00000309  s_SSEG                          
-     0000088E  l_CODE                          
+     00000874  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
@@ -110,7 +110,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000083AB    0000088E =        2190. bytes (REL,CON)
+CODE                                000083AB    00000874 =        2164. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -133,26 +133,26 @@ CODE                                000083AB    0000088E =        2190. bytes (R
      000087BD  _i2c_send_address                  main
      000087D0  _i2c_stop                          main
      000087D5  _i2c_write                         main
-     00008825  _i2c_read                          main
-     00008899  _i2c_scan                          main
-     000088D1  _cm_SM                             main
-     000088F7  _cm_SN                             main
-     000088FD  _cm_RM                             main
-     00008907  _cm_DB                             main
-     0000890A  _cm_ST                             main
-     00008918  _cm_SR                             main
-     00008989  _cm_SW                             main
-     000089FA  _data_handler                      main
-     00008ABE  _command_switcher                  main
-     00008B0C  _main                              main
-     00008B42  _memcmp                            _memcmp
-     00008B85  ___memcpy                          
-     00008B85  _memcpy                            
-     00008BD8  _memset                            _memset
-     00008BFA  ___sdcc_external_startup           _startup
-     00008BFC  _strlen                            _strlen
-     00008C0A  __modsint                          
-     00008C22  __divsint                          
+     0000880B  _i2c_read                          main
+     0000887F  _i2c_scan                          main
+     000088B7  _cm_SM                             main
+     000088DD  _cm_SN                             main
+     000088E3  _cm_RM                             main
+     000088ED  _cm_DB                             main
+     000088F0  _cm_ST                             main
+     000088FE  _cm_SR                             main
+     0000896F  _cm_SW                             main
+     000089E0  _data_handler                      main
+     00008AA4  _command_switcher                  main
+     00008AF2  _main                              main
+     00008B28  _memcmp                            _memcmp
+     00008B6B  ___memcpy                          
+     00008B6B  _memcpy                            
+     00008BBE  _memset                            _memset
+     00008BE0  ___sdcc_external_startup           _startup
+     00008BE2  _strlen                            _strlen
+     00008BF0  __modsint                          
+     00008C08  __divsint                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
 Files Linked                              [ module(s) ]
