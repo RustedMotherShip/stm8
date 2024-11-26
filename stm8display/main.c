@@ -1,11 +1,19 @@
 #include "main.h"
-
-int main(void)
+void setup(void)
 {
     /* Set clock to full speed (16 Mhz) */
     CLK_CKDIVR = 0;
+    
     uart_init(9600,0);
     i2c_init();
+
+    enableInterrupts();
+}
+int main(void)
+{
+    setup();
+    
+    
     //i2c_scan();
     uint8_t buf[2];
     buf[0] = 0xA4;
