@@ -117,6 +117,17 @@ struct I2C_TRISER_
 	
 } typedef I2C_TRISER_t;
 
+struct I2C_IRQ_
+{
+	uint8_t SB:1;
+	uint8_t ADDR:1;
+	uint8_t BTF:1;
+	uint8_t RXNE:1;
+	uint8_t TXE:1;
+	uint8_t AF:1;
+	uint8_t reserve:2;
+	
+} typedef I2C_IRQ_t;
 /* I2C */
 #define I2C_CR1 ((I2C_CR1_t *)0x5210)
 #define I2C_CR2 ((I2C_CR2_t *)0x5211)
@@ -132,3 +143,11 @@ struct I2C_TRISER_
 #define I2C_CCRH ((I2C_CCRH_t *)0x521C)
 #define I2C_TRISER ((I2C_TRISER_t *)0x521D)
 #define I2C_PECR ((I2C_PECR_t *)0x521E)
+
+#define I2C_vector 0x13
+
+I2C_IRQ_t I2C_IRQ = {0};
+
+#define wfi() {__asm__("wfi\n");}
+#define enableInterrupts()    {__asm__("rim\n");}  /* enable interrupts */
+#define disableInterrupts()   {__asm__("sim\n");}  /* disable interrupts */

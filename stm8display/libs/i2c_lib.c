@@ -1,29 +1,45 @@
 #include "i2c_lib.h"
-/*
- ___ ____   ____   
-|_ _|___ \ / ___|  
- | |  __) | |      
- | | / __/| |___   
-|___|_____|\____|  
-*/
 
-void delay(uint16_t ticks)
+void i2c_irq(void) __interrupt(I2C_vector)
 {
-   while(ticks > 0)
-   {
-    ticks-=2;
-    ticks+=1;
-   } 
+  disableInterrupts();
+  memset(&I2C_IRQ, 0, sizeof(I2C_IRQ));
+  if(I2C_SR1 -> SB) 
+  {
+  	I2C_IRQ.SB = 1;
+    I2C_ITR -> ITEVTEN = 0;
+  }
+  if(I2C_SR1 -> ADDR) 
+  {
+  	I2C_IRQ.ADDR = 1;
+    I2C_ITR -> ITEVTEN = 0;
+  }
+  if(I2C_SR1 -> BTF) 
+  {
+  	I2C_IRQ.BTF = 1;
+    I2C_ITR -> ITEVTEN = 0;
+  }
+  if(I2C_SR1 -> TXE) 
+  {
+  	I2C_IRQ.TXE = 1;
+    I2C_ITR -> ITBUFEN = 0;
+  } 
+  if(I2C_SR1 -> RXNE) 
+  {
+  	I2C_IRQ.RXNE = 1;
+    I2C_ITR -> ITBUFEN = 0;
+  }    
+  if(I2C_SR2 -> AF) 
+  {
+  	I2C_IRQ.AF = 1;
+    I2C_ITR -> ITERREN = 0;
+  }
+  enableInterrupts(); 
+  //memset(I2C_ITR, 0, sizeof(I2C_ITR));
 }
-void trash_clean(void)
+
+void i2c_init(void)
 {
-    uint8_t trash_reg = (uint8_t)I2C_SR3;
-    trash_reg = (uint8_t)I2C_DR;
-    trash_reg = (uint8_t)I2C_SR1;
-    trash_reg = (uint8_t)I2C_SR2;
-    
-}
-void i2c_init(void) {
     // Включение I2C
     //----------- Setup I2C ------------------------
     I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
@@ -36,35 +52,27 @@ void i2c_init(void) {
     I2C_CR1 -> PE = 1;// PE=1, enable I2C
 }
 
-void i2c_start(void) {
+void i2c_start(void)
+{
+	I2C_ITR -> ITEVTEN = 1;//Включение прерываний для обработки сигнала старт
     I2C_CR2 -> START = 1; // Отправляем стартовый сигнал
-    while(!(I2C_SR1 -> SB));// Ожидание отправки стартового сигнала
+    while(I2C_ITR -> ITEVTEN);// Ожидание отправки стартового сигнала
+    //while(1);
 }
 
-uint8_t i2c_send_byte(unsigned char data){
-    uart_write("start send byte\n");
-    //trash_clean();
-    data;
-    trash_clean();
-    uart_write("byte -");
-    uart_write((unsigned char *)I2C_DR);
-    uart_write("\n");
-    while (!(I2C_SR1 -> TXE));
-    I2C_DR -> DR = 0x28;
-    trash_clean();
-    uart_write("byte send\n");
-    while(!(I2C_SR1 -> BTF));
-    trash_clean();
-    //while (!(I2C_SR1 -> BTF));
-    int result = I2C_SR2 -> AF;
-    uart_write("DR byte\n");
-    // (uint8_t)I2C_SR3;
-    // (uint8_t)I2C_DR;
-    //int result = 0;
-    uart_write("AF -> ");
-    uart_write((result ? "1" : "0"));
-    uart_write("\n");
-    return result;
+void i2c_stop(void)
+{
+     I2C_CR2 -> STOP = 1;// Отправка стопового сигнала
+}
+
+uint8_t i2c_send_byte(unsigned char data)
+{
+	I2C_ITR -> ITBUFEN = 1;
+	I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
+	I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
+    I2C_DR -> DR = data; //Отправка данных
+    while(I2C_ITR -> ITBUFEN || I2C_ITR -> ITERREN);
+    return I2C_IRQ.AF;
 }
 
 uint8_t i2c_read_byte(unsigned char *data){
@@ -74,13 +82,13 @@ uint8_t i2c_read_byte(unsigned char *data){
      
 }
 
-void i2c_stop(void) {
-     I2C_CR2 -> STOP = 1;// Отправка стопового сигнала
-}
+
 
     
 uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
 {
+    I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
+    I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
     switch(rw_type)
     {
     case 1:
@@ -93,41 +101,23 @@ uint8_t i2c_send_address(uint8_t address,uint8_t rw_type)
     }
     i2c_start();
     I2C_DR -> DR = address;
-    uart_write("WHILE start\n");
-    while (!(I2C_SR1 -> ADDR) && !(I2C_SR2 -> AF));
-    (uint8_t)I2C_SR3;
-    uart_write("WHILE passed\n");  
-    return I2C_SR1 -> ADDR;
+    while(I2C_ITR -> ITEVTEN || I2C_ITR -> ITERREN);
+    return I2C_IRQ.ADDR;
 }
 
 void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
 {
     if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
     {
-
-        uart_write("PIVO\n");
-        uart_write("predfor\n");
-        //while (!(I2C_SR1 -> TXE));
-        data;
-        size;
-        for(int i = 0;i < 25;i++)
+        for(int i = 0;i < size;i++)
         {
-            uart_write("for\n");
-            i2c_send_byte(0x29);//Проверка на АСК бит
-            //uart_write("for2\n");
-            //i2c_send_byte(0x28);//Проверка на АСК бит
-            // {
-            //     uart_write("error send byte\n");
-            //     break;
-            // }
-            //uart_write("if passed\n");    
+            if(i2c_send_byte(data[i]))//Проверка на АСК бит
+            {
+                break;
+            } 
         }
-        uart_write("postforif\n");
     }
-    uart_write("predstop\n");
-    //while (!(I2C_SR1 -> TXE) && !(I2C_SR1 -> BTF));
     i2c_stop();
-    uart_write("poststop\n");
 }
 
 void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){

@@ -125,7 +125,7 @@ struct UART1_PSCR_
 #define UART1_T_vector 0x11
 #define UART1_R_vector 0x12
 
-#define wfi()                 {__asm__("wfi\n");}
+#define wfi() {__asm__("wfi\n");}
 
 
 // #include <stdarg.h>
