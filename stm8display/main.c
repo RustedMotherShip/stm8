@@ -13,13 +13,13 @@ int main(void)
 {
     setup();
     
-    
-    //i2c_scan();
-    
-    uint8_t buf[2];
+    uint8_t buf[5];
     buf[0] = 0xA4;
     buf[1] = 0xA5;
-    i2c_write(I2C_DISPLAY_ADDR,2,buf);
+    buf[2] = 0xA6;
+    buf[3] = 0xA7;
+    buf[4] = 0xA8;
+    i2c_write(0x66,5,buf);
     while(1);
     // uint8_t buf1[256] = {0};
     // buf1[0] = 0x01;

@@ -13,913 +13,1099 @@
                                      13 	.globl _i2c_scan
                                      14 	.globl _i2c_read
                                      15 	.globl _i2c_write
-                                     16 	.globl _i2c_send_address
-                                     17 	.globl _i2c_read_byte
-                                     18 	.globl _i2c_send_byte
-                                     19 	.globl _i2c_stop
-                                     20 	.globl _i2c_start
-                                     21 	.globl _i2c_init
-                                     22 	.globl _i2c_irq
-                                     23 	.globl _uart_read
-                                     24 	.globl _uart_write_byte
-                                     25 	.globl _uart_read_byte
-                                     26 	.globl _uart_init
-                                     27 	.globl _uart_reciever_irq
-                                     28 	.globl _uart_transmission_irq
-                                     29 	.globl _memset
-                                     30 	.globl _I2C_IRQ
-                                     31 	.globl _buf_size
-                                     32 	.globl _buf_pos
-                                     33 	.globl _rx_buf_pointer
-                                     34 	.globl _tx_buf_pointer
-                                     35 	.globl _uart_write
-                                     36 ;--------------------------------------------------------
-                                     37 ; ram data
-                                     38 ;--------------------------------------------------------
-                                     39 	.area DATA
-      000000                         40 _tx_buf_pointer::
-      000000                         41 	.ds 2
-      000002                         42 _rx_buf_pointer::
-      000002                         43 	.ds 2
-      000004                         44 _buf_pos::
-      000004                         45 	.ds 1
-      000005                         46 _buf_size::
-      000005                         47 	.ds 1
-                                     48 ;--------------------------------------------------------
-                                     49 ; ram data
-                                     50 ;--------------------------------------------------------
-                                     51 	.area INITIALIZED
-      000000                         52 _I2C_IRQ::
-      000000                         53 	.ds 1
-                                     54 ;--------------------------------------------------------
-                                     55 ; Stack segment in internal ram
-                                     56 ;--------------------------------------------------------
-                                     57 	.area SSEG
-      000000                         58 __start__stack:
-      000000                         59 	.ds	1
-                                     60 
+                                     16 	.globl _delay
+                                     17 	.globl _i2c_send_address
+                                     18 	.globl _i2c_read_byte
+                                     19 	.globl _i2c_send_byte
+                                     20 	.globl _i2c_stop
+                                     21 	.globl _i2c_start
+                                     22 	.globl _i2c_init
+                                     23 	.globl _i2c_irq
+                                     24 	.globl _uart_read
+                                     25 	.globl _uart_write_byte
+                                     26 	.globl _uart_read_byte
+                                     27 	.globl _uart_init
+                                     28 	.globl _uart_reciever_irq
+                                     29 	.globl _uart_transmission_irq
+                                     30 	.globl _memset
+                                     31 	.globl _counter
+                                     32 	.globl _govno_alert
+                                     33 	.globl _I2C_IRQ
+                                     34 	.globl _buf_size
+                                     35 	.globl _buf_pos
+                                     36 	.globl _rx_buf_pointer
+                                     37 	.globl _tx_buf_pointer
+                                     38 	.globl _uart_write
+                                     39 ;--------------------------------------------------------
+                                     40 ; ram data
+                                     41 ;--------------------------------------------------------
+                                     42 	.area DATA
+      000000                         43 _tx_buf_pointer::
+      000000                         44 	.ds 2
+      000002                         45 _rx_buf_pointer::
+      000002                         46 	.ds 2
+      000004                         47 _buf_pos::
+      000004                         48 	.ds 1
+      000005                         49 _buf_size::
+      000005                         50 	.ds 1
+                                     51 ;--------------------------------------------------------
+                                     52 ; ram data
+                                     53 ;--------------------------------------------------------
+                                     54 	.area INITIALIZED
+      000000                         55 _I2C_IRQ::
+      000000                         56 	.ds 1
+      000001                         57 _govno_alert::
+      000001                         58 	.ds 1
+      000002                         59 _counter::
+      000002                         60 	.ds 1
                                      61 ;--------------------------------------------------------
-                                     62 ; absolute external ram data
+                                     62 ; Stack segment in internal ram
                                      63 ;--------------------------------------------------------
-                                     64 	.area DABS (ABS)
-                                     65 
-                                     66 ; default segment ordering for linker
-                                     67 	.area HOME
-                                     68 	.area GSINIT
-                                     69 	.area GSFINAL
-                                     70 	.area CONST
-                                     71 	.area INITIALIZER
-                                     72 	.area CODE
-                                     73 
-                                     74 ;--------------------------------------------------------
-                                     75 ; interrupt vector
-                                     76 ;--------------------------------------------------------
-                                     77 	.area HOME
-      000000                         78 __interrupt_vect:
-      000000 82v00u00u00             79 	int s_GSINIT ; reset
-      000004 82 00 00 00             80 	int 0x000000 ; trap
-      000008 82 00 00 00             81 	int 0x000000 ; int0
-      00000C 82 00 00 00             82 	int 0x000000 ; int1
-      000010 82 00 00 00             83 	int 0x000000 ; int2
-      000014 82 00 00 00             84 	int 0x000000 ; int3
-      000018 82 00 00 00             85 	int 0x000000 ; int4
-      00001C 82 00 00 00             86 	int 0x000000 ; int5
-      000020 82 00 00 00             87 	int 0x000000 ; int6
-      000024 82 00 00 00             88 	int 0x000000 ; int7
-      000028 82 00 00 00             89 	int 0x000000 ; int8
-      00002C 82 00 00 00             90 	int 0x000000 ; int9
-      000030 82 00 00 00             91 	int 0x000000 ; int10
-      000034 82 00 00 00             92 	int 0x000000 ; int11
-      000038 82 00 00 00             93 	int 0x000000 ; int12
-      00003C 82 00 00 00             94 	int 0x000000 ; int13
-      000040 82 00 00 00             95 	int 0x000000 ; int14
-      000044 82 00 00 00             96 	int 0x000000 ; int15
-      000048 82 00 00 00             97 	int 0x000000 ; int16
-      00004C 82v00u00u00             98 	int _uart_transmission_irq ; int17
-      000050 82v00u00u3C             99 	int _uart_reciever_irq ; int18
-      000054 82v00u01uE4            100 	int _i2c_irq ; int19
-                                    101 ;--------------------------------------------------------
-                                    102 ; global & static initialisations
-                                    103 ;--------------------------------------------------------
-                                    104 	.area HOME
-                                    105 	.area GSINIT
-                                    106 	.area GSFINAL
-                                    107 	.area GSINIT
-      000000 CDr00r00         [ 4]  108 	call	___sdcc_external_startup
-      000003 4D               [ 1]  109 	tnz	a
-      000004 27 03            [ 1]  110 	jreq	__sdcc_init_data
-      000006 CCr00r58         [ 2]  111 	jp	__sdcc_program_startup
-      000009                        112 __sdcc_init_data:
-                                    113 ; stm8_genXINIT() start
-      000009 AEr00r00         [ 2]  114 	ldw x, #l_DATA
-      00000C 27 07            [ 1]  115 	jreq	00002$
-      00000E                        116 00001$:
-      00000E 72 4FuFFuFF      [ 1]  117 	clr (s_DATA - 1, x)
-      000012 5A               [ 2]  118 	decw x
-      000013 26 F9            [ 1]  119 	jrne	00001$
-      000015                        120 00002$:
-      000015 AEr00r00         [ 2]  121 	ldw	x, #l_INITIALIZER
-      000018 27 09            [ 1]  122 	jreq	00004$
-      00001A                        123 00003$:
-      00001A D6uFFuFF         [ 1]  124 	ld	a, (s_INITIALIZER - 1, x)
-      00001D D7uFFuFF         [ 1]  125 	ld	(s_INITIALIZED - 1, x), a
-      000020 5A               [ 2]  126 	decw	x
-      000021 26 F7            [ 1]  127 	jrne	00003$
-      000023                        128 00004$:
-                                    129 ; stm8_genXINIT() end
-                                    130 	.area GSFINAL
-      000000 CCr00r58         [ 2]  131 	jp	__sdcc_program_startup
-                                    132 ;--------------------------------------------------------
-                                    133 ; Home
-                                    134 ;--------------------------------------------------------
-                                    135 	.area HOME
-                                    136 	.area HOME
-      000058                        137 __sdcc_program_startup:
-      000058 CCr03rAD         [ 2]  138 	jp	_main
-                                    139 ;	return from main will return to caller
-                                    140 ;--------------------------------------------------------
-                                    141 ; code
-                                    142 ;--------------------------------------------------------
-                                    143 	.area CODE
-                                    144 ;	libs/uart_lib.c: 3: void uart_transmission_irq(void) __interrupt(UART1_T_vector)
-                                    145 ;	-----------------------------------------
-                                    146 ;	 function uart_transmission_irq
-                                    147 ;	-----------------------------------------
-      000000                        148 _uart_transmission_irq:
-                                    149 ;	libs/uart_lib.c: 5: if(UART1_SR -> TXE) 
-      000000 AE 52 30         [ 2]  150 	ldw	x, #0x5230
-      000003 F6               [ 1]  151 	ld	a, (x)
-      000004 4E               [ 1]  152 	swap	a
-      000005 44               [ 1]  153 	srl	a
-      000006 44               [ 1]  154 	srl	a
-      000007 44               [ 1]  155 	srl	a
-      000008 A5 01            [ 1]  156 	bcp	a, #0x01
-      00000A 27 2F            [ 1]  157 	jreq	00107$
-                                    158 ;	libs/uart_lib.c: 7: if(tx_buf_pointer[buf_pos] != '\0' && buf_size>buf_pos)
-      00000C C6u00u01         [ 1]  159 	ld	a, _tx_buf_pointer+1
-      00000F CBu00u04         [ 1]  160 	add	a, _buf_pos+0
-      000012 97               [ 1]  161 	ld	xl, a
-      000013 C6u00u00         [ 1]  162 	ld	a, _tx_buf_pointer+0
-      000016 A9 00            [ 1]  163 	adc	a, #0x00
-      000018 95               [ 1]  164 	ld	xh, a
-      000019 F6               [ 1]  165 	ld	a, (x)
-      00001A 27 1B            [ 1]  166 	jreq	00102$
-      00001C C6u00u04         [ 1]  167 	ld	a, _buf_pos+0
-      00001F C1u00u05         [ 1]  168 	cp	a, _buf_size+0
-      000022 24 13            [ 1]  169 	jrnc	00102$
-                                    170 ;	libs/uart_lib.c: 8: UART1_DR -> DR = tx_buf_pointer[buf_pos++];
-      000024 C6u00u04         [ 1]  171 	ld	a, _buf_pos+0
-      000027 72 5Cu00u04      [ 1]  172 	inc	_buf_pos+0
-      00002B 5F               [ 1]  173 	clrw	x
-      00002C 97               [ 1]  174 	ld	xl, a
-      00002D 72 BBu00u00      [ 2]  175 	addw	x, _tx_buf_pointer+0
-      000031 F6               [ 1]  176 	ld	a, (x)
-      000032 C7 52 31         [ 1]  177 	ld	0x5231, a
-      000035 20 04            [ 2]  178 	jra	00107$
-      000037                        179 00102$:
-                                    180 ;	libs/uart_lib.c: 10: UART1_CR2 -> TIEN = 0;
-      000037 72 1F 52 35      [ 1]  181 	bres	0x5235, #7
-      00003B                        182 00107$:
-                                    183 ;	libs/uart_lib.c: 14: }
-      00003B 80               [11]  184 	iret
-                                    185 ;	libs/uart_lib.c: 15: void uart_reciever_irq(void) __interrupt(UART1_R_vector)
-                                    186 ;	-----------------------------------------
-                                    187 ;	 function uart_reciever_irq
-                                    188 ;	-----------------------------------------
-      00003C                        189 _uart_reciever_irq:
-      00003C 88               [ 1]  190 	push	a
-                                    191 ;	libs/uart_lib.c: 19: if(UART1_SR -> RXNE)
-      00003D C6 52 30         [ 1]  192 	ld	a, 0x5230
-      000040 4E               [ 1]  193 	swap	a
-      000041 44               [ 1]  194 	srl	a
-      000042 A5 01            [ 1]  195 	bcp	a, #0x01
-      000044 27 27            [ 1]  196 	jreq	00107$
-                                    197 ;	libs/uart_lib.c: 21: trash_reg = UART1_DR -> DR;
-      000046 C6 52 31         [ 1]  198 	ld	a, 0x5231
-                                    199 ;	libs/uart_lib.c: 22: if(trash_reg != '\n' && buf_size>buf_pos)
-      000049 6B 01            [ 1]  200 	ld	(0x01, sp), a
-      00004B A1 0A            [ 1]  201 	cp	a, #0x0a
-      00004D 27 1A            [ 1]  202 	jreq	00102$
-      00004F C6u00u04         [ 1]  203 	ld	a, _buf_pos+0
-      000052 C1u00u05         [ 1]  204 	cp	a, _buf_size+0
-      000055 24 12            [ 1]  205 	jrnc	00102$
-                                    206 ;	libs/uart_lib.c: 23: rx_buf_pointer[buf_pos++] = trash_reg;
-      000057 C6u00u04         [ 1]  207 	ld	a, _buf_pos+0
-      00005A 72 5Cu00u04      [ 1]  208 	inc	_buf_pos+0
-      00005E 5F               [ 1]  209 	clrw	x
-      00005F 97               [ 1]  210 	ld	xl, a
-      000060 72 BBu00u02      [ 2]  211 	addw	x, _rx_buf_pointer+0
-      000064 7B 01            [ 1]  212 	ld	a, (0x01, sp)
-      000066 F7               [ 1]  213 	ld	(x), a
-      000067 20 04            [ 2]  214 	jra	00107$
-      000069                        215 00102$:
-                                    216 ;	libs/uart_lib.c: 25: UART1_CR2 -> RIEN = 0;
-      000069 72 1B 52 35      [ 1]  217 	bres	0x5235, #5
-      00006D                        218 00107$:
-                                    219 ;	libs/uart_lib.c: 29: }
-      00006D 84               [ 1]  220 	pop	a
-      00006E 80               [11]  221 	iret
-                                    222 ;	libs/uart_lib.c: 30: void uart_init(unsigned int baudrate,uint8_t stopbit)
-                                    223 ;	-----------------------------------------
-                                    224 ;	 function uart_init
-                                    225 ;	-----------------------------------------
-      00006F                        226 _uart_init:
-      00006F 52 02            [ 2]  227 	sub	sp, #2
-      000071 1F 01            [ 2]  228 	ldw	(0x01, sp), x
-                                    229 ;	libs/uart_lib.c: 34: UART1_CR2 -> TEN = 1; // Transmitter enable
-      000073 AE 52 35         [ 2]  230 	ldw	x, #0x5235
-      000076 88               [ 1]  231 	push	a
-      000077 F6               [ 1]  232 	ld	a, (x)
-      000078 AA 08            [ 1]  233 	or	a, #0x08
-      00007A F7               [ 1]  234 	ld	(x), a
-      00007B 84               [ 1]  235 	pop	a
-                                    236 ;	libs/uart_lib.c: 35: UART1_CR2 -> REN = 1; // Receiver enable
-      00007C AE 52 35         [ 2]  237 	ldw	x, #0x5235
-      00007F 88               [ 1]  238 	push	a
-      000080 F6               [ 1]  239 	ld	a, (x)
-      000081 AA 04            [ 1]  240 	or	a, #0x04
-      000083 F7               [ 1]  241 	ld	(x), a
-      000084 84               [ 1]  242 	pop	a
-                                    243 ;	libs/uart_lib.c: 36: switch(stopbit)
-      000085 A1 02            [ 1]  244 	cp	a, #0x02
-      000087 27 06            [ 1]  245 	jreq	00101$
-      000089 A1 03            [ 1]  246 	cp	a, #0x03
-      00008B 27 0E            [ 1]  247 	jreq	00102$
-      00008D 20 16            [ 2]  248 	jra	00103$
-                                    249 ;	libs/uart_lib.c: 38: case 2:
-      00008F                        250 00101$:
-                                    251 ;	libs/uart_lib.c: 39: UART1_CR3 -> STOP = 2;
-      00008F C6 52 36         [ 1]  252 	ld	a, 0x5236
-      000092 A4 CF            [ 1]  253 	and	a, #0xcf
-      000094 AA 20            [ 1]  254 	or	a, #0x20
-      000096 C7 52 36         [ 1]  255 	ld	0x5236, a
-                                    256 ;	libs/uart_lib.c: 40: break;
-      000099 20 12            [ 2]  257 	jra	00104$
-                                    258 ;	libs/uart_lib.c: 41: case 3:
-      00009B                        259 00102$:
-                                    260 ;	libs/uart_lib.c: 42: UART1_CR3 -> STOP = 3;
-      00009B C6 52 36         [ 1]  261 	ld	a, 0x5236
-      00009E AA 30            [ 1]  262 	or	a, #0x30
-      0000A0 C7 52 36         [ 1]  263 	ld	0x5236, a
-                                    264 ;	libs/uart_lib.c: 43: break;
-      0000A3 20 08            [ 2]  265 	jra	00104$
-                                    266 ;	libs/uart_lib.c: 44: default:
-      0000A5                        267 00103$:
-                                    268 ;	libs/uart_lib.c: 45: UART1_CR3 -> STOP = 0;
-      0000A5 C6 52 36         [ 1]  269 	ld	a, 0x5236
-      0000A8 A4 CF            [ 1]  270 	and	a, #0xcf
-      0000AA C7 52 36         [ 1]  271 	ld	0x5236, a
-                                    272 ;	libs/uart_lib.c: 47: }
-      0000AD                        273 00104$:
-                                    274 ;	libs/uart_lib.c: 48: switch(baudrate)
-      0000AD 1E 01            [ 2]  275 	ldw	x, (0x01, sp)
-      0000AF A3 08 00         [ 2]  276 	cpw	x, #0x0800
-      0000B2 26 03            [ 1]  277 	jrne	00186$
-      0000B4 CCr01r40         [ 2]  278 	jp	00110$
-      0000B7                        279 00186$:
-      0000B7 1E 01            [ 2]  280 	ldw	x, (0x01, sp)
-      0000B9 A3 09 60         [ 2]  281 	cpw	x, #0x0960
-      0000BC 27 28            [ 1]  282 	jreq	00105$
-      0000BE 1E 01            [ 2]  283 	ldw	x, (0x01, sp)
-      0000C0 A3 10 00         [ 2]  284 	cpw	x, #0x1000
-      0000C3 26 03            [ 1]  285 	jrne	00192$
-      0000C5 CCr01r50         [ 2]  286 	jp	00111$
-      0000C8                        287 00192$:
-      0000C8 1E 01            [ 2]  288 	ldw	x, (0x01, sp)
-      0000CA A3 4B 00         [ 2]  289 	cpw	x, #0x4b00
-      0000CD 27 31            [ 1]  290 	jreq	00106$
-      0000CF 1E 01            [ 2]  291 	ldw	x, (0x01, sp)
-      0000D1 A3 84 00         [ 2]  292 	cpw	x, #0x8400
-      0000D4 27 5A            [ 1]  293 	jreq	00109$
-      0000D6 1E 01            [ 2]  294 	ldw	x, (0x01, sp)
-      0000D8 A3 C2 00         [ 2]  295 	cpw	x, #0xc200
-      0000DB 27 43            [ 1]  296 	jreq	00108$
-      0000DD 1E 01            [ 2]  297 	ldw	x, (0x01, sp)
-      0000DF A3 E1 00         [ 2]  298 	cpw	x, #0xe100
-      0000E2 27 2C            [ 1]  299 	jreq	00107$
-      0000E4 20 7A            [ 2]  300 	jra	00112$
-                                    301 ;	libs/uart_lib.c: 50: case (unsigned int)2400:
-      0000E6                        302 00105$:
-                                    303 ;	libs/uart_lib.c: 51: UART1_BRR2 -> MSB = 0x01;
-      0000E6 C6 52 33         [ 1]  304 	ld	a, 0x5233
-      0000E9 A4 0F            [ 1]  305 	and	a, #0x0f
-      0000EB AA 10            [ 1]  306 	or	a, #0x10
-      0000ED C7 52 33         [ 1]  307 	ld	0x5233, a
-                                    308 ;	libs/uart_lib.c: 52: UART1_BRR1 -> DIV = 0xA0;
-      0000F0 35 A0 52 32      [ 1]  309 	mov	0x5232+0, #0xa0
-                                    310 ;	libs/uart_lib.c: 53: UART1_BRR2 -> LSB = 0x0B; 
-      0000F4 C6 52 33         [ 1]  311 	ld	a, 0x5233
-      0000F7 A4 F0            [ 1]  312 	and	a, #0xf0
-      0000F9 AA 0B            [ 1]  313 	or	a, #0x0b
-      0000FB C7 52 33         [ 1]  314 	ld	0x5233, a
-                                    315 ;	libs/uart_lib.c: 54: break;
-      0000FE 20 6E            [ 2]  316 	jra	00114$
-                                    317 ;	libs/uart_lib.c: 55: case (unsigned int)19200:
-      000100                        318 00106$:
-                                    319 ;	libs/uart_lib.c: 56: UART1_BRR1 -> DIV = 0x34;
-      000100 35 34 52 32      [ 1]  320 	mov	0x5232+0, #0x34
-                                    321 ;	libs/uart_lib.c: 57: UART1_BRR2 -> LSB = 0x01;
-      000104 C6 52 33         [ 1]  322 	ld	a, 0x5233
-      000107 A4 F0            [ 1]  323 	and	a, #0xf0
-      000109 AA 01            [ 1]  324 	or	a, #0x01
-      00010B C7 52 33         [ 1]  325 	ld	0x5233, a
-                                    326 ;	libs/uart_lib.c: 58: break;
-      00010E 20 5E            [ 2]  327 	jra	00114$
-                                    328 ;	libs/uart_lib.c: 59: case (unsigned int)57600:
-      000110                        329 00107$:
-                                    330 ;	libs/uart_lib.c: 60: UART1_BRR1 -> DIV = 0x11;
-      000110 35 11 52 32      [ 1]  331 	mov	0x5232+0, #0x11
-                                    332 ;	libs/uart_lib.c: 61: UART1_BRR2 -> LSB = 0x06;
-      000114 C6 52 33         [ 1]  333 	ld	a, 0x5233
-      000117 A4 F0            [ 1]  334 	and	a, #0xf0
-      000119 AA 06            [ 1]  335 	or	a, #0x06
-      00011B C7 52 33         [ 1]  336 	ld	0x5233, a
-                                    337 ;	libs/uart_lib.c: 62: break;
-      00011E 20 4E            [ 2]  338 	jra	00114$
-                                    339 ;	libs/uart_lib.c: 63: case (unsigned int)115200:
-      000120                        340 00108$:
-                                    341 ;	libs/uart_lib.c: 64: UART1_BRR1 -> DIV = 0x08;
-      000120 35 08 52 32      [ 1]  342 	mov	0x5232+0, #0x08
-                                    343 ;	libs/uart_lib.c: 65: UART1_BRR2 -> LSB = 0x0B;
-      000124 C6 52 33         [ 1]  344 	ld	a, 0x5233
-      000127 A4 F0            [ 1]  345 	and	a, #0xf0
-      000129 AA 0B            [ 1]  346 	or	a, #0x0b
-      00012B C7 52 33         [ 1]  347 	ld	0x5233, a
-                                    348 ;	libs/uart_lib.c: 66: break;
-      00012E 20 3E            [ 2]  349 	jra	00114$
-                                    350 ;	libs/uart_lib.c: 67: case (unsigned int)230400:
-      000130                        351 00109$:
-                                    352 ;	libs/uart_lib.c: 68: UART1_BRR1 -> DIV = 0x04;
-      000130 35 04 52 32      [ 1]  353 	mov	0x5232+0, #0x04
-                                    354 ;	libs/uart_lib.c: 69: UART1_BRR2 -> LSB = 0x05;
-      000134 C6 52 33         [ 1]  355 	ld	a, 0x5233
-      000137 A4 F0            [ 1]  356 	and	a, #0xf0
-      000139 AA 05            [ 1]  357 	or	a, #0x05
-      00013B C7 52 33         [ 1]  358 	ld	0x5233, a
-                                    359 ;	libs/uart_lib.c: 70: break;
-      00013E 20 2E            [ 2]  360 	jra	00114$
-                                    361 ;	libs/uart_lib.c: 71: case (unsigned int)460800:
-      000140                        362 00110$:
-                                    363 ;	libs/uart_lib.c: 72: UART1_BRR1 -> DIV = 0x02;
-      000140 35 02 52 32      [ 1]  364 	mov	0x5232+0, #0x02
-                                    365 ;	libs/uart_lib.c: 73: UART1_BRR2 -> LSB = 0x03;
-      000144 C6 52 33         [ 1]  366 	ld	a, 0x5233
-      000147 A4 F0            [ 1]  367 	and	a, #0xf0
-      000149 AA 03            [ 1]  368 	or	a, #0x03
-      00014B C7 52 33         [ 1]  369 	ld	0x5233, a
-                                    370 ;	libs/uart_lib.c: 74: break;
-      00014E 20 1E            [ 2]  371 	jra	00114$
-                                    372 ;	libs/uart_lib.c: 75: case (unsigned int)921600:
-      000150                        373 00111$:
-                                    374 ;	libs/uart_lib.c: 76: UART1_BRR1 -> DIV = 0x01;
-      000150 35 01 52 32      [ 1]  375 	mov	0x5232+0, #0x01
-                                    376 ;	libs/uart_lib.c: 77: UART1_BRR2 -> LSB = 0x01;
-      000154 C6 52 33         [ 1]  377 	ld	a, 0x5233
-      000157 A4 F0            [ 1]  378 	and	a, #0xf0
-      000159 AA 01            [ 1]  379 	or	a, #0x01
-      00015B C7 52 33         [ 1]  380 	ld	0x5233, a
-                                    381 ;	libs/uart_lib.c: 78: break;
-      00015E 20 0E            [ 2]  382 	jra	00114$
-                                    383 ;	libs/uart_lib.c: 79: default:
-      000160                        384 00112$:
-                                    385 ;	libs/uart_lib.c: 80: UART1_BRR1 -> DIV = 0x68;
-      000160 35 68 52 32      [ 1]  386 	mov	0x5232+0, #0x68
-                                    387 ;	libs/uart_lib.c: 81: UART1_BRR2 -> LSB = 0x03;
-      000164 C6 52 33         [ 1]  388 	ld	a, 0x5233
-      000167 A4 F0            [ 1]  389 	and	a, #0xf0
-      000169 AA 03            [ 1]  390 	or	a, #0x03
-      00016B C7 52 33         [ 1]  391 	ld	0x5233, a
-                                    392 ;	libs/uart_lib.c: 83: }
-      00016E                        393 00114$:
-                                    394 ;	libs/uart_lib.c: 84: }
-      00016E 5B 02            [ 2]  395 	addw	sp, #2
-      000170 81               [ 4]  396 	ret
-                                    397 ;	libs/uart_lib.c: 86: int uart_read_byte(uint8_t *data)
-                                    398 ;	-----------------------------------------
-                                    399 ;	 function uart_read_byte
-                                    400 ;	-----------------------------------------
-      000171                        401 _uart_read_byte:
-                                    402 ;	libs/uart_lib.c: 88: while(!(UART1_SR -> RXNE));
-      000171                        403 00101$:
-      000171 72 0B 52 30 FB   [ 2]  404 	btjf	0x5230, #5, 00101$
-                                    405 ;	libs/uart_lib.c: 90: return 1;
-      000176 5F               [ 1]  406 	clrw	x
-      000177 5C               [ 1]  407 	incw	x
-                                    408 ;	libs/uart_lib.c: 91: }
-      000178 81               [ 4]  409 	ret
-                                    410 ;	libs/uart_lib.c: 93: int uart_write_byte(uint8_t data)
-                                    411 ;	-----------------------------------------
-                                    412 ;	 function uart_write_byte
-                                    413 ;	-----------------------------------------
-      000179                        414 _uart_write_byte:
-                                    415 ;	libs/uart_lib.c: 95: UART1_DR -> DR = data;
-      000179 C7 52 31         [ 1]  416 	ld	0x5231, a
-                                    417 ;	libs/uart_lib.c: 96: while(!(UART1_SR -> TXE));
-      00017C                        418 00101$:
-      00017C 72 0F 52 30 FB   [ 2]  419 	btjf	0x5230, #7, 00101$
-                                    420 ;	libs/uart_lib.c: 97: return 1;
-      000181 5F               [ 1]  421 	clrw	x
-      000182 5C               [ 1]  422 	incw	x
-                                    423 ;	libs/uart_lib.c: 98: }
-      000183 81               [ 4]  424 	ret
-                                    425 ;	libs/uart_lib.c: 100: void uart_write(uint8_t *data_buf)
-                                    426 ;	-----------------------------------------
-                                    427 ;	 function uart_write
-                                    428 ;	-----------------------------------------
-      000184                        429 _uart_write:
-      000184 52 02            [ 2]  430 	sub	sp, #2
-                                    431 ;	libs/uart_lib.c: 102: tx_buf_pointer = data_buf;
-      000186 1F 01            [ 2]  432 	ldw	(0x01, sp), x
-      000188 CFu00u00         [ 2]  433 	ldw	_tx_buf_pointer+0, x
-                                    434 ;	libs/uart_lib.c: 103: buf_pos = 0;
-      00018B 72 5Fu00u04      [ 1]  435 	clr	_buf_pos+0
-                                    436 ;	libs/uart_lib.c: 104: buf_size = 0;
-      00018F 72 5Fu00u05      [ 1]  437 	clr	_buf_size+0
-                                    438 ;	libs/uart_lib.c: 105: while (data_buf[buf_size++] != '\0');
-      000193                        439 00101$:
-      000193 C6u00u05         [ 1]  440 	ld	a, _buf_size+0
-      000196 72 5Cu00u05      [ 1]  441 	inc	_buf_size+0
-      00019A 5F               [ 1]  442 	clrw	x
-      00019B 97               [ 1]  443 	ld	xl, a
-      00019C 72 FB 01         [ 2]  444 	addw	x, (0x01, sp)
-      00019F F6               [ 1]  445 	ld	a, (x)
-      0001A0 26 F1            [ 1]  446 	jrne	00101$
-                                    447 ;	libs/uart_lib.c: 106: UART1_CR2 -> TIEN = 1;
-      0001A2 72 1E 52 35      [ 1]  448 	bset	0x5235, #7
-                                    449 ;	libs/uart_lib.c: 107: while(UART1_CR2 -> TIEN);
-      0001A6                        450 00104$:
-      0001A6 72 0E 52 35 FB   [ 2]  451 	btjt	0x5235, #7, 00104$
-                                    452 ;	libs/uart_lib.c: 108: }
-      0001AB 5B 02            [ 2]  453 	addw	sp, #2
-      0001AD 81               [ 4]  454 	ret
-                                    455 ;	libs/uart_lib.c: 109: void uart_read(uint8_t *data_buf,int size)
-                                    456 ;	-----------------------------------------
-                                    457 ;	 function uart_read
-                                    458 ;	-----------------------------------------
-      0001AE                        459 _uart_read:
-                                    460 ;	libs/uart_lib.c: 111: rx_buf_pointer = data_buf;
-      0001AE CFu00u02         [ 2]  461 	ldw	_rx_buf_pointer+0, x
-                                    462 ;	libs/uart_lib.c: 112: uart_write("rx_buf_pointer\n");
-      0001B1 AEr00r00         [ 2]  463 	ldw	x, #(___str_0+0)
-      0001B4 CDr01r84         [ 4]  464 	call	_uart_write
-                                    465 ;	libs/uart_lib.c: 113: buf_pos = 0;
-      0001B7 72 5Fu00u04      [ 1]  466 	clr	_buf_pos+0
-                                    467 ;	libs/uart_lib.c: 114: uart_write("buf_pos\n");
-      0001BB AEr00r10         [ 2]  468 	ldw	x, #(___str_1+0)
-      0001BE CDr01r84         [ 4]  469 	call	_uart_write
-                                    470 ;	libs/uart_lib.c: 115: buf_size = size;
-      0001C1 7B 04            [ 1]  471 	ld	a, (0x04, sp)
-      0001C3 C7u00u05         [ 1]  472 	ld	_buf_size+0, a
-                                    473 ;	libs/uart_lib.c: 116: uart_write("buf_size\n");
-      0001C6 AEr00r19         [ 2]  474 	ldw	x, #(___str_2+0)
-      0001C9 CDr01r84         [ 4]  475 	call	_uart_write
-                                    476 ;	libs/uart_lib.c: 117: UART1_CR2 -> RIEN = 1;
-      0001CC 72 1A 52 35      [ 1]  477 	bset	0x5235, #5
-                                    478 ;	libs/uart_lib.c: 118: uart_write("RIEN\n");
-      0001D0 AEr00r23         [ 2]  479 	ldw	x, #(___str_3+0)
-      0001D3 CDr01r84         [ 4]  480 	call	_uart_write
-                                    481 ;	libs/uart_lib.c: 119: while(UART1_CR2 -> RIEN);
-      0001D6                        482 00101$:
-      0001D6 C6 52 35         [ 1]  483 	ld	a, 0x5235
-      0001D9 4E               [ 1]  484 	swap	a
-      0001DA 44               [ 1]  485 	srl	a
-      0001DB A4 01            [ 1]  486 	and	a, #0x01
-      0001DD 26 F7            [ 1]  487 	jrne	00101$
-                                    488 ;	libs/uart_lib.c: 120: }
-      0001DF 1E 01            [ 2]  489 	ldw	x, (1, sp)
-      0001E1 5B 04            [ 2]  490 	addw	sp, #4
-      0001E3 FC               [ 2]  491 	jp	(x)
-                                    492 ;	libs/i2c_lib.c: 3: void i2c_irq(void) __interrupt(I2C_vector)
-                                    493 ;	-----------------------------------------
-                                    494 ;	 function i2c_irq
-                                    495 ;	-----------------------------------------
-      0001E4                        496 _i2c_irq:
-      0001E4 4F               [ 1]  497 	clr	a
-      0001E5 62               [ 2]  498 	div	x, a
-                                    499 ;	libs/i2c_lib.c: 5: disableInterrupts();
-      0001E6 9B               [ 1]  500 	sim
-                                    501 ;	libs/i2c_lib.c: 6: memset(&I2C_IRQ, 0, sizeof(I2C_IRQ));
-      0001E7 4B 01            [ 1]  502 	push	#0x01
-      0001E9 4B 00            [ 1]  503 	push	#0x00
-      0001EB 5F               [ 1]  504 	clrw	x
-      0001EC 89               [ 2]  505 	pushw	x
-      0001ED AEr00r00         [ 2]  506 	ldw	x, #(_I2C_IRQ+0)
-      0001F0 CDr00r00         [ 4]  507 	call	_memset
-                                    508 ;	libs/i2c_lib.c: 7: if(I2C_SR1 -> SB) 
-      0001F3 72 01 52 17 08   [ 2]  509 	btjf	0x5217, #0, 00102$
-                                    510 ;	libs/i2c_lib.c: 9: I2C_IRQ.SB = 1;
-      0001F8 72 10u00u00      [ 1]  511 	bset	_I2C_IRQ+0, #0
-                                    512 ;	libs/i2c_lib.c: 10: I2C_ITR -> ITEVTEN = 0;
-      0001FC 72 13 52 1A      [ 1]  513 	bres	0x521a, #1
-      000200                        514 00102$:
-                                    515 ;	libs/i2c_lib.c: 12: if(I2C_SR1 -> ADDR) 
-      000200 72 03 52 17 08   [ 2]  516 	btjf	0x5217, #1, 00104$
-                                    517 ;	libs/i2c_lib.c: 14: I2C_IRQ.ADDR = 1;
-      000205 72 12u00u00      [ 1]  518 	bset	_I2C_IRQ+0, #1
-                                    519 ;	libs/i2c_lib.c: 15: I2C_ITR -> ITEVTEN = 0;
-      000209 72 13 52 1A      [ 1]  520 	bres	0x521a, #1
-      00020D                        521 00104$:
-                                    522 ;	libs/i2c_lib.c: 17: if(I2C_SR1 -> BTF) 
-      00020D 72 05 52 17 08   [ 2]  523 	btjf	0x5217, #2, 00106$
-                                    524 ;	libs/i2c_lib.c: 19: I2C_IRQ.BTF = 1;
-      000212 72 14u00u00      [ 1]  525 	bset	_I2C_IRQ+0, #2
-                                    526 ;	libs/i2c_lib.c: 20: I2C_ITR -> ITEVTEN = 0;
-      000216 72 13 52 1A      [ 1]  527 	bres	0x521a, #1
-      00021A                        528 00106$:
-                                    529 ;	libs/i2c_lib.c: 22: if(I2C_SR1 -> TXE) 
-      00021A 72 0F 52 17 08   [ 2]  530 	btjf	0x5217, #7, 00108$
-                                    531 ;	libs/i2c_lib.c: 24: I2C_IRQ.TXE = 1;
-      00021F 72 18u00u00      [ 1]  532 	bset	_I2C_IRQ+0, #4
-                                    533 ;	libs/i2c_lib.c: 25: I2C_ITR -> ITBUFEN = 0;
-      000223 72 15 52 1A      [ 1]  534 	bres	0x521a, #2
-      000227                        535 00108$:
-                                    536 ;	libs/i2c_lib.c: 27: if(I2C_SR1 -> RXNE) 
-      000227 72 0D 52 17 08   [ 2]  537 	btjf	0x5217, #6, 00110$
-                                    538 ;	libs/i2c_lib.c: 29: I2C_IRQ.RXNE = 1;
-      00022C 72 16u00u00      [ 1]  539 	bset	_I2C_IRQ+0, #3
-                                    540 ;	libs/i2c_lib.c: 30: I2C_ITR -> ITBUFEN = 0;
-      000230 72 15 52 1A      [ 1]  541 	bres	0x521a, #2
-      000234                        542 00110$:
-                                    543 ;	libs/i2c_lib.c: 32: if(I2C_SR2 -> AF) 
-      000234 AE 52 18         [ 2]  544 	ldw	x, #0x5218
-      000237 F6               [ 1]  545 	ld	a, (x)
-      000238 44               [ 1]  546 	srl	a
-      000239 44               [ 1]  547 	srl	a
-      00023A A4 01            [ 1]  548 	and	a, #0x01
-      00023C 27 0B            [ 1]  549 	jreq	00112$
-                                    550 ;	libs/i2c_lib.c: 34: I2C_IRQ.AF = 1;
-      00023E 72 1Au00u00      [ 1]  551 	bset	_I2C_IRQ+0, #5
-                                    552 ;	libs/i2c_lib.c: 35: I2C_ITR -> ITERREN = 0;
-      000242 AE 52 1A         [ 2]  553 	ldw	x, #0x521a
-      000245 F6               [ 1]  554 	ld	a, (x)
-      000246 A4 FE            [ 1]  555 	and	a, #0xfe
-      000248 F7               [ 1]  556 	ld	(x), a
-      000249                        557 00112$:
-                                    558 ;	libs/i2c_lib.c: 37: enableInterrupts(); 
-      000249 9A               [ 1]  559 	rim
-                                    560 ;	libs/i2c_lib.c: 39: }
-      00024A 80               [11]  561 	iret
-                                    562 ;	libs/i2c_lib.c: 41: void i2c_init(void)
-                                    563 ;	-----------------------------------------
-                                    564 ;	 function i2c_init
-                                    565 ;	-----------------------------------------
-      00024B                        566 _i2c_init:
-                                    567 ;	libs/i2c_lib.c: 45: I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
-      00024B 72 11 52 10      [ 1]  568 	bres	0x5210, #0
-                                    569 ;	libs/i2c_lib.c: 46: I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
-      00024F C6 52 12         [ 1]  570 	ld	a, 0x5212
-      000252 A4 C0            [ 1]  571 	and	a, #0xc0
-      000254 AA 10            [ 1]  572 	or	a, #0x10
-      000256 C7 52 12         [ 1]  573 	ld	0x5212, a
-                                    574 ;	libs/i2c_lib.c: 47: I2C_CCRH -> CCR = 0;// =0
-      000259 C6 52 1C         [ 1]  575 	ld	a, 0x521c
-      00025C A4 F0            [ 1]  576 	and	a, #0xf0
-      00025E C7 52 1C         [ 1]  577 	ld	0x521c, a
-                                    578 ;	libs/i2c_lib.c: 48: I2C_CCRL -> CCR = 80;// 100kHz for I2C
-      000261 35 50 52 1B      [ 1]  579 	mov	0x521b+0, #0x50
-                                    580 ;	libs/i2c_lib.c: 49: I2C_CCRH -> FS = 0;// set standart mode(100кHz)
-      000265 72 1F 52 1C      [ 1]  581 	bres	0x521c, #7
-                                    582 ;	libs/i2c_lib.c: 50: I2C_OARH -> ADDMODE = 0;// 7-bit address mode
-      000269 72 1F 52 14      [ 1]  583 	bres	0x5214, #7
-                                    584 ;	libs/i2c_lib.c: 51: I2C_OARH -> ADDCONF = 1;// see reference manual
-      00026D 72 10 52 14      [ 1]  585 	bset	0x5214, #0
-                                    586 ;	libs/i2c_lib.c: 52: I2C_CR1 -> PE = 1;// PE=1, enable I2C
-      000271 72 10 52 10      [ 1]  587 	bset	0x5210, #0
-                                    588 ;	libs/i2c_lib.c: 53: }
-      000275 81               [ 4]  589 	ret
-                                    590 ;	libs/i2c_lib.c: 55: void i2c_start(void)
-                                    591 ;	-----------------------------------------
-                                    592 ;	 function i2c_start
-                                    593 ;	-----------------------------------------
-      000276                        594 _i2c_start:
-                                    595 ;	libs/i2c_lib.c: 57: I2C_ITR -> ITEVTEN = 1;//Включение прерываний для обработки сигнала старт
-      000276 72 12 52 1A      [ 1]  596 	bset	0x521a, #1
-                                    597 ;	libs/i2c_lib.c: 58: I2C_CR2 -> START = 1; // Отправляем стартовый сигнал
-      00027A 72 10 52 11      [ 1]  598 	bset	0x5211, #0
-                                    599 ;	libs/i2c_lib.c: 59: while(I2C_ITR -> ITEVTEN);// Ожидание отправки стартового сигнала
-      00027E                        600 00101$:
-      00027E C6 52 1A         [ 1]  601 	ld	a, 0x521a
-      000281 A5 02            [ 1]  602 	bcp	a, #2
-      000283 26 F9            [ 1]  603 	jrne	00101$
-                                    604 ;	libs/i2c_lib.c: 61: }
-      000285 81               [ 4]  605 	ret
-                                    606 ;	libs/i2c_lib.c: 63: void i2c_stop(void)
-                                    607 ;	-----------------------------------------
-                                    608 ;	 function i2c_stop
-                                    609 ;	-----------------------------------------
-      000286                        610 _i2c_stop:
-                                    611 ;	libs/i2c_lib.c: 65: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала
-      000286 72 12 52 11      [ 1]  612 	bset	0x5211, #1
-                                    613 ;	libs/i2c_lib.c: 66: }
-      00028A 81               [ 4]  614 	ret
-                                    615 ;	libs/i2c_lib.c: 68: uint8_t i2c_send_byte(unsigned char data)
-                                    616 ;	-----------------------------------------
-                                    617 ;	 function i2c_send_byte
-                                    618 ;	-----------------------------------------
-      00028B                        619 _i2c_send_byte:
-      00028B 88               [ 1]  620 	push	a
-      00028C 6B 01            [ 1]  621 	ld	(0x01, sp), a
-                                    622 ;	libs/i2c_lib.c: 70: I2C_ITR -> ITBUFEN = 1;
-      00028E 72 14 52 1A      [ 1]  623 	bset	0x521a, #2
-                                    624 ;	libs/i2c_lib.c: 71: I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
-      000292 72 12 52 1A      [ 1]  625 	bset	0x521a, #1
-                                    626 ;	libs/i2c_lib.c: 72: I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
-      000296 72 10 52 1A      [ 1]  627 	bset	0x521a, #0
-                                    628 ;	libs/i2c_lib.c: 73: I2C_DR -> DR = data; //Отправка данных
-      00029A AE 52 16         [ 2]  629 	ldw	x, #0x5216
-      00029D 7B 01            [ 1]  630 	ld	a, (0x01, sp)
-      00029F F7               [ 1]  631 	ld	(x), a
-                                    632 ;	libs/i2c_lib.c: 74: while(I2C_ITR -> ITBUFEN || I2C_ITR -> ITERREN);
-      0002A0                        633 00102$:
-      0002A0 C6 52 1A         [ 1]  634 	ld	a, 0x521a
-      0002A3 44               [ 1]  635 	srl	a
-      0002A4 A5 02            [ 1]  636 	bcp	a, #2
-      0002A6 26 F8            [ 1]  637 	jrne	00102$
-      0002A8 C6 52 1A         [ 1]  638 	ld	a, 0x521a
-      0002AB A5 01            [ 1]  639 	bcp	a, #0x01
-      0002AD 26 F1            [ 1]  640 	jrne	00102$
-                                    641 ;	libs/i2c_lib.c: 75: return I2C_IRQ.AF;
-      0002AF C6u00u00         [ 1]  642 	ld	a, _I2C_IRQ+0
-      0002B2 4E               [ 1]  643 	swap	a
-      0002B3 44               [ 1]  644 	srl	a
-      0002B4 A4 01            [ 1]  645 	and	a, #0x01
-                                    646 ;	libs/i2c_lib.c: 76: }
-      0002B6 5B 01            [ 2]  647 	addw	sp, #1
-      0002B8 81               [ 4]  648 	ret
-                                    649 ;	libs/i2c_lib.c: 78: uint8_t i2c_read_byte(unsigned char *data){
-                                    650 ;	-----------------------------------------
-                                    651 ;	 function i2c_read_byte
-                                    652 ;	-----------------------------------------
-      0002B9                        653 _i2c_read_byte:
-                                    654 ;	libs/i2c_lib.c: 79: while (!(I2C_SR1 -> RXNE));
-      0002B9                        655 00101$:
-      0002B9 72 0D 52 17 FB   [ 2]  656 	btjf	0x5217, #6, 00101$
-                                    657 ;	libs/i2c_lib.c: 81: return 0;
-      0002BE 4F               [ 1]  658 	clr	a
-                                    659 ;	libs/i2c_lib.c: 83: }
-      0002BF 81               [ 4]  660 	ret
-                                    661 ;	libs/i2c_lib.c: 88: uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
-                                    662 ;	-----------------------------------------
-                                    663 ;	 function i2c_send_address
-                                    664 ;	-----------------------------------------
-      0002C0                        665 _i2c_send_address:
-      0002C0 90 97            [ 1]  666 	ld	yl, a
-                                    667 ;	libs/i2c_lib.c: 90: I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
-      0002C2 72 12 52 1A      [ 1]  668 	bset	0x521a, #1
-                                    669 ;	libs/i2c_lib.c: 91: I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
-      0002C6 72 10 52 1A      [ 1]  670 	bset	0x521a, #0
-                                    671 ;	libs/i2c_lib.c: 95: address = address << 1;
-      0002CA 93               [ 1]  672 	ldw	x, y
-      0002CB 58               [ 2]  673 	sllw	x
-                                    674 ;	libs/i2c_lib.c: 92: switch(rw_type)
-      0002CC 7B 03            [ 1]  675 	ld	a, (0x03, sp)
-      0002CE 4A               [ 1]  676 	dec	a
-      0002CF 26 04            [ 1]  677 	jrne	00102$
-                                    678 ;	libs/i2c_lib.c: 95: address = address << 1;
-      0002D1 9F               [ 1]  679 	ld	a, xl
-                                    680 ;	libs/i2c_lib.c: 96: address |= 0x01; // Отправка адреса устройства с битом на чтение
-      0002D2 AA 01            [ 1]  681 	or	a, #0x01
-                                    682 ;	libs/i2c_lib.c: 97: break;
-                                    683 ;	libs/i2c_lib.c: 98: default:
-                                    684 ;	libs/i2c_lib.c: 99: address = address << 1; // Отправка адреса устройства с битом на запись
-                                    685 ;	libs/i2c_lib.c: 101: }
-      0002D4 21                     686 	.byte 0x21
-      0002D5                        687 00102$:
-      0002D5 9F               [ 1]  688 	ld	a, xl
-      0002D6                        689 00103$:
-                                    690 ;	libs/i2c_lib.c: 102: i2c_start();
-      0002D6 88               [ 1]  691 	push	a
-      0002D7 CDr02r76         [ 4]  692 	call	_i2c_start
-      0002DA 84               [ 1]  693 	pop	a
-                                    694 ;	libs/i2c_lib.c: 103: I2C_DR -> DR = address;
-      0002DB C7 52 16         [ 1]  695 	ld	0x5216, a
-                                    696 ;	libs/i2c_lib.c: 104: while(I2C_ITR -> ITEVTEN || I2C_ITR -> ITERREN);
-      0002DE                        697 00105$:
-      0002DE C6 52 1A         [ 1]  698 	ld	a, 0x521a
-      0002E1 A5 02            [ 1]  699 	bcp	a, #2
-      0002E3 26 F9            [ 1]  700 	jrne	00105$
-      0002E5 C6 52 1A         [ 1]  701 	ld	a, 0x521a
-      0002E8 A5 01            [ 1]  702 	bcp	a, #0x01
-      0002EA 26 F2            [ 1]  703 	jrne	00105$
-                                    704 ;	libs/i2c_lib.c: 105: return I2C_IRQ.ADDR;
-      0002EC C6u00u00         [ 1]  705 	ld	a, _I2C_IRQ+0
-      0002EF 44               [ 1]  706 	srl	a
-      0002F0 A4 01            [ 1]  707 	and	a, #0x01
-                                    708 ;	libs/i2c_lib.c: 106: }
-      0002F2 85               [ 2]  709 	popw	x
-      0002F3 5B 01            [ 2]  710 	addw	sp, #1
-      0002F5 FC               [ 2]  711 	jp	(x)
-                                    712 ;	libs/i2c_lib.c: 108: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
-                                    713 ;	-----------------------------------------
-                                    714 ;	 function i2c_write
-                                    715 ;	-----------------------------------------
-      0002F6                        716 _i2c_write:
-      0002F6 52 02            [ 2]  717 	sub	sp, #2
-                                    718 ;	libs/i2c_lib.c: 110: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
-      0002F8 4B 00            [ 1]  719 	push	#0x00
-      0002FA CDr02rC0         [ 4]  720 	call	_i2c_send_address
-      0002FD 4D               [ 1]  721 	tnz	a
-      0002FE 27 1D            [ 1]  722 	jreq	00105$
-                                    723 ;	libs/i2c_lib.c: 112: for(int i = 0;i < size;i++)
-      000300 5F               [ 1]  724 	clrw	x
-      000301                        725 00107$:
-      000301 7B 05            [ 1]  726 	ld	a, (0x05, sp)
-      000303 6B 02            [ 1]  727 	ld	(0x02, sp), a
-      000305 0F 01            [ 1]  728 	clr	(0x01, sp)
-      000307 13 01            [ 2]  729 	cpw	x, (0x01, sp)
-      000309 2E 12            [ 1]  730 	jrsge	00105$
-                                    731 ;	libs/i2c_lib.c: 114: if(i2c_send_byte(data[i]))//Проверка на АСК бит
-      00030B 90 93            [ 1]  732 	ldw	y, x
-      00030D 72 F9 06         [ 2]  733 	addw	y, (0x06, sp)
-      000310 90 F6            [ 1]  734 	ld	a, (y)
-      000312 89               [ 2]  735 	pushw	x
-      000313 CDr02r8B         [ 4]  736 	call	_i2c_send_byte
-      000316 85               [ 2]  737 	popw	x
-      000317 4D               [ 1]  738 	tnz	a
-      000318 26 03            [ 1]  739 	jrne	00105$
-                                    740 ;	libs/i2c_lib.c: 112: for(int i = 0;i < size;i++)
-      00031A 5C               [ 1]  741 	incw	x
-      00031B 20 E4            [ 2]  742 	jra	00107$
-      00031D                        743 00105$:
-                                    744 ;	libs/i2c_lib.c: 120: i2c_stop();
-      00031D 1E 03            [ 2]  745 	ldw	x, (3, sp)
-      00031F 1F 06            [ 2]  746 	ldw	(6, sp), x
-      000321 5B 05            [ 2]  747 	addw	sp, #5
-                                    748 ;	libs/i2c_lib.c: 121: }
-      000323 CCr02r86         [ 2]  749 	jp	_i2c_stop
-                                    750 ;	libs/i2c_lib.c: 123: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){
-                                    751 ;	-----------------------------------------
-                                    752 ;	 function i2c_read
-                                    753 ;	-----------------------------------------
-      000326                        754 _i2c_read:
-      000326 52 02            [ 2]  755 	sub	sp, #2
-                                    756 ;	libs/i2c_lib.c: 124: I2C_CR2 -> ACK = 1;
-      000328 AE 52 11         [ 2]  757 	ldw	x, #0x5211
-      00032B 88               [ 1]  758 	push	a
-      00032C F6               [ 1]  759 	ld	a, (x)
-      00032D AA 04            [ 1]  760 	or	a, #0x04
-      00032F F7               [ 1]  761 	ld	(x), a
-      000330 84               [ 1]  762 	pop	a
-                                    763 ;	libs/i2c_lib.c: 125: if(i2c_send_address(dev_addr,1))
-      000331 4B 01            [ 1]  764 	push	#0x01
-      000333 CDr02rC0         [ 4]  765 	call	_i2c_send_address
-      000336 4D               [ 1]  766 	tnz	a
-      000337 27 1F            [ 1]  767 	jreq	00103$
-                                    768 ;	libs/i2c_lib.c: 126: for(int i = 0;i < size;i++)
-      000339 5F               [ 1]  769 	clrw	x
-      00033A                        770 00105$:
-      00033A 7B 05            [ 1]  771 	ld	a, (0x05, sp)
-      00033C 6B 02            [ 1]  772 	ld	(0x02, sp), a
-      00033E 0F 01            [ 1]  773 	clr	(0x01, sp)
-      000340 13 01            [ 2]  774 	cpw	x, (0x01, sp)
-      000342 2E 14            [ 1]  775 	jrsge	00103$
-                                    776 ;	libs/i2c_lib.c: 128: i2c_read_byte((unsigned char *)data[i]);
-      000344 90 93            [ 1]  777 	ldw	y, x
-      000346 72 F9 06         [ 2]  778 	addw	y, (0x06, sp)
-      000349 90 F6            [ 1]  779 	ld	a, (y)
-      00034B 90 5F            [ 1]  780 	clrw	y
-      00034D 90 97            [ 1]  781 	ld	yl, a
-      00034F 89               [ 2]  782 	pushw	x
-      000350 93               [ 1]  783 	ldw	x, y
-      000351 CDr02rB9         [ 4]  784 	call	_i2c_read_byte
-      000354 85               [ 2]  785 	popw	x
-                                    786 ;	libs/i2c_lib.c: 126: for(int i = 0;i < size;i++)
-      000355 5C               [ 1]  787 	incw	x
-      000356 20 E2            [ 2]  788 	jra	00105$
-      000358                        789 00103$:
-                                    790 ;	libs/i2c_lib.c: 130: I2C_CR2 -> ACK = 0;
-      000358 C6 52 11         [ 1]  791 	ld	a, 0x5211
-      00035B A4 FB            [ 1]  792 	and	a, #0xfb
-      00035D C7 52 11         [ 1]  793 	ld	0x5211, a
-                                    794 ;	libs/i2c_lib.c: 131: }
-      000360 1E 03            [ 2]  795 	ldw	x, (3, sp)
-      000362 5B 07            [ 2]  796 	addw	sp, #7
-      000364 FC               [ 2]  797 	jp	(x)
-                                    798 ;	libs/i2c_lib.c: 132: uint8_t i2c_scan(void) 
-                                    799 ;	-----------------------------------------
-                                    800 ;	 function i2c_scan
-                                    801 ;	-----------------------------------------
-      000365                        802 _i2c_scan:
-      000365 52 02            [ 2]  803 	sub	sp, #2
-                                    804 ;	libs/i2c_lib.c: 134: for (uint8_t addr = 1; addr < 127; addr++)
-      000367 A6 01            [ 1]  805 	ld	a, #0x01
-      000369 6B 01            [ 1]  806 	ld	(0x01, sp), a
-      00036B 6B 02            [ 1]  807 	ld	(0x02, sp), a
-      00036D                        808 00105$:
-      00036D 7B 02            [ 1]  809 	ld	a, (0x02, sp)
-      00036F A1 7F            [ 1]  810 	cp	a, #0x7f
-      000371 24 23            [ 1]  811 	jrnc	00103$
-                                    812 ;	libs/i2c_lib.c: 136: if(i2c_send_address(addr, 0))
-      000373 4B 00            [ 1]  813 	push	#0x00
-      000375 7B 03            [ 1]  814 	ld	a, (0x03, sp)
-      000377 CDr02rC0         [ 4]  815 	call	_i2c_send_address
-      00037A 4D               [ 1]  816 	tnz	a
-      00037B 27 07            [ 1]  817 	jreq	00102$
-                                    818 ;	libs/i2c_lib.c: 138: i2c_stop();
-      00037D CDr02r86         [ 4]  819 	call	_i2c_stop
-                                    820 ;	libs/i2c_lib.c: 139: return addr;
-      000380 7B 01            [ 1]  821 	ld	a, (0x01, sp)
-      000382 20 16            [ 2]  822 	jra	00107$
-      000384                        823 00102$:
-                                    824 ;	libs/i2c_lib.c: 141: I2C_SR2 -> AF = 0;
-      000384 72 15 52 18      [ 1]  825 	bres	0x5218, #2
-                                    826 ;	libs/i2c_lib.c: 142: uart_write("error addr\n"); //Очистка флага ошибки
-      000388 AEr00r29         [ 2]  827 	ldw	x, #(___str_4+0)
-      00038B CDr01r84         [ 4]  828 	call	_uart_write
-                                    829 ;	libs/i2c_lib.c: 134: for (uint8_t addr = 1; addr < 127; addr++)
-      00038E 0C 02            [ 1]  830 	inc	(0x02, sp)
-      000390 7B 02            [ 1]  831 	ld	a, (0x02, sp)
-      000392 6B 01            [ 1]  832 	ld	(0x01, sp), a
-      000394 20 D7            [ 2]  833 	jra	00105$
-      000396                        834 00103$:
-                                    835 ;	libs/i2c_lib.c: 144: i2c_stop();
-      000396 CDr02r86         [ 4]  836 	call	_i2c_stop
-                                    837 ;	libs/i2c_lib.c: 145: return 0;
-      000399 4F               [ 1]  838 	clr	a
-      00039A                        839 00107$:
-                                    840 ;	libs/i2c_lib.c: 146: }
-      00039A 5B 02            [ 2]  841 	addw	sp, #2
-      00039C 81               [ 4]  842 	ret
-                                    843 ;	main.c: 2: void setup(void)
-                                    844 ;	-----------------------------------------
-                                    845 ;	 function setup
-                                    846 ;	-----------------------------------------
-      00039D                        847 _setup:
-                                    848 ;	main.c: 5: CLK_CKDIVR = 0;
-      00039D 35 00 50 C6      [ 1]  849 	mov	0x50c6+0, #0x00
-                                    850 ;	main.c: 7: uart_init(9600,0);
-      0003A1 4F               [ 1]  851 	clr	a
-      0003A2 AE 25 80         [ 2]  852 	ldw	x, #0x2580
-      0003A5 CDr00r6F         [ 4]  853 	call	_uart_init
-                                    854 ;	main.c: 8: i2c_init();
-      0003A8 CDr02r4B         [ 4]  855 	call	_i2c_init
-                                    856 ;	main.c: 10: enableInterrupts();
-      0003AB 9A               [ 1]  857 	rim
-                                    858 ;	main.c: 11: }
-      0003AC 81               [ 4]  859 	ret
-                                    860 ;	main.c: 12: int main(void)
-                                    861 ;	-----------------------------------------
-                                    862 ;	 function main
-                                    863 ;	-----------------------------------------
-      0003AD                        864 _main:
-      0003AD 52 02            [ 2]  865 	sub	sp, #2
-                                    866 ;	main.c: 14: setup();
-      0003AF CDr03r9D         [ 4]  867 	call	_setup
-                                    868 ;	main.c: 20: buf[0] = 0xA4;
-      0003B2 96               [ 1]  869 	ldw	x, sp
-      0003B3 5C               [ 1]  870 	incw	x
-      0003B4 A6 A4            [ 1]  871 	ld	a, #0xa4
-      0003B6 F7               [ 1]  872 	ld	(x), a
-                                    873 ;	main.c: 21: buf[1] = 0xA5;
-      0003B7 A6 A5            [ 1]  874 	ld	a, #0xa5
-      0003B9 6B 02            [ 1]  875 	ld	(0x02, sp), a
-                                    876 ;	main.c: 22: i2c_write(I2C_DISPLAY_ADDR,2,buf);
-      0003BB 89               [ 2]  877 	pushw	x
-      0003BC 4B 02            [ 1]  878 	push	#0x02
-      0003BE A6 3C            [ 1]  879 	ld	a, #0x3c
-      0003C0 CDr02rF6         [ 4]  880 	call	_i2c_write
-                                    881 ;	main.c: 23: while(1);
-      0003C3                        882 00102$:
-      0003C3 20 FE            [ 2]  883 	jra	00102$
-                                    884 ;	main.c: 34: }
-      0003C5 5B 02            [ 2]  885 	addw	sp, #2
-      0003C7 81               [ 4]  886 	ret
-                                    887 	.area CODE
-                                    888 	.area CONST
-                                    889 	.area CONST
-      000000                        890 ___str_0:
-      000000 72 78 5F 62 75 66 5F   891 	.ascii "rx_buf_pointer"
+                                     64 	.area SSEG
+      000000                         65 __start__stack:
+      000000                         66 	.ds	1
+                                     67 
+                                     68 ;--------------------------------------------------------
+                                     69 ; absolute external ram data
+                                     70 ;--------------------------------------------------------
+                                     71 	.area DABS (ABS)
+                                     72 
+                                     73 ; default segment ordering for linker
+                                     74 	.area HOME
+                                     75 	.area GSINIT
+                                     76 	.area GSFINAL
+                                     77 	.area CONST
+                                     78 	.area INITIALIZER
+                                     79 	.area CODE
+                                     80 
+                                     81 ;--------------------------------------------------------
+                                     82 ; interrupt vector
+                                     83 ;--------------------------------------------------------
+                                     84 	.area HOME
+      000000                         85 __interrupt_vect:
+      000000 82v00u00u00             86 	int s_GSINIT ; reset
+      000004 82 00 00 00             87 	int 0x000000 ; trap
+      000008 82 00 00 00             88 	int 0x000000 ; int0
+      00000C 82 00 00 00             89 	int 0x000000 ; int1
+      000010 82 00 00 00             90 	int 0x000000 ; int2
+      000014 82 00 00 00             91 	int 0x000000 ; int3
+      000018 82 00 00 00             92 	int 0x000000 ; int4
+      00001C 82 00 00 00             93 	int 0x000000 ; int5
+      000020 82 00 00 00             94 	int 0x000000 ; int6
+      000024 82 00 00 00             95 	int 0x000000 ; int7
+      000028 82 00 00 00             96 	int 0x000000 ; int8
+      00002C 82 00 00 00             97 	int 0x000000 ; int9
+      000030 82 00 00 00             98 	int 0x000000 ; int10
+      000034 82 00 00 00             99 	int 0x000000 ; int11
+      000038 82 00 00 00            100 	int 0x000000 ; int12
+      00003C 82 00 00 00            101 	int 0x000000 ; int13
+      000040 82 00 00 00            102 	int 0x000000 ; int14
+      000044 82 00 00 00            103 	int 0x000000 ; int15
+      000048 82 00 00 00            104 	int 0x000000 ; int16
+      00004C 82v00u00u00            105 	int _uart_transmission_irq ; int17
+      000050 82v00u00u3C            106 	int _uart_reciever_irq ; int18
+      000054 82v00u01uE4            107 	int _i2c_irq ; int19
+                                    108 ;--------------------------------------------------------
+                                    109 ; global & static initialisations
+                                    110 ;--------------------------------------------------------
+                                    111 	.area HOME
+                                    112 	.area GSINIT
+                                    113 	.area GSFINAL
+                                    114 	.area GSINIT
+      000000 CDr00r00         [ 4]  115 	call	___sdcc_external_startup
+      000003 4D               [ 1]  116 	tnz	a
+      000004 27 03            [ 1]  117 	jreq	__sdcc_init_data
+      000006 CCr00r58         [ 2]  118 	jp	__sdcc_program_startup
+      000009                        119 __sdcc_init_data:
+                                    120 ; stm8_genXINIT() start
+      000009 AEr00r00         [ 2]  121 	ldw x, #l_DATA
+      00000C 27 07            [ 1]  122 	jreq	00002$
+      00000E                        123 00001$:
+      00000E 72 4FuFFuFF      [ 1]  124 	clr (s_DATA - 1, x)
+      000012 5A               [ 2]  125 	decw x
+      000013 26 F9            [ 1]  126 	jrne	00001$
+      000015                        127 00002$:
+      000015 AEr00r00         [ 2]  128 	ldw	x, #l_INITIALIZER
+      000018 27 09            [ 1]  129 	jreq	00004$
+      00001A                        130 00003$:
+      00001A D6uFFuFF         [ 1]  131 	ld	a, (s_INITIALIZER - 1, x)
+      00001D D7uFFuFF         [ 1]  132 	ld	(s_INITIALIZED - 1, x), a
+      000020 5A               [ 2]  133 	decw	x
+      000021 26 F7            [ 1]  134 	jrne	00003$
+      000023                        135 00004$:
+                                    136 ; stm8_genXINIT() end
+                                    137 	.area GSFINAL
+      000000 CCr00r58         [ 2]  138 	jp	__sdcc_program_startup
+                                    139 ;--------------------------------------------------------
+                                    140 ; Home
+                                    141 ;--------------------------------------------------------
+                                    142 	.area HOME
+                                    143 	.area HOME
+      000058                        144 __sdcc_program_startup:
+      000058 CCr04r30         [ 2]  145 	jp	_main
+                                    146 ;	return from main will return to caller
+                                    147 ;--------------------------------------------------------
+                                    148 ; code
+                                    149 ;--------------------------------------------------------
+                                    150 	.area CODE
+                                    151 ;	libs/uart_lib.c: 3: void uart_transmission_irq(void) __interrupt(UART1_T_vector)
+                                    152 ;	-----------------------------------------
+                                    153 ;	 function uart_transmission_irq
+                                    154 ;	-----------------------------------------
+      000000                        155 _uart_transmission_irq:
+                                    156 ;	libs/uart_lib.c: 5: if(UART1_SR -> TXE) 
+      000000 AE 52 30         [ 2]  157 	ldw	x, #0x5230
+      000003 F6               [ 1]  158 	ld	a, (x)
+      000004 4E               [ 1]  159 	swap	a
+      000005 44               [ 1]  160 	srl	a
+      000006 44               [ 1]  161 	srl	a
+      000007 44               [ 1]  162 	srl	a
+      000008 A5 01            [ 1]  163 	bcp	a, #0x01
+      00000A 27 2F            [ 1]  164 	jreq	00107$
+                                    165 ;	libs/uart_lib.c: 7: if(tx_buf_pointer[buf_pos] != '\0' && buf_size>buf_pos)
+      00000C C6u00u01         [ 1]  166 	ld	a, _tx_buf_pointer+1
+      00000F CBu00u04         [ 1]  167 	add	a, _buf_pos+0
+      000012 97               [ 1]  168 	ld	xl, a
+      000013 C6u00u00         [ 1]  169 	ld	a, _tx_buf_pointer+0
+      000016 A9 00            [ 1]  170 	adc	a, #0x00
+      000018 95               [ 1]  171 	ld	xh, a
+      000019 F6               [ 1]  172 	ld	a, (x)
+      00001A 27 1B            [ 1]  173 	jreq	00102$
+      00001C C6u00u04         [ 1]  174 	ld	a, _buf_pos+0
+      00001F C1u00u05         [ 1]  175 	cp	a, _buf_size+0
+      000022 24 13            [ 1]  176 	jrnc	00102$
+                                    177 ;	libs/uart_lib.c: 8: UART1_DR -> DR = tx_buf_pointer[buf_pos++];
+      000024 C6u00u04         [ 1]  178 	ld	a, _buf_pos+0
+      000027 72 5Cu00u04      [ 1]  179 	inc	_buf_pos+0
+      00002B 5F               [ 1]  180 	clrw	x
+      00002C 97               [ 1]  181 	ld	xl, a
+      00002D 72 BBu00u00      [ 2]  182 	addw	x, _tx_buf_pointer+0
+      000031 F6               [ 1]  183 	ld	a, (x)
+      000032 C7 52 31         [ 1]  184 	ld	0x5231, a
+      000035 20 04            [ 2]  185 	jra	00107$
+      000037                        186 00102$:
+                                    187 ;	libs/uart_lib.c: 10: UART1_CR2 -> TIEN = 0;
+      000037 72 1F 52 35      [ 1]  188 	bres	0x5235, #7
+      00003B                        189 00107$:
+                                    190 ;	libs/uart_lib.c: 14: }
+      00003B 80               [11]  191 	iret
+                                    192 ;	libs/uart_lib.c: 15: void uart_reciever_irq(void) __interrupt(UART1_R_vector)
+                                    193 ;	-----------------------------------------
+                                    194 ;	 function uart_reciever_irq
+                                    195 ;	-----------------------------------------
+      00003C                        196 _uart_reciever_irq:
+      00003C 88               [ 1]  197 	push	a
+                                    198 ;	libs/uart_lib.c: 19: if(UART1_SR -> RXNE)
+      00003D C6 52 30         [ 1]  199 	ld	a, 0x5230
+      000040 4E               [ 1]  200 	swap	a
+      000041 44               [ 1]  201 	srl	a
+      000042 A5 01            [ 1]  202 	bcp	a, #0x01
+      000044 27 27            [ 1]  203 	jreq	00107$
+                                    204 ;	libs/uart_lib.c: 21: trash_reg = UART1_DR -> DR;
+      000046 C6 52 31         [ 1]  205 	ld	a, 0x5231
+                                    206 ;	libs/uart_lib.c: 22: if(trash_reg != '\n' && buf_size>buf_pos)
+      000049 6B 01            [ 1]  207 	ld	(0x01, sp), a
+      00004B A1 0A            [ 1]  208 	cp	a, #0x0a
+      00004D 27 1A            [ 1]  209 	jreq	00102$
+      00004F C6u00u04         [ 1]  210 	ld	a, _buf_pos+0
+      000052 C1u00u05         [ 1]  211 	cp	a, _buf_size+0
+      000055 24 12            [ 1]  212 	jrnc	00102$
+                                    213 ;	libs/uart_lib.c: 23: rx_buf_pointer[buf_pos++] = trash_reg;
+      000057 C6u00u04         [ 1]  214 	ld	a, _buf_pos+0
+      00005A 72 5Cu00u04      [ 1]  215 	inc	_buf_pos+0
+      00005E 5F               [ 1]  216 	clrw	x
+      00005F 97               [ 1]  217 	ld	xl, a
+      000060 72 BBu00u02      [ 2]  218 	addw	x, _rx_buf_pointer+0
+      000064 7B 01            [ 1]  219 	ld	a, (0x01, sp)
+      000066 F7               [ 1]  220 	ld	(x), a
+      000067 20 04            [ 2]  221 	jra	00107$
+      000069                        222 00102$:
+                                    223 ;	libs/uart_lib.c: 25: UART1_CR2 -> RIEN = 0;
+      000069 72 1B 52 35      [ 1]  224 	bres	0x5235, #5
+      00006D                        225 00107$:
+                                    226 ;	libs/uart_lib.c: 29: }
+      00006D 84               [ 1]  227 	pop	a
+      00006E 80               [11]  228 	iret
+                                    229 ;	libs/uart_lib.c: 30: void uart_init(unsigned int baudrate,uint8_t stopbit)
+                                    230 ;	-----------------------------------------
+                                    231 ;	 function uart_init
+                                    232 ;	-----------------------------------------
+      00006F                        233 _uart_init:
+      00006F 52 02            [ 2]  234 	sub	sp, #2
+      000071 1F 01            [ 2]  235 	ldw	(0x01, sp), x
+                                    236 ;	libs/uart_lib.c: 34: UART1_CR2 -> TEN = 1; // Transmitter enable
+      000073 AE 52 35         [ 2]  237 	ldw	x, #0x5235
+      000076 88               [ 1]  238 	push	a
+      000077 F6               [ 1]  239 	ld	a, (x)
+      000078 AA 08            [ 1]  240 	or	a, #0x08
+      00007A F7               [ 1]  241 	ld	(x), a
+      00007B 84               [ 1]  242 	pop	a
+                                    243 ;	libs/uart_lib.c: 35: UART1_CR2 -> REN = 1; // Receiver enable
+      00007C AE 52 35         [ 2]  244 	ldw	x, #0x5235
+      00007F 88               [ 1]  245 	push	a
+      000080 F6               [ 1]  246 	ld	a, (x)
+      000081 AA 04            [ 1]  247 	or	a, #0x04
+      000083 F7               [ 1]  248 	ld	(x), a
+      000084 84               [ 1]  249 	pop	a
+                                    250 ;	libs/uart_lib.c: 36: switch(stopbit)
+      000085 A1 02            [ 1]  251 	cp	a, #0x02
+      000087 27 06            [ 1]  252 	jreq	00101$
+      000089 A1 03            [ 1]  253 	cp	a, #0x03
+      00008B 27 0E            [ 1]  254 	jreq	00102$
+      00008D 20 16            [ 2]  255 	jra	00103$
+                                    256 ;	libs/uart_lib.c: 38: case 2:
+      00008F                        257 00101$:
+                                    258 ;	libs/uart_lib.c: 39: UART1_CR3 -> STOP = 2;
+      00008F C6 52 36         [ 1]  259 	ld	a, 0x5236
+      000092 A4 CF            [ 1]  260 	and	a, #0xcf
+      000094 AA 20            [ 1]  261 	or	a, #0x20
+      000096 C7 52 36         [ 1]  262 	ld	0x5236, a
+                                    263 ;	libs/uart_lib.c: 40: break;
+      000099 20 12            [ 2]  264 	jra	00104$
+                                    265 ;	libs/uart_lib.c: 41: case 3:
+      00009B                        266 00102$:
+                                    267 ;	libs/uart_lib.c: 42: UART1_CR3 -> STOP = 3;
+      00009B C6 52 36         [ 1]  268 	ld	a, 0x5236
+      00009E AA 30            [ 1]  269 	or	a, #0x30
+      0000A0 C7 52 36         [ 1]  270 	ld	0x5236, a
+                                    271 ;	libs/uart_lib.c: 43: break;
+      0000A3 20 08            [ 2]  272 	jra	00104$
+                                    273 ;	libs/uart_lib.c: 44: default:
+      0000A5                        274 00103$:
+                                    275 ;	libs/uart_lib.c: 45: UART1_CR3 -> STOP = 0;
+      0000A5 C6 52 36         [ 1]  276 	ld	a, 0x5236
+      0000A8 A4 CF            [ 1]  277 	and	a, #0xcf
+      0000AA C7 52 36         [ 1]  278 	ld	0x5236, a
+                                    279 ;	libs/uart_lib.c: 47: }
+      0000AD                        280 00104$:
+                                    281 ;	libs/uart_lib.c: 48: switch(baudrate)
+      0000AD 1E 01            [ 2]  282 	ldw	x, (0x01, sp)
+      0000AF A3 08 00         [ 2]  283 	cpw	x, #0x0800
+      0000B2 26 03            [ 1]  284 	jrne	00186$
+      0000B4 CCr01r40         [ 2]  285 	jp	00110$
+      0000B7                        286 00186$:
+      0000B7 1E 01            [ 2]  287 	ldw	x, (0x01, sp)
+      0000B9 A3 09 60         [ 2]  288 	cpw	x, #0x0960
+      0000BC 27 28            [ 1]  289 	jreq	00105$
+      0000BE 1E 01            [ 2]  290 	ldw	x, (0x01, sp)
+      0000C0 A3 10 00         [ 2]  291 	cpw	x, #0x1000
+      0000C3 26 03            [ 1]  292 	jrne	00192$
+      0000C5 CCr01r50         [ 2]  293 	jp	00111$
+      0000C8                        294 00192$:
+      0000C8 1E 01            [ 2]  295 	ldw	x, (0x01, sp)
+      0000CA A3 4B 00         [ 2]  296 	cpw	x, #0x4b00
+      0000CD 27 31            [ 1]  297 	jreq	00106$
+      0000CF 1E 01            [ 2]  298 	ldw	x, (0x01, sp)
+      0000D1 A3 84 00         [ 2]  299 	cpw	x, #0x8400
+      0000D4 27 5A            [ 1]  300 	jreq	00109$
+      0000D6 1E 01            [ 2]  301 	ldw	x, (0x01, sp)
+      0000D8 A3 C2 00         [ 2]  302 	cpw	x, #0xc200
+      0000DB 27 43            [ 1]  303 	jreq	00108$
+      0000DD 1E 01            [ 2]  304 	ldw	x, (0x01, sp)
+      0000DF A3 E1 00         [ 2]  305 	cpw	x, #0xe100
+      0000E2 27 2C            [ 1]  306 	jreq	00107$
+      0000E4 20 7A            [ 2]  307 	jra	00112$
+                                    308 ;	libs/uart_lib.c: 50: case (unsigned int)2400:
+      0000E6                        309 00105$:
+                                    310 ;	libs/uart_lib.c: 51: UART1_BRR2 -> MSB = 0x01;
+      0000E6 C6 52 33         [ 1]  311 	ld	a, 0x5233
+      0000E9 A4 0F            [ 1]  312 	and	a, #0x0f
+      0000EB AA 10            [ 1]  313 	or	a, #0x10
+      0000ED C7 52 33         [ 1]  314 	ld	0x5233, a
+                                    315 ;	libs/uart_lib.c: 52: UART1_BRR1 -> DIV = 0xA0;
+      0000F0 35 A0 52 32      [ 1]  316 	mov	0x5232+0, #0xa0
+                                    317 ;	libs/uart_lib.c: 53: UART1_BRR2 -> LSB = 0x0B; 
+      0000F4 C6 52 33         [ 1]  318 	ld	a, 0x5233
+      0000F7 A4 F0            [ 1]  319 	and	a, #0xf0
+      0000F9 AA 0B            [ 1]  320 	or	a, #0x0b
+      0000FB C7 52 33         [ 1]  321 	ld	0x5233, a
+                                    322 ;	libs/uart_lib.c: 54: break;
+      0000FE 20 6E            [ 2]  323 	jra	00114$
+                                    324 ;	libs/uart_lib.c: 55: case (unsigned int)19200:
+      000100                        325 00106$:
+                                    326 ;	libs/uart_lib.c: 56: UART1_BRR1 -> DIV = 0x34;
+      000100 35 34 52 32      [ 1]  327 	mov	0x5232+0, #0x34
+                                    328 ;	libs/uart_lib.c: 57: UART1_BRR2 -> LSB = 0x01;
+      000104 C6 52 33         [ 1]  329 	ld	a, 0x5233
+      000107 A4 F0            [ 1]  330 	and	a, #0xf0
+      000109 AA 01            [ 1]  331 	or	a, #0x01
+      00010B C7 52 33         [ 1]  332 	ld	0x5233, a
+                                    333 ;	libs/uart_lib.c: 58: break;
+      00010E 20 5E            [ 2]  334 	jra	00114$
+                                    335 ;	libs/uart_lib.c: 59: case (unsigned int)57600:
+      000110                        336 00107$:
+                                    337 ;	libs/uart_lib.c: 60: UART1_BRR1 -> DIV = 0x11;
+      000110 35 11 52 32      [ 1]  338 	mov	0x5232+0, #0x11
+                                    339 ;	libs/uart_lib.c: 61: UART1_BRR2 -> LSB = 0x06;
+      000114 C6 52 33         [ 1]  340 	ld	a, 0x5233
+      000117 A4 F0            [ 1]  341 	and	a, #0xf0
+      000119 AA 06            [ 1]  342 	or	a, #0x06
+      00011B C7 52 33         [ 1]  343 	ld	0x5233, a
+                                    344 ;	libs/uart_lib.c: 62: break;
+      00011E 20 4E            [ 2]  345 	jra	00114$
+                                    346 ;	libs/uart_lib.c: 63: case (unsigned int)115200:
+      000120                        347 00108$:
+                                    348 ;	libs/uart_lib.c: 64: UART1_BRR1 -> DIV = 0x08;
+      000120 35 08 52 32      [ 1]  349 	mov	0x5232+0, #0x08
+                                    350 ;	libs/uart_lib.c: 65: UART1_BRR2 -> LSB = 0x0B;
+      000124 C6 52 33         [ 1]  351 	ld	a, 0x5233
+      000127 A4 F0            [ 1]  352 	and	a, #0xf0
+      000129 AA 0B            [ 1]  353 	or	a, #0x0b
+      00012B C7 52 33         [ 1]  354 	ld	0x5233, a
+                                    355 ;	libs/uart_lib.c: 66: break;
+      00012E 20 3E            [ 2]  356 	jra	00114$
+                                    357 ;	libs/uart_lib.c: 67: case (unsigned int)230400:
+      000130                        358 00109$:
+                                    359 ;	libs/uart_lib.c: 68: UART1_BRR1 -> DIV = 0x04;
+      000130 35 04 52 32      [ 1]  360 	mov	0x5232+0, #0x04
+                                    361 ;	libs/uart_lib.c: 69: UART1_BRR2 -> LSB = 0x05;
+      000134 C6 52 33         [ 1]  362 	ld	a, 0x5233
+      000137 A4 F0            [ 1]  363 	and	a, #0xf0
+      000139 AA 05            [ 1]  364 	or	a, #0x05
+      00013B C7 52 33         [ 1]  365 	ld	0x5233, a
+                                    366 ;	libs/uart_lib.c: 70: break;
+      00013E 20 2E            [ 2]  367 	jra	00114$
+                                    368 ;	libs/uart_lib.c: 71: case (unsigned int)460800:
+      000140                        369 00110$:
+                                    370 ;	libs/uart_lib.c: 72: UART1_BRR1 -> DIV = 0x02;
+      000140 35 02 52 32      [ 1]  371 	mov	0x5232+0, #0x02
+                                    372 ;	libs/uart_lib.c: 73: UART1_BRR2 -> LSB = 0x03;
+      000144 C6 52 33         [ 1]  373 	ld	a, 0x5233
+      000147 A4 F0            [ 1]  374 	and	a, #0xf0
+      000149 AA 03            [ 1]  375 	or	a, #0x03
+      00014B C7 52 33         [ 1]  376 	ld	0x5233, a
+                                    377 ;	libs/uart_lib.c: 74: break;
+      00014E 20 1E            [ 2]  378 	jra	00114$
+                                    379 ;	libs/uart_lib.c: 75: case (unsigned int)921600:
+      000150                        380 00111$:
+                                    381 ;	libs/uart_lib.c: 76: UART1_BRR1 -> DIV = 0x01;
+      000150 35 01 52 32      [ 1]  382 	mov	0x5232+0, #0x01
+                                    383 ;	libs/uart_lib.c: 77: UART1_BRR2 -> LSB = 0x01;
+      000154 C6 52 33         [ 1]  384 	ld	a, 0x5233
+      000157 A4 F0            [ 1]  385 	and	a, #0xf0
+      000159 AA 01            [ 1]  386 	or	a, #0x01
+      00015B C7 52 33         [ 1]  387 	ld	0x5233, a
+                                    388 ;	libs/uart_lib.c: 78: break;
+      00015E 20 0E            [ 2]  389 	jra	00114$
+                                    390 ;	libs/uart_lib.c: 79: default:
+      000160                        391 00112$:
+                                    392 ;	libs/uart_lib.c: 80: UART1_BRR1 -> DIV = 0x68;
+      000160 35 68 52 32      [ 1]  393 	mov	0x5232+0, #0x68
+                                    394 ;	libs/uart_lib.c: 81: UART1_BRR2 -> LSB = 0x03;
+      000164 C6 52 33         [ 1]  395 	ld	a, 0x5233
+      000167 A4 F0            [ 1]  396 	and	a, #0xf0
+      000169 AA 03            [ 1]  397 	or	a, #0x03
+      00016B C7 52 33         [ 1]  398 	ld	0x5233, a
+                                    399 ;	libs/uart_lib.c: 83: }
+      00016E                        400 00114$:
+                                    401 ;	libs/uart_lib.c: 84: }
+      00016E 5B 02            [ 2]  402 	addw	sp, #2
+      000170 81               [ 4]  403 	ret
+                                    404 ;	libs/uart_lib.c: 86: int uart_read_byte(uint8_t *data)
+                                    405 ;	-----------------------------------------
+                                    406 ;	 function uart_read_byte
+                                    407 ;	-----------------------------------------
+      000171                        408 _uart_read_byte:
+                                    409 ;	libs/uart_lib.c: 88: while(!(UART1_SR -> RXNE));
+      000171                        410 00101$:
+      000171 72 0B 52 30 FB   [ 2]  411 	btjf	0x5230, #5, 00101$
+                                    412 ;	libs/uart_lib.c: 90: return 1;
+      000176 5F               [ 1]  413 	clrw	x
+      000177 5C               [ 1]  414 	incw	x
+                                    415 ;	libs/uart_lib.c: 91: }
+      000178 81               [ 4]  416 	ret
+                                    417 ;	libs/uart_lib.c: 93: int uart_write_byte(uint8_t data)
+                                    418 ;	-----------------------------------------
+                                    419 ;	 function uart_write_byte
+                                    420 ;	-----------------------------------------
+      000179                        421 _uart_write_byte:
+                                    422 ;	libs/uart_lib.c: 95: UART1_DR -> DR = data;
+      000179 C7 52 31         [ 1]  423 	ld	0x5231, a
+                                    424 ;	libs/uart_lib.c: 96: while(!(UART1_SR -> TXE));
+      00017C                        425 00101$:
+      00017C 72 0F 52 30 FB   [ 2]  426 	btjf	0x5230, #7, 00101$
+                                    427 ;	libs/uart_lib.c: 97: return 1;
+      000181 5F               [ 1]  428 	clrw	x
+      000182 5C               [ 1]  429 	incw	x
+                                    430 ;	libs/uart_lib.c: 98: }
+      000183 81               [ 4]  431 	ret
+                                    432 ;	libs/uart_lib.c: 100: void uart_write(uint8_t *data_buf)
+                                    433 ;	-----------------------------------------
+                                    434 ;	 function uart_write
+                                    435 ;	-----------------------------------------
+      000184                        436 _uart_write:
+      000184 52 02            [ 2]  437 	sub	sp, #2
+                                    438 ;	libs/uart_lib.c: 102: tx_buf_pointer = data_buf;
+      000186 1F 01            [ 2]  439 	ldw	(0x01, sp), x
+      000188 CFu00u00         [ 2]  440 	ldw	_tx_buf_pointer+0, x
+                                    441 ;	libs/uart_lib.c: 103: buf_pos = 0;
+      00018B 72 5Fu00u04      [ 1]  442 	clr	_buf_pos+0
+                                    443 ;	libs/uart_lib.c: 104: buf_size = 0;
+      00018F 72 5Fu00u05      [ 1]  444 	clr	_buf_size+0
+                                    445 ;	libs/uart_lib.c: 105: while (data_buf[buf_size++] != '\0');
+      000193                        446 00101$:
+      000193 C6u00u05         [ 1]  447 	ld	a, _buf_size+0
+      000196 72 5Cu00u05      [ 1]  448 	inc	_buf_size+0
+      00019A 5F               [ 1]  449 	clrw	x
+      00019B 97               [ 1]  450 	ld	xl, a
+      00019C 72 FB 01         [ 2]  451 	addw	x, (0x01, sp)
+      00019F F6               [ 1]  452 	ld	a, (x)
+      0001A0 26 F1            [ 1]  453 	jrne	00101$
+                                    454 ;	libs/uart_lib.c: 106: UART1_CR2 -> TIEN = 1;
+      0001A2 72 1E 52 35      [ 1]  455 	bset	0x5235, #7
+                                    456 ;	libs/uart_lib.c: 107: while(UART1_CR2 -> TIEN);
+      0001A6                        457 00104$:
+      0001A6 72 0E 52 35 FB   [ 2]  458 	btjt	0x5235, #7, 00104$
+                                    459 ;	libs/uart_lib.c: 108: }
+      0001AB 5B 02            [ 2]  460 	addw	sp, #2
+      0001AD 81               [ 4]  461 	ret
+                                    462 ;	libs/uart_lib.c: 109: void uart_read(uint8_t *data_buf,int size)
+                                    463 ;	-----------------------------------------
+                                    464 ;	 function uart_read
+                                    465 ;	-----------------------------------------
+      0001AE                        466 _uart_read:
+                                    467 ;	libs/uart_lib.c: 111: rx_buf_pointer = data_buf;
+      0001AE CFu00u02         [ 2]  468 	ldw	_rx_buf_pointer+0, x
+                                    469 ;	libs/uart_lib.c: 112: uart_write("rx_buf_pointer\n");
+      0001B1 AEr00r00         [ 2]  470 	ldw	x, #(___str_0+0)
+      0001B4 CDr01r84         [ 4]  471 	call	_uart_write
+                                    472 ;	libs/uart_lib.c: 113: buf_pos = 0;
+      0001B7 72 5Fu00u04      [ 1]  473 	clr	_buf_pos+0
+                                    474 ;	libs/uart_lib.c: 114: uart_write("buf_pos\n");
+      0001BB AEr00r10         [ 2]  475 	ldw	x, #(___str_1+0)
+      0001BE CDr01r84         [ 4]  476 	call	_uart_write
+                                    477 ;	libs/uart_lib.c: 115: buf_size = size;
+      0001C1 7B 04            [ 1]  478 	ld	a, (0x04, sp)
+      0001C3 C7u00u05         [ 1]  479 	ld	_buf_size+0, a
+                                    480 ;	libs/uart_lib.c: 116: uart_write("buf_size\n");
+      0001C6 AEr00r19         [ 2]  481 	ldw	x, #(___str_2+0)
+      0001C9 CDr01r84         [ 4]  482 	call	_uart_write
+                                    483 ;	libs/uart_lib.c: 117: UART1_CR2 -> RIEN = 1;
+      0001CC 72 1A 52 35      [ 1]  484 	bset	0x5235, #5
+                                    485 ;	libs/uart_lib.c: 118: uart_write("RIEN\n");
+      0001D0 AEr00r23         [ 2]  486 	ldw	x, #(___str_3+0)
+      0001D3 CDr01r84         [ 4]  487 	call	_uart_write
+                                    488 ;	libs/uart_lib.c: 119: while(UART1_CR2 -> RIEN);
+      0001D6                        489 00101$:
+      0001D6 C6 52 35         [ 1]  490 	ld	a, 0x5235
+      0001D9 4E               [ 1]  491 	swap	a
+      0001DA 44               [ 1]  492 	srl	a
+      0001DB A4 01            [ 1]  493 	and	a, #0x01
+      0001DD 26 F7            [ 1]  494 	jrne	00101$
+                                    495 ;	libs/uart_lib.c: 120: }
+      0001DF 1E 01            [ 2]  496 	ldw	x, (1, sp)
+      0001E1 5B 04            [ 2]  497 	addw	sp, #4
+      0001E3 FC               [ 2]  498 	jp	(x)
+                                    499 ;	libs/i2c_lib.c: 5: void i2c_irq(void) __interrupt(I2C_vector)
+                                    500 ;	-----------------------------------------
+                                    501 ;	 function i2c_irq
+                                    502 ;	-----------------------------------------
+      0001E4                        503 _i2c_irq:
+      0001E4 4F               [ 1]  504 	clr	a
+      0001E5 62               [ 2]  505 	div	x, a
+                                    506 ;	libs/i2c_lib.c: 8: disableInterrupts();
+      0001E6 9B               [ 1]  507 	sim
+                                    508 ;	libs/i2c_lib.c: 9: memset(&I2C_IRQ, 0, sizeof(I2C_IRQ));
+      0001E7 4B 01            [ 1]  509 	push	#0x01
+      0001E9 4B 00            [ 1]  510 	push	#0x00
+      0001EB 5F               [ 1]  511 	clrw	x
+      0001EC 89               [ 2]  512 	pushw	x
+      0001ED AEr00r00         [ 2]  513 	ldw	x, #(_I2C_IRQ+0)
+      0001F0 CDr00r00         [ 4]  514 	call	_memset
+                                    515 ;	libs/i2c_lib.c: 10: govno_alert = 0;
+      0001F3 72 5Fu00u01      [ 1]  516 	clr	_govno_alert+0
+                                    517 ;	libs/i2c_lib.c: 11: if(I2C_SR1 -> ADDR == 1)
+      0001F7 72 03 52 17 08   [ 2]  518 	btjf	0x5217, #1, 00102$
+                                    519 ;	libs/i2c_lib.c: 14: I2C_IRQ.ADDR = 1;
+      0001FC 72 12u00u00      [ 1]  520 	bset	_I2C_IRQ+0, #1
+                                    521 ;	libs/i2c_lib.c: 15: govno_alert = 6;
+      000200 35 06u00u01      [ 1]  522 	mov	_govno_alert+0, #0x06
+                                    523 ;	libs/i2c_lib.c: 16: I2C_SR3; //EV6 
+      000204                        524 00102$:
+                                    525 ;	libs/i2c_lib.c: 19: if(I2C_SR1 -> SB)//EV5 
+      000204 72 01 52 17 04   [ 2]  526 	btjf	0x5217, #0, 00104$
+                                    527 ;	libs/i2c_lib.c: 22: I2C_IRQ.SB = 1;
+      000209 72 10u00u00      [ 1]  528 	bset	_I2C_IRQ+0, #0
+      00020D                        529 00104$:
+                                    530 ;	libs/i2c_lib.c: 24: if(I2C_SR1 -> BTF) 
+      00020D 72 05 52 17 04   [ 2]  531 	btjf	0x5217, #2, 00106$
+                                    532 ;	libs/i2c_lib.c: 26: I2C_IRQ.BTF = 1;
+      000212 72 14u00u00      [ 1]  533 	bset	_I2C_IRQ+0, #2
+      000216                        534 00106$:
+                                    535 ;	libs/i2c_lib.c: 28: if(I2C_SR1 -> TXE) 
+      000216 72 0F 52 17 08   [ 2]  536 	btjf	0x5217, #7, 00108$
+                                    537 ;	libs/i2c_lib.c: 30: counter++;
+      00021B 72 5Cu00u02      [ 1]  538 	inc	_counter+0
+                                    539 ;	libs/i2c_lib.c: 31: I2C_IRQ.TXE = 1;
+      00021F 72 18u00u00      [ 1]  540 	bset	_I2C_IRQ+0, #4
+      000223                        541 00108$:
+                                    542 ;	libs/i2c_lib.c: 33: if(I2C_SR1 -> RXNE) 
+      000223 72 0D 52 17 04   [ 2]  543 	btjf	0x5217, #6, 00110$
+                                    544 ;	libs/i2c_lib.c: 35: I2C_IRQ.RXNE = 1;
+      000228 72 16u00u00      [ 1]  545 	bset	_I2C_IRQ+0, #3
+      00022C                        546 00110$:
+                                    547 ;	libs/i2c_lib.c: 37: if(I2C_SR2 -> AF) 
+      00022C C6 52 18         [ 1]  548 	ld	a, 0x5218
+      00022F 44               [ 1]  549 	srl	a
+      000230 44               [ 1]  550 	srl	a
+      000231 A5 01            [ 1]  551 	bcp	a, #0x01
+      000233 27 04            [ 1]  552 	jreq	00112$
+                                    553 ;	libs/i2c_lib.c: 39: I2C_IRQ.AF = 1;
+      000235 72 1Au00u00      [ 1]  554 	bset	_I2C_IRQ+0, #5
+      000239                        555 00112$:
+                                    556 ;	libs/i2c_lib.c: 41: I2C_ITR -> ITBUFEN = 0;
+      000239 72 15 52 1A      [ 1]  557 	bres	0x521a, #2
+                                    558 ;	libs/i2c_lib.c: 42: I2C_ITR -> ITEVTEN = 0; //Выключение флагов прерываний
+      00023D 72 13 52 1A      [ 1]  559 	bres	0x521a, #1
+                                    560 ;	libs/i2c_lib.c: 43: I2C_ITR -> ITERREN = 0;
+      000241 AE 52 1A         [ 2]  561 	ldw	x, #0x521a
+      000244 F6               [ 1]  562 	ld	a, (x)
+      000245 A4 FE            [ 1]  563 	and	a, #0xfe
+      000247 F7               [ 1]  564 	ld	(x), a
+                                    565 ;	libs/i2c_lib.c: 44: enableInterrupts(); 
+      000248 9A               [ 1]  566 	rim
+                                    567 ;	libs/i2c_lib.c: 46: }
+      000249 80               [11]  568 	iret
+                                    569 ;	libs/i2c_lib.c: 47: void i2c_init(void)
+                                    570 ;	-----------------------------------------
+                                    571 ;	 function i2c_init
+                                    572 ;	-----------------------------------------
+      00024A                        573 _i2c_init:
+                                    574 ;	libs/i2c_lib.c: 51: I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
+      00024A 72 11 52 10      [ 1]  575 	bres	0x5210, #0
+                                    576 ;	libs/i2c_lib.c: 52: I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
+      00024E C6 52 12         [ 1]  577 	ld	a, 0x5212
+      000251 A4 C0            [ 1]  578 	and	a, #0xc0
+      000253 AA 10            [ 1]  579 	or	a, #0x10
+      000255 C7 52 12         [ 1]  580 	ld	0x5212, a
+                                    581 ;	libs/i2c_lib.c: 53: I2C_CCRH -> CCR = 0;// =0
+      000258 C6 52 1C         [ 1]  582 	ld	a, 0x521c
+      00025B A4 F0            [ 1]  583 	and	a, #0xf0
+      00025D C7 52 1C         [ 1]  584 	ld	0x521c, a
+                                    585 ;	libs/i2c_lib.c: 54: I2C_CCRL -> CCR = 80;// 100kHz for I2C
+      000260 35 50 52 1B      [ 1]  586 	mov	0x521b+0, #0x50
+                                    587 ;	libs/i2c_lib.c: 55: I2C_CCRH -> FS = 0;// set standart mode(100кHz)
+      000264 72 1F 52 1C      [ 1]  588 	bres	0x521c, #7
+                                    589 ;	libs/i2c_lib.c: 56: I2C_OARH -> ADDMODE = 0;// 7-bit address mode
+      000268 72 1F 52 14      [ 1]  590 	bres	0x5214, #7
+                                    591 ;	libs/i2c_lib.c: 57: I2C_OARH -> ADDCONF = 1;// see reference manual
+      00026C 72 10 52 14      [ 1]  592 	bset	0x5214, #0
+                                    593 ;	libs/i2c_lib.c: 58: I2C_CR1 -> PE = 1;// PE=1, enable I2C
+      000270 72 10 52 10      [ 1]  594 	bset	0x5210, #0
+                                    595 ;	libs/i2c_lib.c: 59: }
+      000274 81               [ 4]  596 	ret
+                                    597 ;	libs/i2c_lib.c: 61: void i2c_start(void)
+                                    598 ;	-----------------------------------------
+                                    599 ;	 function i2c_start
+                                    600 ;	-----------------------------------------
+      000275                        601 _i2c_start:
+                                    602 ;	libs/i2c_lib.c: 63: uart_write("i2c_start\n");
+      000275 AEr00r29         [ 2]  603 	ldw	x, #(___str_4+0)
+      000278 CDr01r84         [ 4]  604 	call	_uart_write
+                                    605 ;	libs/i2c_lib.c: 64: I2C_ITR -> ITEVTEN = 1;//Включение прерываний для обработки сигнала старт
+      00027B 72 12 52 1A      [ 1]  606 	bset	0x521a, #1
+                                    607 ;	libs/i2c_lib.c: 65: I2C_CR2 -> START = 1; // Отправляем стартовый сигнал
+      00027F 72 10 52 11      [ 1]  608 	bset	0x5211, #0
+                                    609 ;	libs/i2c_lib.c: 66: while(I2C_ITR -> ITEVTEN);// Ожидание отправки стартового сигнала
+      000283                        610 00101$:
+      000283 C6 52 1A         [ 1]  611 	ld	a, 0x521a
+      000286 A5 02            [ 1]  612 	bcp	a, #2
+      000288 26 F9            [ 1]  613 	jrne	00101$
+                                    614 ;	libs/i2c_lib.c: 68: }
+      00028A 81               [ 4]  615 	ret
+                                    616 ;	libs/i2c_lib.c: 70: void i2c_stop(void)
+                                    617 ;	-----------------------------------------
+                                    618 ;	 function i2c_stop
+                                    619 ;	-----------------------------------------
+      00028B                        620 _i2c_stop:
+                                    621 ;	libs/i2c_lib.c: 72: uart_write("i2c_stop\n");
+      00028B AEr00r34         [ 2]  622 	ldw	x, #(___str_5+0)
+      00028E CDr01r84         [ 4]  623 	call	_uart_write
+                                    624 ;	libs/i2c_lib.c: 73: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала
+      000291 72 12 52 11      [ 1]  625 	bset	0x5211, #1
+                                    626 ;	libs/i2c_lib.c: 74: if(govno_alert == 6)
+      000295 C6u00u01         [ 1]  627 	ld	a, _govno_alert+0
+      000298 A1 06            [ 1]  628 	cp	a, #0x06
+      00029A 27 01            [ 1]  629 	jreq	00114$
+      00029C 81               [ 4]  630 	ret
+      00029D                        631 00114$:
+                                    632 ;	libs/i2c_lib.c: 75: uart_write("govno alert\n");
+      00029D AEr00r3E         [ 2]  633 	ldw	x, #(___str_6+0)
+                                    634 ;	libs/i2c_lib.c: 77: }
+      0002A0 CCr01r84         [ 2]  635 	jp	_uart_write
+                                    636 ;	libs/i2c_lib.c: 79: uint8_t i2c_send_byte(unsigned char data)
+                                    637 ;	-----------------------------------------
+                                    638 ;	 function i2c_send_byte
+                                    639 ;	-----------------------------------------
+      0002A3                        640 _i2c_send_byte:
+      0002A3 88               [ 1]  641 	push	a
+      0002A4 6B 01            [ 1]  642 	ld	(0x01, sp), a
+                                    643 ;	libs/i2c_lib.c: 81: uart_write("i2c_send_byte\n");
+      0002A6 AEr00r4B         [ 2]  644 	ldw	x, #(___str_7+0)
+      0002A9 CDr01r84         [ 4]  645 	call	_uart_write
+                                    646 ;	libs/i2c_lib.c: 82: I2C_ITR -> ITBUFEN = 1;
+      0002AC 72 14 52 1A      [ 1]  647 	bset	0x521a, #2
+                                    648 ;	libs/i2c_lib.c: 83: I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
+      0002B0 72 12 52 1A      [ 1]  649 	bset	0x521a, #1
+                                    650 ;	libs/i2c_lib.c: 84: I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
+      0002B4 72 10 52 1A      [ 1]  651 	bset	0x521a, #0
+                                    652 ;	libs/i2c_lib.c: 85: uart_write("i2c_irq_enable_all_send_byte\n");
+      0002B8 AEr00r5A         [ 2]  653 	ldw	x, #(___str_8+0)
+      0002BB CDr01r84         [ 4]  654 	call	_uart_write
+                                    655 ;	libs/i2c_lib.c: 86: while(I2C_ITR -> ITERREN && I2C_ITR -> ITEVTEN);
+      0002BE                        656 00102$:
+      0002BE C6 52 1A         [ 1]  657 	ld	a, 0x521a
+      0002C1 A5 01            [ 1]  658 	bcp	a, #0x01
+      0002C3 27 07            [ 1]  659 	jreq	00104$
+      0002C5 C6 52 1A         [ 1]  660 	ld	a, 0x521a
+      0002C8 A5 02            [ 1]  661 	bcp	a, #2
+      0002CA 26 F2            [ 1]  662 	jrne	00102$
+      0002CC                        663 00104$:
+                                    664 ;	libs/i2c_lib.c: 88: I2C_DR -> DR = data; //Отправка данных
+      0002CC AE 52 16         [ 2]  665 	ldw	x, #0x5216
+      0002CF 7B 01            [ 1]  666 	ld	a, (0x01, sp)
+      0002D1 F7               [ 1]  667 	ld	(x), a
+                                    668 ;	libs/i2c_lib.c: 89: I2C_DR -> DR = data; //Отправка данных
+      0002D2 AE 52 16         [ 2]  669 	ldw	x, #0x5216
+      0002D5 7B 01            [ 1]  670 	ld	a, (0x01, sp)
+      0002D7 F7               [ 1]  671 	ld	(x), a
+                                    672 ;	libs/i2c_lib.c: 90: uart_write("AF -> ");
+      0002D8 AEr00r78         [ 2]  673 	ldw	x, #(___str_9+0)
+      0002DB CDr01r84         [ 4]  674 	call	_uart_write
+                                    675 ;	libs/i2c_lib.c: 91: uart_write((I2C_IRQ.AF ? "1\n" : "0\n"));
+      0002DE 72 0Bu00u00 04   [ 2]  676 	btjf	_I2C_IRQ+0, #5, 00107$
+      0002E3 AEr00r7F         [ 2]  677 	ldw	x, #___str_10+0
+      0002E6 BC                     678 	.byte 0xbc
+      0002E7                        679 00107$:
+      0002E7 AEr00r82         [ 2]  680 	ldw	x, #___str_11+0
+      0002EA                        681 00108$:
+      0002EA CDr01r84         [ 4]  682 	call	_uart_write
+                                    683 ;	libs/i2c_lib.c: 92: return I2C_IRQ.AF;
+      0002ED C6u00u00         [ 1]  684 	ld	a, _I2C_IRQ+0
+      0002F0 4E               [ 1]  685 	swap	a
+      0002F1 44               [ 1]  686 	srl	a
+      0002F2 A4 01            [ 1]  687 	and	a, #0x01
+                                    688 ;	libs/i2c_lib.c: 93: }
+      0002F4 5B 01            [ 2]  689 	addw	sp, #1
+      0002F6 81               [ 4]  690 	ret
+                                    691 ;	libs/i2c_lib.c: 95: uint8_t i2c_read_byte(unsigned char *data){
+                                    692 ;	-----------------------------------------
+                                    693 ;	 function i2c_read_byte
+                                    694 ;	-----------------------------------------
+      0002F7                        695 _i2c_read_byte:
+                                    696 ;	libs/i2c_lib.c: 96: while (!(I2C_SR1 -> RXNE));
+      0002F7                        697 00101$:
+      0002F7 72 0D 52 17 FB   [ 2]  698 	btjf	0x5217, #6, 00101$
+                                    699 ;	libs/i2c_lib.c: 98: return 0;
+      0002FC 4F               [ 1]  700 	clr	a
+                                    701 ;	libs/i2c_lib.c: 100: }
+      0002FD 81               [ 4]  702 	ret
+                                    703 ;	libs/i2c_lib.c: 105: uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
+                                    704 ;	-----------------------------------------
+                                    705 ;	 function i2c_send_address
+                                    706 ;	-----------------------------------------
+      0002FE                        707 _i2c_send_address:
+      0002FE 88               [ 1]  708 	push	a
+      0002FF 6B 01            [ 1]  709 	ld	(0x01, sp), a
+                                    710 ;	libs/i2c_lib.c: 107: i2c_start();
+      000301 CDr02r75         [ 4]  711 	call	_i2c_start
+                                    712 ;	libs/i2c_lib.c: 108: uart_write("i2c_send_address\n");
+      000304 AEr00r85         [ 2]  713 	ldw	x, #(___str_12+0)
+      000307 CDr01r84         [ 4]  714 	call	_uart_write
+                                    715 ;	libs/i2c_lib.c: 112: address = address << 1;
+      00030A 7B 01            [ 1]  716 	ld	a, (0x01, sp)
+      00030C 48               [ 1]  717 	sll	a
+                                    718 ;	libs/i2c_lib.c: 109: switch(rw_type)
+      00030D 88               [ 1]  719 	push	a
+      00030E 7B 05            [ 1]  720 	ld	a, (0x05, sp)
+      000310 4A               [ 1]  721 	dec	a
+      000311 84               [ 1]  722 	pop	a
+      000312 26 02            [ 1]  723 	jrne	00102$
+                                    724 ;	libs/i2c_lib.c: 112: address = address << 1;
+                                    725 ;	libs/i2c_lib.c: 113: address |= 0x01; // Отправка адреса устройства с битом на чтение
+      000314 AA 01            [ 1]  726 	or	a, #0x01
+                                    727 ;	libs/i2c_lib.c: 114: break;
+                                    728 ;	libs/i2c_lib.c: 115: default:
+                                    729 ;	libs/i2c_lib.c: 116: address = address << 1; // Отправка адреса устройства с битом на запись
+                                    730 ;	libs/i2c_lib.c: 118: }
+      000316                        731 00102$:
+                                    732 ;	libs/i2c_lib.c: 119: I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
+      000316 AE 52 1A         [ 2]  733 	ldw	x, #0x521a
+      000319 88               [ 1]  734 	push	a
+      00031A F6               [ 1]  735 	ld	a, (x)
+      00031B AA 02            [ 1]  736 	or	a, #0x02
+      00031D F7               [ 1]  737 	ld	(x), a
+      00031E 84               [ 1]  738 	pop	a
+                                    739 ;	libs/i2c_lib.c: 120: I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
+      00031F AE 52 1A         [ 2]  740 	ldw	x, #0x521a
+      000322 88               [ 1]  741 	push	a
+      000323 F6               [ 1]  742 	ld	a, (x)
+      000324 AA 01            [ 1]  743 	or	a, #0x01
+      000326 F7               [ 1]  744 	ld	(x), a
+      000327 AEr00r97         [ 2]  745 	ldw	x, #(___str_13+0)
+      00032A CDr01r84         [ 4]  746 	call	_uart_write
+      00032D 84               [ 1]  747 	pop	a
+                                    748 ;	libs/i2c_lib.c: 122: I2C_DR -> DR = address;
+      00032E C7 52 16         [ 1]  749 	ld	0x5216, a
+                                    750 ;	libs/i2c_lib.c: 123: while(I2C_ITR -> ITEVTEN && I2C_ITR -> ITERREN);
+      000331                        751 00105$:
+      000331 C6 52 1A         [ 1]  752 	ld	a, 0x521a
+      000334 A5 02            [ 1]  753 	bcp	a, #2
+      000336 27 07            [ 1]  754 	jreq	00107$
+      000338 C6 52 1A         [ 1]  755 	ld	a, 0x521a
+      00033B A5 01            [ 1]  756 	bcp	a, #0x01
+      00033D 26 F2            [ 1]  757 	jrne	00105$
+      00033F                        758 00107$:
+                                    759 ;	libs/i2c_lib.c: 124: if(I2C_IRQ.ADDR > 0)
+      00033F 72 03u00u00 08   [ 2]  760 	btjf	_I2C_IRQ+0, #1, 00109$
+                                    761 ;	libs/i2c_lib.c: 125: uart_write("1\n");
+      000344 AEr00r7F         [ 2]  762 	ldw	x, #(___str_10+0)
+      000347 CDr01r84         [ 4]  763 	call	_uart_write
+      00034A 20 06            [ 2]  764 	jra	00110$
+      00034C                        765 00109$:
+                                    766 ;	libs/i2c_lib.c: 127: uart_write("0\n");
+      00034C AEr00r82         [ 2]  767 	ldw	x, #(___str_11+0)
+      00034F CDr01r84         [ 4]  768 	call	_uart_write
+      000352                        769 00110$:
+                                    770 ;	libs/i2c_lib.c: 129: return I2C_IRQ.AF;
+      000352 C6u00u00         [ 1]  771 	ld	a, _I2C_IRQ+0
+      000355 4E               [ 1]  772 	swap	a
+      000356 44               [ 1]  773 	srl	a
+      000357 A4 01            [ 1]  774 	and	a, #0x01
+                                    775 ;	libs/i2c_lib.c: 130: }
+      000359 5B 01            [ 2]  776 	addw	sp, #1
+      00035B 85               [ 2]  777 	popw	x
+      00035C 5B 01            [ 2]  778 	addw	sp, #1
+      00035E FC               [ 2]  779 	jp	(x)
+                                    780 ;	libs/i2c_lib.c: 132: void delay(uint16_t ticks)
+                                    781 ;	-----------------------------------------
+                                    782 ;	 function delay
+                                    783 ;	-----------------------------------------
+      00035F                        784 _delay:
+                                    785 ;	libs/i2c_lib.c: 134: while(ticks > 0)
+      00035F                        786 00101$:
+      00035F 5D               [ 2]  787 	tnzw	x
+      000360 26 01            [ 1]  788 	jrne	00120$
+      000362 81               [ 4]  789 	ret
+      000363                        790 00120$:
+                                    791 ;	libs/i2c_lib.c: 136: ticks-=2;
+      000363 5A               [ 2]  792 	decw	x
+      000364 5A               [ 2]  793 	decw	x
+                                    794 ;	libs/i2c_lib.c: 137: ticks+=1;
+      000365 5C               [ 1]  795 	incw	x
+      000366 20 F7            [ 2]  796 	jra	00101$
+                                    797 ;	libs/i2c_lib.c: 139: }
+      000368 81               [ 4]  798 	ret
+                                    799 ;	libs/i2c_lib.c: 140: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
+                                    800 ;	-----------------------------------------
+                                    801 ;	 function i2c_write
+                                    802 ;	-----------------------------------------
+      000369                        803 _i2c_write:
+      000369 52 02            [ 2]  804 	sub	sp, #2
+                                    805 ;	libs/i2c_lib.c: 142: i2c_send_address(dev_addr, 0);//Проверка на АСК бит
+      00036B 4B 00            [ 1]  806 	push	#0x00
+      00036D CDr02rFE         [ 4]  807 	call	_i2c_send_address
+                                    808 ;	libs/i2c_lib.c: 145: for(int i = 0;i < size;i++)
+      000370 5F               [ 1]  809 	clrw	x
+      000371                        810 00104$:
+      000371 7B 05            [ 1]  811 	ld	a, (0x05, sp)
+      000373 6B 02            [ 1]  812 	ld	(0x02, sp), a
+      000375 0F 01            [ 1]  813 	clr	(0x01, sp)
+      000377 13 01            [ 2]  814 	cpw	x, (0x01, sp)
+      000379 2E 0F            [ 1]  815 	jrsge	00101$
+                                    816 ;	libs/i2c_lib.c: 147: i2c_send_byte(data[i]);//Проверка на АСК бит
+      00037B 90 93            [ 1]  817 	ldw	y, x
+      00037D 72 F9 06         [ 2]  818 	addw	y, (0x06, sp)
+      000380 90 F6            [ 1]  819 	ld	a, (y)
+      000382 89               [ 2]  820 	pushw	x
+      000383 CDr02rA3         [ 4]  821 	call	_i2c_send_byte
+      000386 85               [ 2]  822 	popw	x
+                                    823 ;	libs/i2c_lib.c: 145: for(int i = 0;i < size;i++)
+      000387 5C               [ 1]  824 	incw	x
+      000388 20 E7            [ 2]  825 	jra	00104$
+      00038A                        826 00101$:
+                                    827 ;	libs/i2c_lib.c: 153: i2c_stop();
+      00038A CDr02r8B         [ 4]  828 	call	_i2c_stop
+                                    829 ;	libs/i2c_lib.c: 154: for(int i = 0;i< counter;i++)
+      00038D 5F               [ 1]  830 	clrw	x
+      00038E                        831 00107$:
+      00038E C6u00u02         [ 1]  832 	ld	a, _counter+0
+      000391 6B 02            [ 1]  833 	ld	(0x02, sp), a
+      000393 0F 01            [ 1]  834 	clr	(0x01, sp)
+      000395 13 01            [ 2]  835 	cpw	x, (0x01, sp)
+      000397 2E 0B            [ 1]  836 	jrsge	00109$
+                                    837 ;	libs/i2c_lib.c: 155: uart_write("|");
+      000399 89               [ 2]  838 	pushw	x
+      00039A AEr00rA0         [ 2]  839 	ldw	x, #(___str_14+0)
+      00039D CDr01r84         [ 4]  840 	call	_uart_write
+      0003A0 85               [ 2]  841 	popw	x
+                                    842 ;	libs/i2c_lib.c: 154: for(int i = 0;i< counter;i++)
+      0003A1 5C               [ 1]  843 	incw	x
+      0003A2 20 EA            [ 2]  844 	jra	00107$
+      0003A4                        845 00109$:
+                                    846 ;	libs/i2c_lib.c: 156: }
+      0003A4 1E 03            [ 2]  847 	ldw	x, (3, sp)
+      0003A6 5B 07            [ 2]  848 	addw	sp, #7
+      0003A8 FC               [ 2]  849 	jp	(x)
+                                    850 ;	libs/i2c_lib.c: 158: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){
+                                    851 ;	-----------------------------------------
+                                    852 ;	 function i2c_read
+                                    853 ;	-----------------------------------------
+      0003A9                        854 _i2c_read:
+      0003A9 52 02            [ 2]  855 	sub	sp, #2
+                                    856 ;	libs/i2c_lib.c: 159: I2C_CR2 -> ACK = 1;
+      0003AB AE 52 11         [ 2]  857 	ldw	x, #0x5211
+      0003AE 88               [ 1]  858 	push	a
+      0003AF F6               [ 1]  859 	ld	a, (x)
+      0003B0 AA 04            [ 1]  860 	or	a, #0x04
+      0003B2 F7               [ 1]  861 	ld	(x), a
+      0003B3 84               [ 1]  862 	pop	a
+                                    863 ;	libs/i2c_lib.c: 160: if(i2c_send_address(dev_addr,1))
+      0003B4 4B 01            [ 1]  864 	push	#0x01
+      0003B6 CDr02rFE         [ 4]  865 	call	_i2c_send_address
+      0003B9 4D               [ 1]  866 	tnz	a
+      0003BA 27 1F            [ 1]  867 	jreq	00103$
+                                    868 ;	libs/i2c_lib.c: 161: for(int i = 0;i < size;i++)
+      0003BC 5F               [ 1]  869 	clrw	x
+      0003BD                        870 00105$:
+      0003BD 7B 05            [ 1]  871 	ld	a, (0x05, sp)
+      0003BF 6B 02            [ 1]  872 	ld	(0x02, sp), a
+      0003C1 0F 01            [ 1]  873 	clr	(0x01, sp)
+      0003C3 13 01            [ 2]  874 	cpw	x, (0x01, sp)
+      0003C5 2E 14            [ 1]  875 	jrsge	00103$
+                                    876 ;	libs/i2c_lib.c: 163: i2c_read_byte((unsigned char *)data[i]);
+      0003C7 90 93            [ 1]  877 	ldw	y, x
+      0003C9 72 F9 06         [ 2]  878 	addw	y, (0x06, sp)
+      0003CC 90 F6            [ 1]  879 	ld	a, (y)
+      0003CE 90 5F            [ 1]  880 	clrw	y
+      0003D0 90 97            [ 1]  881 	ld	yl, a
+      0003D2 89               [ 2]  882 	pushw	x
+      0003D3 93               [ 1]  883 	ldw	x, y
+      0003D4 CDr02rF7         [ 4]  884 	call	_i2c_read_byte
+      0003D7 85               [ 2]  885 	popw	x
+                                    886 ;	libs/i2c_lib.c: 161: for(int i = 0;i < size;i++)
+      0003D8 5C               [ 1]  887 	incw	x
+      0003D9 20 E2            [ 2]  888 	jra	00105$
+      0003DB                        889 00103$:
+                                    890 ;	libs/i2c_lib.c: 165: I2C_CR2 -> ACK = 0;
+      0003DB C6 52 11         [ 1]  891 	ld	a, 0x5211
+      0003DE A4 FB            [ 1]  892 	and	a, #0xfb
+      0003E0 C7 52 11         [ 1]  893 	ld	0x5211, a
+                                    894 ;	libs/i2c_lib.c: 166: }
+      0003E3 1E 03            [ 2]  895 	ldw	x, (3, sp)
+      0003E5 5B 07            [ 2]  896 	addw	sp, #7
+      0003E7 FC               [ 2]  897 	jp	(x)
+                                    898 ;	libs/i2c_lib.c: 167: uint8_t i2c_scan(void) 
+                                    899 ;	-----------------------------------------
+                                    900 ;	 function i2c_scan
+                                    901 ;	-----------------------------------------
+      0003E8                        902 _i2c_scan:
+      0003E8 52 02            [ 2]  903 	sub	sp, #2
+                                    904 ;	libs/i2c_lib.c: 169: for (uint8_t addr = 1; addr < 127; addr++)
+      0003EA A6 01            [ 1]  905 	ld	a, #0x01
+      0003EC 6B 01            [ 1]  906 	ld	(0x01, sp), a
+      0003EE 6B 02            [ 1]  907 	ld	(0x02, sp), a
+      0003F0                        908 00105$:
+      0003F0 7B 02            [ 1]  909 	ld	a, (0x02, sp)
+      0003F2 A1 7F            [ 1]  910 	cp	a, #0x7f
+      0003F4 24 23            [ 1]  911 	jrnc	00103$
+                                    912 ;	libs/i2c_lib.c: 171: if(!(i2c_send_address(addr, 0)))
+      0003F6 4B 00            [ 1]  913 	push	#0x00
+      0003F8 7B 03            [ 1]  914 	ld	a, (0x03, sp)
+      0003FA CDr02rFE         [ 4]  915 	call	_i2c_send_address
+      0003FD 4D               [ 1]  916 	tnz	a
+      0003FE 26 07            [ 1]  917 	jrne	00102$
+                                    918 ;	libs/i2c_lib.c: 173: i2c_stop();
+      000400 CDr02r8B         [ 4]  919 	call	_i2c_stop
+                                    920 ;	libs/i2c_lib.c: 174: return addr;
+      000403 7B 01            [ 1]  921 	ld	a, (0x01, sp)
+      000405 20 16            [ 2]  922 	jra	00107$
+      000407                        923 00102$:
+                                    924 ;	libs/i2c_lib.c: 176: I2C_SR2 -> AF = 0;
+      000407 72 15 52 18      [ 1]  925 	bres	0x5218, #2
+                                    926 ;	libs/i2c_lib.c: 177: uart_write("error addr\n"); //Очистка флага ошибки
+      00040B AEr00rA2         [ 2]  927 	ldw	x, #(___str_15+0)
+      00040E CDr01r84         [ 4]  928 	call	_uart_write
+                                    929 ;	libs/i2c_lib.c: 169: for (uint8_t addr = 1; addr < 127; addr++)
+      000411 0C 02            [ 1]  930 	inc	(0x02, sp)
+      000413 7B 02            [ 1]  931 	ld	a, (0x02, sp)
+      000415 6B 01            [ 1]  932 	ld	(0x01, sp), a
+      000417 20 D7            [ 2]  933 	jra	00105$
+      000419                        934 00103$:
+                                    935 ;	libs/i2c_lib.c: 179: i2c_stop();
+      000419 CDr02r8B         [ 4]  936 	call	_i2c_stop
+                                    937 ;	libs/i2c_lib.c: 180: return 0;
+      00041C 4F               [ 1]  938 	clr	a
+      00041D                        939 00107$:
+                                    940 ;	libs/i2c_lib.c: 181: }
+      00041D 5B 02            [ 2]  941 	addw	sp, #2
+      00041F 81               [ 4]  942 	ret
+                                    943 ;	main.c: 2: void setup(void)
+                                    944 ;	-----------------------------------------
+                                    945 ;	 function setup
+                                    946 ;	-----------------------------------------
+      000420                        947 _setup:
+                                    948 ;	main.c: 5: CLK_CKDIVR = 0;
+      000420 35 00 50 C6      [ 1]  949 	mov	0x50c6+0, #0x00
+                                    950 ;	main.c: 7: uart_init(9600,0);
+      000424 4F               [ 1]  951 	clr	a
+      000425 AE 25 80         [ 2]  952 	ldw	x, #0x2580
+      000428 CDr00r6F         [ 4]  953 	call	_uart_init
+                                    954 ;	main.c: 8: i2c_init();
+      00042B CDr02r4A         [ 4]  955 	call	_i2c_init
+                                    956 ;	main.c: 10: enableInterrupts();
+      00042E 9A               [ 1]  957 	rim
+                                    958 ;	main.c: 11: }
+      00042F 81               [ 4]  959 	ret
+                                    960 ;	main.c: 12: int main(void)
+                                    961 ;	-----------------------------------------
+                                    962 ;	 function main
+                                    963 ;	-----------------------------------------
+      000430                        964 _main:
+      000430 52 05            [ 2]  965 	sub	sp, #5
+                                    966 ;	main.c: 14: setup();
+      000432 CDr04r20         [ 4]  967 	call	_setup
+                                    968 ;	main.c: 17: buf[0] = 0xA4;
+      000435 96               [ 1]  969 	ldw	x, sp
+      000436 5C               [ 1]  970 	incw	x
+      000437 A6 A4            [ 1]  971 	ld	a, #0xa4
+      000439 F7               [ 1]  972 	ld	(x), a
+                                    973 ;	main.c: 18: buf[1] = 0xA5;
+      00043A A6 A5            [ 1]  974 	ld	a, #0xa5
+      00043C 6B 02            [ 1]  975 	ld	(0x02, sp), a
+                                    976 ;	main.c: 19: buf[2] = 0xA6;
+      00043E A6 A6            [ 1]  977 	ld	a, #0xa6
+      000440 6B 03            [ 1]  978 	ld	(0x03, sp), a
+                                    979 ;	main.c: 20: buf[3] = 0xA7;
+      000442 A6 A7            [ 1]  980 	ld	a, #0xa7
+      000444 6B 04            [ 1]  981 	ld	(0x04, sp), a
+                                    982 ;	main.c: 21: buf[4] = 0xA8;
+      000446 A6 A8            [ 1]  983 	ld	a, #0xa8
+      000448 6B 05            [ 1]  984 	ld	(0x05, sp), a
+                                    985 ;	main.c: 22: i2c_write(0x66,5,buf);
+      00044A 89               [ 2]  986 	pushw	x
+      00044B 4B 05            [ 1]  987 	push	#0x05
+      00044D A6 66            [ 1]  988 	ld	a, #0x66
+      00044F CDr03r69         [ 4]  989 	call	_i2c_write
+                                    990 ;	main.c: 23: while(1);
+      000452                        991 00102$:
+      000452 20 FE            [ 2]  992 	jra	00102$
+                                    993 ;	main.c: 34: }
+      000454 5B 05            [ 2]  994 	addw	sp, #5
+      000456 81               [ 4]  995 	ret
+                                    996 	.area CODE
+                                    997 	.area CONST
+                                    998 	.area CONST
+      000000                        999 ___str_0:
+      000000 72 78 5F 62 75 66 5F  1000 	.ascii "rx_buf_pointer"
              70 6F 69 6E 74 65 72
-      00000E 0A                     892 	.db 0x0a
-      00000F 00                     893 	.db 0x00
-                                    894 	.area CODE
-                                    895 	.area CONST
-      000010                        896 ___str_1:
-      000010 62 75 66 5F 70 6F 73   897 	.ascii "buf_pos"
-      000017 0A                     898 	.db 0x0a
-      000018 00                     899 	.db 0x00
-                                    900 	.area CODE
-                                    901 	.area CONST
-      000019                        902 ___str_2:
-      000019 62 75 66 5F 73 69 7A   903 	.ascii "buf_size"
+      00000E 0A                    1001 	.db 0x0a
+      00000F 00                    1002 	.db 0x00
+                                   1003 	.area CODE
+                                   1004 	.area CONST
+      000010                       1005 ___str_1:
+      000010 62 75 66 5F 70 6F 73  1006 	.ascii "buf_pos"
+      000017 0A                    1007 	.db 0x0a
+      000018 00                    1008 	.db 0x00
+                                   1009 	.area CODE
+                                   1010 	.area CONST
+      000019                       1011 ___str_2:
+      000019 62 75 66 5F 73 69 7A  1012 	.ascii "buf_size"
              65
-      000021 0A                     904 	.db 0x0a
-      000022 00                     905 	.db 0x00
-                                    906 	.area CODE
-                                    907 	.area CONST
-      000023                        908 ___str_3:
-      000023 52 49 45 4E            909 	.ascii "RIEN"
-      000027 0A                     910 	.db 0x0a
-      000028 00                     911 	.db 0x00
-                                    912 	.area CODE
-                                    913 	.area CONST
-      000029                        914 ___str_4:
-      000029 65 72 72 6F 72 20 61   915 	.ascii "error addr"
+      000021 0A                    1013 	.db 0x0a
+      000022 00                    1014 	.db 0x00
+                                   1015 	.area CODE
+                                   1016 	.area CONST
+      000023                       1017 ___str_3:
+      000023 52 49 45 4E           1018 	.ascii "RIEN"
+      000027 0A                    1019 	.db 0x0a
+      000028 00                    1020 	.db 0x00
+                                   1021 	.area CODE
+                                   1022 	.area CONST
+      000029                       1023 ___str_4:
+      000029 69 32 63 5F 73 74 61  1024 	.ascii "i2c_start"
+             72 74
+      000032 0A                    1025 	.db 0x0a
+      000033 00                    1026 	.db 0x00
+                                   1027 	.area CODE
+                                   1028 	.area CONST
+      000034                       1029 ___str_5:
+      000034 69 32 63 5F 73 74 6F  1030 	.ascii "i2c_stop"
+             70
+      00003C 0A                    1031 	.db 0x0a
+      00003D 00                    1032 	.db 0x00
+                                   1033 	.area CODE
+                                   1034 	.area CONST
+      00003E                       1035 ___str_6:
+      00003E 67 6F 76 6E 6F 20 61  1036 	.ascii "govno alert"
+             6C 65 72 74
+      000049 0A                    1037 	.db 0x0a
+      00004A 00                    1038 	.db 0x00
+                                   1039 	.area CODE
+                                   1040 	.area CONST
+      00004B                       1041 ___str_7:
+      00004B 69 32 63 5F 73 65 6E  1042 	.ascii "i2c_send_byte"
+             64 5F 62 79 74 65
+      000058 0A                    1043 	.db 0x0a
+      000059 00                    1044 	.db 0x00
+                                   1045 	.area CODE
+                                   1046 	.area CONST
+      00005A                       1047 ___str_8:
+      00005A 69 32 63 5F 69 72 71  1048 	.ascii "i2c_irq_enable_all_send_byte"
+             5F 65 6E 61 62 6C 65
+             5F 61 6C 6C 5F 73 65
+             6E 64 5F 62 79 74 65
+      000076 0A                    1049 	.db 0x0a
+      000077 00                    1050 	.db 0x00
+                                   1051 	.area CODE
+                                   1052 	.area CONST
+      000078                       1053 ___str_9:
+      000078 41 46 20 2D 3E 20     1054 	.ascii "AF -> "
+      00007E 00                    1055 	.db 0x00
+                                   1056 	.area CODE
+                                   1057 	.area CONST
+      00007F                       1058 ___str_10:
+      00007F 31                    1059 	.ascii "1"
+      000080 0A                    1060 	.db 0x0a
+      000081 00                    1061 	.db 0x00
+                                   1062 	.area CODE
+                                   1063 	.area CONST
+      000082                       1064 ___str_11:
+      000082 30                    1065 	.ascii "0"
+      000083 0A                    1066 	.db 0x0a
+      000084 00                    1067 	.db 0x00
+                                   1068 	.area CODE
+                                   1069 	.area CONST
+      000085                       1070 ___str_12:
+      000085 69 32 63 5F 73 65 6E  1071 	.ascii "i2c_send_address"
+             64 5F 61 64 64 72 65
+             73 73
+      000095 0A                    1072 	.db 0x0a
+      000096 00                    1073 	.db 0x00
+                                   1074 	.area CODE
+                                   1075 	.area CONST
+      000097                       1076 ___str_13:
+      000097 41 44 44 52 20 2D 3E  1077 	.ascii "ADDR -> "
+             20
+      00009F 00                    1078 	.db 0x00
+                                   1079 	.area CODE
+                                   1080 	.area CONST
+      0000A0                       1081 ___str_14:
+      0000A0 7C                    1082 	.ascii "|"
+      0000A1 00                    1083 	.db 0x00
+                                   1084 	.area CODE
+                                   1085 	.area CONST
+      0000A2                       1086 ___str_15:
+      0000A2 65 72 72 6F 72 20 61  1087 	.ascii "error addr"
              64 64 72
-      000033 0A                     916 	.db 0x0a
-      000034 00                     917 	.db 0x00
-                                    918 	.area CODE
-                                    919 	.area INITIALIZER
-      000000                        920 __xinit__I2C_IRQ:
-      000000 00                     921 	.db 0x00
-                                    922 	.area CABS (ABS)
+      0000AC 0A                    1088 	.db 0x0a
+      0000AD 00                    1089 	.db 0x00
+                                   1090 	.area CODE
+                                   1091 	.area INITIALIZER
+      000000                       1092 __xinit__I2C_IRQ:
+      000000 00                    1093 	.db 0x00
+      000001                       1094 __xinit__govno_alert:
+      000001 00                    1095 	.db #0x00	; 0
+      000002                       1096 __xinit__counter:
+      000002 00                    1097 	.db #0x00	; 0
+                                   1098 	.area CABS (ABS)
