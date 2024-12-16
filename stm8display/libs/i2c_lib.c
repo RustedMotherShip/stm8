@@ -1,48 +1,63 @@
 #include "i2c_lib.h"
 uint8_t govno_alert = 0;
 uint8_t counter = 0;
+uint8_t dummy = 0;
+void delay(uint16_t ticks)
+{
+   while(ticks > 0)
+   {
+    ticks-=2;
+    ticks+=1;
+   } 
+}
 
 void i2c_irq(void) __interrupt(I2C_vector)
 {
   
   disableInterrupts();
-  memset(&I2C_IRQ, 0, sizeof(I2C_IRQ));
-  govno_alert = 0;
-  if(I2C_SR1 -> ADDR == 1)
+  I2C_IRQ.all = 0;//обнуление флагов регистров
+
+  if(I2C_SR1 -> ADDR)//прерывание адреса
   {
-    
+    clr_sr1();
     I2C_IRQ.ADDR = 1;
-    govno_alert = 6;
-    I2C_SR3; //EV6 
-    
+    clr_sr3();//EV6
+    I2C_ITR -> ITEVTEN = 0;
+    return;
   }
-  if(I2C_SR1 -> SB)//EV5 
+  if(I2C_SR1 -> SB)//EV5 прерывание стартового импульса
   {
-    
   	I2C_IRQ.SB = 1;
+    I2C_ITR -> ITEVTEN = 0;
+    return;
   }
-  if(I2C_SR1 -> BTF) 
+  if(I2C_SR1 -> BTF) //прерывание отправки данных
   {
   	I2C_IRQ.BTF = 1;
+    I2C_ITR -> ITEVTEN = 0;
+    return;
   }
-  if(I2C_SR1 -> TXE) 
+  if(I2C_SR1 -> TXE) //прерывание регистра данных(он пуст)
   {
-    counter++;
   	I2C_IRQ.TXE = 1;
+    I2C_ITR -> ITBUFEN = 0;
+    return;
   } 
-  if(I2C_SR1 -> RXNE) 
+  if(I2C_SR1 -> RXNE) //прерывание регистра данных(он не пуст)
   {
   	I2C_IRQ.RXNE = 1;
+    I2C_ITR -> ITBUFEN = 0;
+    return;
   }    
-  if(I2C_SR2 -> AF) 
+  if(I2C_SR2 -> AF) //прерывание ошибки NACK
   {
   	I2C_IRQ.AF = 1;
+    I2C_ITR -> ITEVTEN = 0;
+    I2C_ITR -> ITERREN = 0;
+    I2C_ITR -> ITBUFEN = 0;
+    return;
   }
-  I2C_ITR -> ITBUFEN = 0;
-  I2C_ITR -> ITEVTEN = 0; //Выключение флагов прерываний
-  I2C_ITR -> ITERREN = 0;
   enableInterrupts(); 
-  //memset(I2C_ITR, 0, sizeof(I2C_ITR));
 }
 void i2c_init(void)
 {
@@ -60,52 +75,38 @@ void i2c_init(void)
 
 void i2c_start(void)
 {
-    uart_write("i2c_start\n");
+    //uart_write("i2c_start\n");
 	I2C_ITR -> ITEVTEN = 1;//Включение прерываний для обработки сигнала старт
-    I2C_CR2 -> START = 1; // Отправляем стартовый сигнал
+    I2C_CR2 -> START = 1;// Отправляем стартовый сигнал
     while(I2C_ITR -> ITEVTEN);// Ожидание отправки стартового сигнала
-    //while(1);
 }
 
 void i2c_stop(void)
 {
-    uart_write("i2c_stop\n");
-    I2C_CR2 -> STOP = 1;// Отправка стопового сигнала
-    if(govno_alert == 6)
-        uart_write("govno alert\n");
-    
+    I2C_CR2 -> STOP = 1;// Отправка стопового сигнала  
 }
 
 uint8_t i2c_send_byte(unsigned char data)
 {
-    uart_write("i2c_send_byte\n");
 	I2C_ITR -> ITBUFEN = 1;
 	I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
 	I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
-    uart_write("i2c_irq_enable_all_send_byte\n");
-    while(I2C_ITR -> ITERREN && I2C_ITR -> ITEVTEN);
-    //while(!I2C_IRQ.TXE);
     I2C_DR -> DR = data; //Отправка данных
-    I2C_DR -> DR = data; //Отправка данных
-    uart_write("AF -> ");
-    uart_write((I2C_IRQ.AF ? "1\n" : "0\n"));
-    return I2C_IRQ.AF;
+    while(I2C_ITR -> ITERREN && I2C_ITR -> ITEVTEN);//ожидание прерывания
+    return I2C_IRQ.AF;//флаг ответа
 }
 
-uint8_t i2c_read_byte(unsigned char *data){
-    while (!(I2C_SR1 -> RXNE));
-    data = (unsigned char *)I2C_DR -> DR;
+uint8_t i2c_read_byte(unsigned char data){
+    I2C_ITR -> ITBUFEN = 1;
+    I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
+    I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
+    while(I2C_ITR -> ITERREN && I2C_ITR -> ITEVTEN);//ожидание прерывания
+    data = I2C_DR -> DR;
     return 0;
-     
 }
 
-
-
-    
 uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
 {
-    i2c_start();
-    uart_write("i2c_send_address\n");
     switch(rw_type)
     {
     case 1:
@@ -116,66 +117,53 @@ uint8_t i2c_send_address(uint8_t address,uint8_t rw_type)
         address = address << 1; // Отправка адреса устройства с битом на запись
     break;
     }
+    i2c_start();
+    I2C_DR -> DR = address;
     I2C_ITR -> ITEVTEN = 1; //Включение прерываний на отправку
     I2C_ITR -> ITERREN = 1; //Включение прерываний на ошибки
-    uart_write("ADDR -> ");
-    I2C_DR -> DR = address;
     while(I2C_ITR -> ITEVTEN && I2C_ITR -> ITERREN);
-    if(I2C_IRQ.ADDR > 0)
-        uart_write("1\n");
-    else
-        uart_write("0\n");
-
-    return I2C_IRQ.AF;
+    return !I2C_IRQ.AF;
 }
 
-void delay(uint16_t ticks)
-{
-   while(ticks > 0)
-   {
-    ticks-=2;
-    ticks+=1;
-   } 
-}
 void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
 {
-    i2c_send_address(dev_addr, 0);//Проверка на АСК бит
-    //{
-    //delay(200);
+    if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
     for(int i = 0;i < size;i++)
         {
-            i2c_send_byte(data[i]);//Проверка на АСК бит
-            // {
-            //     break;
-            // } 
+            if(i2c_send_byte(data[i]))//Проверка на АСК бит
+            {
+                break;//ошибка отправки нет ACK бита -> выход из цикла
+            } 
         }
-    //}
     i2c_stop();
-    for(int i = 0;i< counter;i++)
-        uart_write("|");
 }
 
-void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data){
-    I2C_CR2 -> ACK = 1;
-    if(i2c_send_address(dev_addr,1))
-    for(int i = 0;i < size;i++)
+void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data)
+{
+    //включение ответа на посылки 
+    i2c_send_address(dev_addr, 1);
+    if(i2c_send_address(dev_addr, 1))//проверка на ACK
     {
-        i2c_read_byte((unsigned char *)data[i]);
+        //I2C_CR2 -> ACK = 1;
+        for(int i = 0;i < size;i++) //цикл чтения данных с шины
+        {
+            i2c_read_byte(data[i]);//функция записи байта в элемент массива
+        }
     }
-    I2C_CR2 -> ACK = 0;
+    //I2C_CR2 -> ACK = 0;//выключение ответа на посылки
+    i2c_stop(); 
 }
 uint8_t i2c_scan(void) 
 {
     for (uint8_t addr = 1; addr < 127; addr++)
     {
-        if(!(i2c_send_address(addr, 0)))
+        if(i2c_send_address(addr, 0))//отправка адреса на проверку 
         {
-            i2c_stop();
-            return addr;
+            i2c_stop();//адрес совпал 
+            return addr;// выход из цикла
         }
-        I2C_SR2 -> AF = 0;
-        uart_write("error addr\n"); //Очистка флага ошибки
+        I2C_SR2 -> AF = 0;//очистка флага ошибки
     }
-    i2c_stop();
+    i2c_stop();//совпадений нет выход из функции
     return 0;
 }

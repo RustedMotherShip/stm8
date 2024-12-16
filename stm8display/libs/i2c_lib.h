@@ -1,4 +1,3 @@
-#include "uart_lib.c"
 struct I2C_CR1_
 {
 	uint8_t PE:1;
@@ -119,13 +118,19 @@ struct I2C_TRISER_
 
 struct I2C_IRQ_
 {
-	uint8_t SB:1;
-	uint8_t ADDR:1;
-	uint8_t BTF:1;
-	uint8_t RXNE:1;
-	uint8_t TXE:1;
-	uint8_t AF:1;
-	uint8_t reserve:2;
+	union
+	{
+		uint8_t all;
+		struct {
+			uint8_t SB:1;
+			uint8_t ADDR:1;
+			uint8_t BTF:1;
+			uint8_t RXNE:1;
+			uint8_t TXE:1;
+			uint8_t AF:1;
+			uint8_t reserve:2;
+		};
+	};
 	
 } typedef I2C_IRQ_t;
 /* I2C */
@@ -149,5 +154,7 @@ struct I2C_IRQ_
 I2C_IRQ_t I2C_IRQ = {0};
 
 #define wfi() {__asm__("wfi\n");}
+#define clr_sr1() {__asm__("ld a,0x5217\n");}  // очистка SR1 	
+#define clr_sr3() {__asm__("ld a,0x5219\n");}  // очистка SR3 
 #define enableInterrupts()    {__asm__("rim\n");}  /* enable interrupts */
 #define disableInterrupts()   {__asm__("sim\n");}  /* disable interrupts */
