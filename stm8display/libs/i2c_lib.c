@@ -78,8 +78,8 @@ uint8_t i2c_send_byte(uint8_t data)
     I2C_DR -> DR = data; //Отправка данных
     while(!I2C_SR1 -> TXE)
     if(I2C_SR2 -> AF)
-        return 0;
-    return 1;//флаг ответа
+        return 1;
+    return 0;//флаг ответа
 }
 
 void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)

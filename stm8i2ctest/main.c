@@ -359,12 +359,12 @@ void i2c_stop(void) {
     //uart_write("Stop generated\n");
 }
 void i2c_write(void){
-    // //I2C_DR = 0;
-    // reg_check();
-    // I2C_DR = d_addr;
-    // reg_check();
-    // while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
-    //reg_check();
+    I2C_DR = 0;
+    reg_check();
+    I2C_DR = d_addr;
+    reg_check();
+    while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+    reg_check();
     for(int i = 0;i < d_size;i++)
     {
         I2C_DR = data_buf[i];
@@ -569,13 +569,72 @@ void main(void)
     i2c_init();
     uart_write("SS\n");
     current_dev = 0x3C;
-    d_addr = 0x55;
-    d_size = 3;
-    data_buf[0] = 1;
-    data_buf[1] = 2;
-    data_buf[2] = 3;
+    d_addr = 0x00;
+
+    data_buf[0] = 0xAE;
+    data_buf[1] = 0xD5;
+    data_buf[2] = 0x80;
+    data_buf[3] = 0xA8;
+    data_buf[4] = 0x2E;
+    data_buf[5] = 0xAF;
+    d_size = 4;
     cm_SW();
+
+    data_buf[0] = 0x1F;
+    d_size = 1;
     cm_SW();
+
+    data_buf[0] = 0xD3;
+    data_buf[1] = 0x00;
+    data_buf[2] = 0x40;
+    data_buf[3] = 0x8D;
+    d_size = 4;
+    cm_SW();
+
+    data_buf[0] = 0x14;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0xDB;
+    data_buf[1] = 0x40;
+    data_buf[2] = 0xA4;
+    data_buf[3] = 0xA6;
+    d_size = 4;
+    cm_SW();
+
+    data_buf[0] = 0xDA;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0x02;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0x81;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0x8F;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0xD9;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0xF1;
+    d_size = 1;
+    cm_SW();
+
+    data_buf[0] = 0x20;
+    data_buf[1] = 0x00;
+    data_buf[2] = 0xA1;
+    data_buf[3] = 0xC8;
+    d_size = 6;
+    cm_SW();
+
+    data_buf[0] = 0xA7;
+    d_size = 1;
     cm_SW();
 
     while(1)

@@ -52,19 +52,19 @@ Symbol Table
   2 _a                                                             000200 GR
   2 _buffer                                                        000100 GR
   A _char_buffer_to_int                                            00022D GR
-  A _cm_DB                                                         000542 GR
-  A _cm_RM                                                         000538 GR
-  A _cm_SM                                                         00050C GR
-  A _cm_SN                                                         000532 GR
-  A _cm_SR                                                         000553 GR
-  A _cm_ST                                                         000545 GR
+  A _cm_DB                                                         000563 GR
+  A _cm_RM                                                         000559 GR
+  A _cm_SM                                                         00052D GR
+  A _cm_SN                                                         000553 GR
+  A _cm_SR                                                         000574 GR
+  A _cm_ST                                                         000566 GR
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
-  A _cm_SW                                                         0005C4 GR
-  A _command_switcher                                              0006F9 GR
+  A _cm_SW                                                         0005E5 GR
+  A _command_switcher                                              00071A GR
   A _convert_chars_to_int                                          00012F GR
   A _convert_int_to_binary                                         000156 GR
   A _convert_int_to_chars                                          0000AA GR
@@ -72,18 +72,18 @@ Symbol Table
   2 _d_addr                                                        000203 GR
   2 _d_size                                                        000205 GR
   2 _data_buf                                                      000207 GR
-  A _data_handler                                                  000635 GR
+  A _data_handler                                                  000656 GR
   A _delay                                                         000000 GR
   A _get_addr_from_buff                                            00018E GR
   A _get_size_from_buff                                            0001D3 GR
   A _i2c_init                                                      0003E7 GR
-  A _i2c_read                                                      000460 GR
-  A _i2c_scan                                                      0004D4 GR
+  A _i2c_read                                                      000481 GR
+  A _i2c_scan                                                      0004F5 GR
   A _i2c_send_address                                              000412 GR
   A _i2c_start                                                     000408 GR
   A _i2c_stop                                                      000425 GR
   A _i2c_write                                                     00042A GR
-  A _main                                                          000747 GR
+  A _main                                                          000768 GR
     _memcmp                                                        ****** GX
     _memset                                                        ****** GX
   2 _p_bytes                                                       000206 GR
@@ -117,6 +117,6 @@ Area Table
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size     76   flags    0
    9 INITIALIZER                                size    308   flags    0
-   A CODE                                       size    77D   flags    0
+   A CODE                                       size    84C   flags    0
    B CABS                                       size      0   flags    8
 

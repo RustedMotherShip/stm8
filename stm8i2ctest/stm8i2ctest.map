@@ -25,7 +25,7 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000308  l_INITIALIZED                   
      00000308  l_INITIALIZER                   
      00000309  s_SSEG                          
-     00000874  l_CODE                          
+     00000943  l_CODE                          
      00008000  s_HOME                          
      00008007  s_GSINIT                        
      0000802A  s_GSFINAL                       
@@ -110,7 +110,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000083AB    00000874 =        2164. bytes (REL,CON)
+CODE                                000083AB    00000943 =        2371. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -133,26 +133,26 @@ CODE                                000083AB    00000874 =        2164. bytes (R
      000087BD  _i2c_send_address                  main
      000087D0  _i2c_stop                          main
      000087D5  _i2c_write                         main
-     0000880B  _i2c_read                          main
-     0000887F  _i2c_scan                          main
-     000088B7  _cm_SM                             main
-     000088DD  _cm_SN                             main
-     000088E3  _cm_RM                             main
-     000088ED  _cm_DB                             main
-     000088F0  _cm_ST                             main
-     000088FE  _cm_SR                             main
-     0000896F  _cm_SW                             main
-     000089E0  _data_handler                      main
-     00008AA4  _command_switcher                  main
-     00008AF2  _main                              main
-     00008B28  _memcmp                            _memcmp
-     00008B6B  ___memcpy                          
-     00008B6B  _memcpy                            
-     00008BBE  _memset                            _memset
-     00008BE0  ___sdcc_external_startup           _startup
-     00008BE2  _strlen                            _strlen
-     00008BF0  __modsint                          
-     00008C08  __divsint                          
+     0000882C  _i2c_read                          main
+     000088A0  _i2c_scan                          main
+     000088D8  _cm_SM                             main
+     000088FE  _cm_SN                             main
+     00008904  _cm_RM                             main
+     0000890E  _cm_DB                             main
+     00008911  _cm_ST                             main
+     0000891F  _cm_SR                             main
+     00008990  _cm_SW                             main
+     00008A01  _data_handler                      main
+     00008AC5  _command_switcher                  main
+     00008B13  _main                              main
+     00008BF7  _memcmp                            _memcmp
+     00008C3A  ___memcpy                          
+     00008C3A  _memcpy                            
+     00008C8D  _memset                            _memset
+     00008CAF  ___sdcc_external_startup           _startup
+     00008CB1  _strlen                            _strlen
+     00008CBF  __modsint                          
+     00008CD7  __divsint                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
 Files Linked                              [ module(s) ]
@@ -162,13 +162,13 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memcmp.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ memcpy.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memset.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _strlen.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _divsint.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _memcmp.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ memcpy.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _memset.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _startup.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _strlen.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _modsint.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _divsint.rel ]
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 

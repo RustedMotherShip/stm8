@@ -14,24 +14,24 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s_CABS                          
      00000000  s_DABS                          
      00000000  s__CODE                         
-     00000001  l_INITIALIZED                   
-     00000001  l_INITIALIZER                   
      00000001  l_SSEG                          
      00000001  s_DATA                          
      00000003  l_GSFINAL                       
      00000006  l_DATA                          
      00000007  s_INITIALIZED                   
-     00000008  s_SSEG                          
      00000023  l_GSINIT                        
      00000029  l_CONST                         
      00000057  l_HOME                          
-     00000476  l_CODE                          
+     00000201  l_INITIALIZED                   
+     00000201  l_INITIALIZER                   
+     00000208  s_SSEG                          
+     00000E9C  l_CODE                          
      00008000  s_HOME                          
      00008057  s_GSINIT                        
      0000807A  s_GSFINAL                       
      0000807D  s_CONST                         
      000080A6  s_INITIALIZER                   
-     000080A7  s_CODE                          
+     000082A7  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -52,18 +52,19 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000007    00000001 =           1. bytes (REL,CON)
+INITIALIZED                         00000007    00000201 =         513. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000007  _I2C_IRQ                           main
+     00000008  _splash                            main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000008    00000001 =           1. bytes (REL,CON)
+SSEG                                00000208    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -108,7 +109,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         000080A6    00000001 =           1. bytes (REL,CON)
+INITIALIZER                         000080A6    00000201 =         513. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -117,29 +118,39 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000080A7    00000476 =        1142. bytes (REL,CON)
+CODE                                000082A7    00000E9C =        3740. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     000080A7  _uart_transmission_irq             main
-     000080E3  _uart_reciever_irq                 main
-     00008116  _uart_init                         main
-     00008218  _uart_read_byte                    main
-     00008220  _uart_write_byte                   main
-     0000822B  _uart_write                        main
-     00008255  _uart_read                         main
-     0000828B  _i2c_init                          main
-     000082B6  _i2c_start                         main
-     000082C0  _i2c_stop                          main
-     000082C5  _i2c_send_address                  main
-     000082F4  _i2c_read_byte                     main
-     000082FD  _i2c_read                          main
-     0000835E  _i2c_send_byte                     main
-     00008370  _i2c_write                         main
-     000083A0  _i2c_scan                          main
-     000083D3  _setup                             main
-     000083E3  _main                              main
-     0000851B  ___sdcc_external_startup           _startup
+     000082A7  _uart_transmission_irq             main
+     000082E3  _uart_reciever_irq                 main
+     00008316  _uart_init                         main
+     00008418  _uart_read_byte                    main
+     00008420  _uart_write_byte                   main
+     0000842B  _uart_write                        main
+     00008455  _uart_read                         main
+     0000848B  _i2c_init                          main
+     000084B6  _i2c_start                         main
+     000084C0  _i2c_stop                          main
+     000084C5  _i2c_send_address                  main
+     000084F4  _i2c_read_byte                     main
+     000084FD  _i2c_read                          main
+     0000855E  _i2c_send_byte                     main
+     00008570  _i2c_write                         main
+     000085A0  _i2c_scan                          main
+     000085D3  _setup                             main
+     000085E3  _delay                             main
+     000085ED  _display_init                      main
+     000086D2  _display_set_params_to_write       main
+     000086F8  _display_draw_pixel                main
+     00008749  _display_buffer_fill               main
+     000087EA  _display_set                       main
+     00008885  _display_clean                     main
+     000088E6  _gg                                main
+     00008E29  _main                              main
+     00008E32  _display_splash                    main
+     00009124  __mulint                           
+     00009141  ___sdcc_external_startup           _startup
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 
@@ -150,6 +161,7 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _mulint.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 12.

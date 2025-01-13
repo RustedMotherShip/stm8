@@ -14,12 +14,23 @@ Symbol Table
   8 ___str_2                                                       000019 R
   8 ___str_3                                                       000023 R
   5 __interrupt_vect                                               000000 R
+    __mulint                                                       ****** GX
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000054 R
   3 __start__stack                                                 000000 R
   9 __xinit__I2C_IRQ                                               000000 R
+  9 __xinit__splash                                                000001 R
   1 _buf_pos                                                       000004 GR
   1 _buf_size                                                      000005 GR
+  A _delay                                                         00033C GR
+  A _display_buffer_fill                                           0004A2 GR
+  A _display_clean                                                 0005DE GR
+  A _display_draw_pixel                                            000451 GR
+  A _display_init                                                  000346 GR
+  A _display_set                                                   000543 GR
+  A _display_set_params_to_write                                   00042B GR
+  A _display_splash                                                000B8B GR
+  A _gg                                                            00063F GR
   A _i2c_init                                                      0001E4 GR
   A _i2c_read                                                      000256 GR
   A _i2c_read_byte                                                 00024D GR
@@ -29,9 +40,10 @@ Symbol Table
   A _i2c_start                                                     00020F GR
   A _i2c_stop                                                      000219 GR
   A _i2c_write                                                     0002C9 GR
-  A _main                                                          00033C GR
+  A _main                                                          000B82 GR
   1 _rx_buf_pointer                                                000002 GR
   A _setup                                                         00032C GR
+  2 _splash                                                        000001 GR
   1 _tx_buf_pointer                                                000000 GR
   A _uart_init                                                     00006F GR
   A _uart_read                                                     0001AE GR
@@ -46,23 +58,28 @@ Symbol Table
     s_GSINIT                                                       ****** GX
     s_INITIALIZED                                                  ****** GX
     s_INITIALIZER                                                  ****** GX
-
-
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
 Hexadecimal [24-Bits]
 
 Area Table
 
    0 _CODE                                      size      0   flags    0
    1 DATA                                       size      6   flags    0
-   2 INITIALIZED                                size      1   flags    0
+   2 INITIALIZED                                size    201   flags    0
    3 SSEG                                       size      1   flags    0
    4 DABS                                       size      0   flags    8
    5 HOME                                       size     57   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size     29   flags    0
-   9 INITIALIZER                                size      1   flags    0
-   A CODE                                       size    474   flags    0
+   9 INITIALIZER                                size    201   flags    0
+   A CODE                                       size    E7D   flags    0
    B CABS                                       size      0   flags    8
 

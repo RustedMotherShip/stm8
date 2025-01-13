@@ -957,14 +957,31 @@ _i2c_stop:
 ;	-----------------------------------------
 _i2c_write:
 	sub	sp, #2
+;	main.c: 362: I2C_DR = 0;
+	mov	0x5216+0, #0x00
+;	main.c: 363: reg_check();
+	call	_reg_check
+;	main.c: 364: I2C_DR = d_addr;
+	mov	0x5216+0, _d_addr+0
+;	main.c: 365: reg_check();
+	call	_reg_check
+;	main.c: 366: while (!(I2C_SR1 & (1 << 7)) && (I2C_SR2 & (1 << 2)) && !(I2C_SR1 & (1 << 2))); // Отправка адреса регистра
+00103$:
+	ld	a, 0x5217
+	jrmi	00105$
+	btjf	0x5218, #2, 00105$
+	btjf	0x5217, #2, 00103$
+00105$:
+;	main.c: 367: reg_check();
+	call	_reg_check
 ;	main.c: 368: for(int i = 0;i < d_size;i++)
 	clrw	x
-00108$:
+00113$:
 	ld	a, _d_size+0
 	ld	(0x02, sp), a
 	clr	(0x01, sp)
 	cpw	x, (0x01, sp)
-	jrsge	00110$
+	jrsge	00115$
 ;	main.c: 370: I2C_DR = data_buf[i];
 	ldw	y, x
 	ld	a, (_data_buf+0, y)
@@ -974,20 +991,20 @@ _i2c_write:
 	call	_reg_check
 	popw	x
 ;	main.c: 372: while (!(I2C_SR1 & (1 << 7)) && I2C_SR2 & (1 << 2) && !(I2C_SR1 & (1 << 2)));
-00103$:
+00108$:
 	ld	a, 0x5217
-	jrmi	00105$
-	btjf	0x5218, #2, 00105$
-	btjf	0x5217, #2, 00103$
-00105$:
+	jrmi	00110$
+	btjf	0x5218, #2, 00110$
+	btjf	0x5217, #2, 00108$
+00110$:
 ;	main.c: 373: reg_check();
 	pushw	x
 	call	_reg_check
 	popw	x
 ;	main.c: 368: for(int i = 0;i < d_size;i++)
 	incw	x
-	jra	00108$
-00110$:
+	jra	00113$
+00115$:
 ;	main.c: 375: }
 	addw	sp, #2
 	ret
@@ -1524,30 +1541,122 @@ _main:
 	call	_uart_write
 ;	main.c: 571: current_dev = 0x3C;
 	mov	_current_dev+0, #0x3c
-;	main.c: 572: d_addr = 0x55;
-	mov	_d_addr+0, #0x55
-;	main.c: 573: d_size = 3;
-	mov	_d_size+0, #0x03
-;	main.c: 574: data_buf[0] = 1;
-	mov	_data_buf+0, #0x01
-;	main.c: 575: data_buf[1] = 2;
-	mov	_data_buf+1, #0x02
-;	main.c: 576: data_buf[2] = 3;
-	mov	_data_buf+2, #0x03
-;	main.c: 577: cm_SW();
+;	main.c: 572: d_addr = 0x00;
+	clr	_d_addr+0
+;	main.c: 574: data_buf[0] = 0xAE;
+	mov	_data_buf+0, #0xae
+;	main.c: 575: data_buf[1] = 0xD5;
+	mov	_data_buf+1, #0xd5
+;	main.c: 576: data_buf[2] = 0x80;
+	mov	_data_buf+2, #0x80
+;	main.c: 577: data_buf[3] = 0xA8;
+	mov	_data_buf+3, #0xa8
+;	main.c: 578: data_buf[4] = 0x2E;
+	mov	_data_buf+4, #0x2e
+;	main.c: 579: data_buf[5] = 0xAF;
+	mov	_data_buf+5, #0xaf
+;	main.c: 580: d_size = 4;
+	mov	_d_size+0, #0x04
+;	main.c: 581: cm_SW();
 	call	_cm_SW
-;	main.c: 578: cm_SW();
+;	main.c: 583: data_buf[0] = 0x1F;
+	mov	_data_buf+0, #0x1f
+;	main.c: 584: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 585: cm_SW();
 	call	_cm_SW
-;	main.c: 579: cm_SW();
+;	main.c: 587: data_buf[0] = 0xD3;
+	mov	_data_buf+0, #0xd3
+;	main.c: 588: data_buf[1] = 0x00;
+	mov	_data_buf+1, #0x00
+;	main.c: 589: data_buf[2] = 0x40;
+	mov	_data_buf+2, #0x40
+;	main.c: 590: data_buf[3] = 0x8D;
+	mov	_data_buf+3, #0x8d
+;	main.c: 591: d_size = 4;
+	mov	_d_size+0, #0x04
+;	main.c: 592: cm_SW();
 	call	_cm_SW
-;	main.c: 581: while(1)
+;	main.c: 594: data_buf[0] = 0x14;
+	mov	_data_buf+0, #0x14
+;	main.c: 595: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 596: cm_SW();
+	call	_cm_SW
+;	main.c: 598: data_buf[0] = 0xDB;
+	mov	_data_buf+0, #0xdb
+;	main.c: 599: data_buf[1] = 0x40;
+	mov	_data_buf+1, #0x40
+;	main.c: 600: data_buf[2] = 0xA4;
+	mov	_data_buf+2, #0xa4
+;	main.c: 601: data_buf[3] = 0xA6;
+	mov	_data_buf+3, #0xa6
+;	main.c: 602: d_size = 4;
+	mov	_d_size+0, #0x04
+;	main.c: 603: cm_SW();
+	call	_cm_SW
+;	main.c: 605: data_buf[0] = 0xDA;
+	mov	_data_buf+0, #0xda
+;	main.c: 606: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 607: cm_SW();
+	call	_cm_SW
+;	main.c: 609: data_buf[0] = 0x02;
+	mov	_data_buf+0, #0x02
+;	main.c: 610: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 611: cm_SW();
+	call	_cm_SW
+;	main.c: 613: data_buf[0] = 0x81;
+	mov	_data_buf+0, #0x81
+;	main.c: 614: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 615: cm_SW();
+	call	_cm_SW
+;	main.c: 617: data_buf[0] = 0x8F;
+	mov	_data_buf+0, #0x8f
+;	main.c: 618: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 619: cm_SW();
+	call	_cm_SW
+;	main.c: 621: data_buf[0] = 0xD9;
+	mov	_data_buf+0, #0xd9
+;	main.c: 622: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 623: cm_SW();
+	call	_cm_SW
+;	main.c: 625: data_buf[0] = 0xF1;
+	mov	_data_buf+0, #0xf1
+;	main.c: 626: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 627: cm_SW();
+	call	_cm_SW
+;	main.c: 629: data_buf[0] = 0x20;
+	mov	_data_buf+0, #0x20
+;	main.c: 630: data_buf[1] = 0x00;
+	mov	_data_buf+1, #0x00
+;	main.c: 631: data_buf[2] = 0xA1;
+	mov	_data_buf+2, #0xa1
+;	main.c: 632: data_buf[3] = 0xC8;
+	mov	_data_buf+3, #0xc8
+;	main.c: 633: d_size = 6;
+	mov	_d_size+0, #0x06
+;	main.c: 634: cm_SW();
+	call	_cm_SW
+;	main.c: 636: data_buf[0] = 0xA7;
+	mov	_data_buf+0, #0xa7
+;	main.c: 637: d_size = 1;
+	mov	_d_size+0, #0x01
+;	main.c: 638: cm_SW();
+	call	_cm_SW
+;	main.c: 640: while(1)
 00102$:
-;	main.c: 583: uart_read();
+;	main.c: 642: uart_read();
 	call	_uart_read
-;	main.c: 584: command_switcher();
+;	main.c: 643: command_switcher();
 	call	_command_switcher
 	jra	00102$
-;	main.c: 586: }
+;	main.c: 645: }
 	ret
 	.area CODE
 	.area CONST
