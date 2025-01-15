@@ -12,6 +12,25 @@ void setup(void)
     enableInterrupts();
 }
 
+int get_bit(int data,int bit)
+{
+    return ((data >> bit) & 1) ? 1 : 0;
+}
+int set_bit(int data,int bit, int value)
+{
+    int mask = 1 << bit ;
+    switch(value)
+    {
+        case 1:
+            data |= mask;
+        break;
+
+        default:
+            data &= ~mask;
+        break;
+    }
+    return data;
+}
 void delay(uint16_t ticks)
 {
    while(ticks > 0)
@@ -52,7 +71,7 @@ void display_init(void)
     setup_buf[1] = 0xF1;
     i2c_write(I2C_DISPLAY_ADDR,2,setup_buf);
     setup_buf[1] = 0x20;
-    setup_buf[2] = 0x01;
+    setup_buf[2] = 0x00;
     setup_buf[3] = 0xA1;
     setup_buf[4] = 0xC8;
     i2c_write(I2C_DISPLAY_ADDR,7,setup_buf);
@@ -63,6 +82,7 @@ void display_set_params_to_write(void)
     uint8_t set_params_buf[8] = {0x00,0x22,0x00,0x03,0x00,0x21,0x00,0x7F};
     i2c_write(I2C_DISPLAY_ADDR,8,set_params_buf);
 }
+
 #define WHITE 1
 #define BLACK 0
 #define SSD1306_LCDWIDTH 128
@@ -70,45 +90,40 @@ void display_set_params_to_write(void)
 
 void display_draw_pixel(uint8_t *buffer, uint8_t x, uint8_t y, uint8_t color)
 {
-
-  switch(color)
-  {
-    case WHITE:
-      buffer[x + (y / 8) * SSD1306_LCDWIDTH] |=  (1 << (y & 7));
-      break;
-    case BLACK:
-      buffer[x + (y / 8) * SSD1306_LCDWIDTH] &= ~(1 << (y & 7));
-      break;
-    default:
-      break;
-  }
+      buffer[x + ((y / 8) * SSD1306_LCDWIDTH)] = set_bit(buffer[x + ((y / 8) * SSD1306_LCDWIDTH)],(y % 8),color);
 }
 
-void display_buffer_fill(uint8_t x, uint8_t y,uint8_t *in_data, uint8_t *out_data,uint8_t width, uint8_t height, uint8_t color)
-{
-  uint8_t byteWidth = (width + 7) / 8;
+void display_buffer_fill_entire(uint8_t *in_data, uint8_t *out_data) {
 
-  for(int j = 0; j < height; j++) {
-    for(int i = 0; i < width; i++) {
-      if(in_data[j * byteWidth + i / 8] & (128 >> (i & 7)))
-        display_draw_pixel(out_data,x + i, y + j, color);
+  for (int height = 0; height < SSD1306_LCDHEIGHT; height++) {
+    for (int width = 0; width < SSD1306_LCDWIDTH; width++) {
+
+         display_draw_pixel(out_data, width, height, get_bit(in_data[(height * 16) + (width / 8)], 7 - (width % 8)));
+         //uart_write_byte((height * 16) + (width / 8));
+         //uart_write_byte('\n');
     }
   }
 }
 
 
-void display_set(uint8_t **data)
-{
-    data;
-    display_set_params_to_write();
-    for (int i = 0; i < 512; i += 32) 
-    {
+
+
+
+
+void display_set(uint8_t *data) {
+  data;
+  display_set_params_to_write();
+    int i = 0;
+    do {
         uint8_t set_buf[33] = {0x40};
-        for(int o = 0; o < 32; o++)
-            set_buf[o+1] = data[i+o][1];
-        i2c_write(I2C_DISPLAY_ADDR,33,set_buf);
-    }
+        for (int o = 0; o < 32; o++) {
+            set_buf[o + 1] = data[i + o];
+        }
+        i2c_write(I2C_DISPLAY_ADDR, 33, set_buf);
+        i += 32;
+    } while (i < 512);
 }
+
 
 void display_clean(void)
 {
@@ -127,8 +142,8 @@ void gg(void)
 
     display_clean();
     uint8_t buffer[512] = {0};
-    display_buffer_fill(0,0,splash,buffer,128,32,WHITE);
-    //display_set(buffer);
+    display_buffer_fill_entire(splash,buffer);
+    display_set(buffer);
 }
 
 int main(void)
@@ -146,84 +161,3 @@ int main(void)
 |_|  |_| |_| |_| |_| \_\
                     Inc. 
 */
-
-
-
-
-
-
-void display_splash(void)
-{
-    uint8_t black_buf[9] = {0x40};
-    uint8_t white_buf[9] = {0x40};
-    for(int i = 1;i<9;i++)
-        white_buf[i] = 0xFF;
-    display_set_params_to_write();
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    //
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    //
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    //
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,white_buf);
-    i2c_write(I2C_DISPLAY_ADDR,9,black_buf);
-
-    //обнуление экрана
-}

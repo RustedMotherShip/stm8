@@ -7,7 +7,7 @@ Area                                    Addr        Size        Decimal Bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000000  .__.ABS.                           _startup
+     00000000  .__.ABS.                           
      00000000  l_CABS                          
      00000000  l_DABS                          
      00000000  l__CODE                         
@@ -25,7 +25,7 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000201  l_INITIALIZED                   
      00000201  l_INITIALIZER                   
      00000208  s_SSEG                          
-     00000E9C  l_CODE                          
+     00000BA1  l_CODE                          
      00008000  s_HOME                          
      00008057  s_GSINIT                        
      0000807A  s_GSFINAL                       
@@ -118,7 +118,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000082A7    00000E9C =        3740. bytes (REL,CON)
+CODE                                000082A7    00000BA1 =        2977. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -139,19 +139,19 @@ CODE                                000082A7    00000E9C =        3740. bytes (R
      00008570  _i2c_write                         main
      000085A0  _i2c_scan                          main
      000085D3  _setup                             main
-     000085E3  _delay                             main
-     000085ED  _display_init                      main
-     000086D2  _display_set_params_to_write       main
-     000086F8  _display_draw_pixel                main
-     00008749  _display_buffer_fill               main
-     000087EA  _display_set                       main
-     00008885  _display_clean                     main
-     000088E6  _gg                                main
-     00008E29  _main                              main
-     00008E32  _display_splash                    main
-     00009124  __mulint                           
-     00009141  ___sdcc_external_startup           _startup
-
+     000085E3  _get_bit                           main
+     000085F8  _set_bit                           main
+     0000862B  _delay                             main
+     00008635  _display_init                      main
+     00008718  _display_set_params_to_write       main
+     0000873E  _display_draw_pixel                main
+     00008789  _display_buffer_fill_entire        main
+     000087F6  _display_set                       main
+     0000888A  _display_clean                     main
+     000088EB  _gg                                main
+     00008E25  _main                              main
+     00008E2E  ___sdcc_external_startup           _startup
+     00008E30  __modsint                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 
 Files Linked                              [ module(s) ]
@@ -161,8 +161,8 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _mulint.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 12.
 
