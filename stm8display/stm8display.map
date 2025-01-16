@@ -25,7 +25,7 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000201  l_INITIALIZED                   
      00000201  l_INITIALIZER                   
      00000208  s_SSEG                          
-     00000BA1  l_CODE                          
+     000007CA  l_CODE                          
      00008000  s_HOME                          
      00008057  s_GSINIT                        
      0000807A  s_GSFINAL                       
@@ -118,7 +118,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000082A7    00000BA1 =        2977. bytes (REL,CON)
+CODE                                000082A7    000007CA =        1994. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -146,12 +146,12 @@ CODE                                000082A7    00000BA1 =        2977. bytes (R
      00008718  _display_set_params_to_write       main
      0000873E  _display_draw_pixel                main
      00008789  _display_buffer_fill_entire        main
-     000087F6  _display_set                       main
-     0000888A  _display_clean                     main
-     000088EB  _gg                                main
-     00008E25  _main                              main
-     00008E2E  ___sdcc_external_startup           _startup
-     00008E30  __modsint                          
+     00008921  _display_clean                     main
+     00008A42  _gg                                main
+     00008A4E  _main                              main
+     00008A57  ___sdcc_external_startup           _startup
+     00008A59  __modsint                          
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 
 Files Linked                              [ module(s) ]

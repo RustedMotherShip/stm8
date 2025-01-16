@@ -24,13 +24,12 @@ Symbol Table
   1 _buf_size                                                      000005 GR
   A _delay                                                         000384 GR
   A _display_buffer_fill_entire                                    0004E2 GR
-  A _display_clean                                                 0005E3 GR
+  A _display_clean                                                 00067A GR
   A _display_draw_pixel                                            000497 GR
   A _display_init                                                  00038E GR
-  A _display_set                                                   00054F GR
   A _display_set_params_to_write                                   000471 GR
   A _get_bit                                                       00033C GR
-  A _gg                                                            000644 GR
+  A _gg                                                            00079B GR
   A _i2c_init                                                      0001E4 GR
   A _i2c_read                                                      000256 GR
   A _i2c_read_byte                                                 00024D GR
@@ -40,7 +39,7 @@ Symbol Table
   A _i2c_start                                                     00020F GR
   A _i2c_stop                                                      000219 GR
   A _i2c_write                                                     0002C9 GR
-  A _main                                                          000B7E GR
+  A _main                                                          0007A7 GR
   1 _rx_buf_pointer                                                000002 GR
   A _set_bit                                                       000351 GR
   A _setup                                                         00032C GR
@@ -58,12 +57,12 @@ Symbol Table
     s_DATA                                                         ****** GX
     s_GSINIT                                                       ****** GX
     s_INITIALIZED                                                  ****** GX
+    s_INITIALIZER                                                  ****** GX
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
-    s_INITIALIZER                                                  ****** GX
 
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
@@ -81,6 +80,6 @@ Area Table
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size     29   flags    0
    9 INITIALIZER                                size    201   flags    0
-   A CODE                                       size    B87   flags    0
+   A CODE                                       size    7B0   flags    0
    B CABS                                       size      0   flags    8
 

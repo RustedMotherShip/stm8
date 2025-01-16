@@ -11,7 +11,6 @@
 	.globl _main
 	.globl _gg
 	.globl _display_clean
-	.globl _display_set
 	.globl _display_buffer_fill_entire
 	.globl _display_draw_pixel
 	.globl _display_set_params_to_write
@@ -1143,256 +1142,18 @@ _display_draw_pixel:
 	ldw	x, (9, sp)
 	addw	sp, #12
 	jp	(x)
-;	main.c: 96: void display_buffer_fill_entire(uint8_t *in_data, uint8_t *out_data) {
+;	main.c: 96: void display_buffer_fill_entire(uint8_t *in_data) {
 ;	-----------------------------------------
 ;	 function display_buffer_fill_entire
 ;	-----------------------------------------
 _display_buffer_fill_entire:
-	sub	sp, #10
-	ldw	(0x05, sp), x
-;	main.c: 98: for (int height = 0; height < SSD1306_LCDHEIGHT; height++) {
-	clrw	x
-	ldw	(0x07, sp), x
-00107$:
-	ldw	x, (0x07, sp)
-	cpw	x, #0x0020
-	jrsge	00109$
-;	main.c: 99: for (int width = 0; width < SSD1306_LCDWIDTH; width++) {
-	ldw	x, (0x07, sp)
-	sllw	x
-	sllw	x
-	sllw	x
-	sllw	x
-	ldw	(0x01, sp), x
-	clrw	x
-	ldw	(0x09, sp), x
-00104$:
-	ldw	x, (0x09, sp)
-	cpw	x, #0x0080
-	jrsge	00108$
-;	main.c: 101: display_draw_pixel(out_data, width, height, get_bit(in_data[(height * 16) + (width / 8)], 7 - (width % 8)));
-	push	#0x08
-	push	#0x00
-	ldw	x, (0x0b, sp)
-	call	__modsint
-	ldw	(0x03, sp), x
-	ldw	y, #0x0007
-	subw	y, (0x03, sp)
-	ldw	x, (0x09, sp)
-	jrpl	00143$
-	addw	x, #0x0007
-00143$:
-	sraw	x
-	sraw	x
-	sraw	x
-	addw	x, (0x01, sp)
-	addw	x, (0x05, sp)
-	ld	a, (x)
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_get_bit
-	ld	a, (0x08, sp)
-	rlwa	x
-	ld	a, (0x0a, sp)
-	rrwa	x
-	pushw	x
-	addw	sp, #1
-	push	a
-	ld	a, xh
-	ldw	x, (0x0f, sp)
-	call	_display_draw_pixel
-;	main.c: 99: for (int width = 0; width < SSD1306_LCDWIDTH; width++) {
-	ldw	x, (0x09, sp)
-	incw	x
-	ldw	(0x09, sp), x
-	jra	00104$
-00108$:
-;	main.c: 98: for (int height = 0; height < SSD1306_LCDHEIGHT; height++) {
-	ldw	x, (0x07, sp)
-	incw	x
-	ldw	(0x07, sp), x
-	jra	00107$
-00109$:
-;	main.c: 106: }
-	ldw	x, (11, sp)
-	addw	sp, #14
-	jp	(x)
-;	main.c: 113: void display_set(uint8_t *data) {
-;	-----------------------------------------
-;	 function display_set
-;	-----------------------------------------
-_display_set:
-	sub	sp, #41
-	ldw	(0x26, sp), x
-;	main.c: 115: display_set_params_to_write();
+	sub	sp, #141
+	ldw	(0x86, sp), x
+;	main.c: 98: display_set_params_to_write();
 	call	_display_set_params_to_write
-;	main.c: 117: do {
-	clrw	x
-	ldw	(0x28, sp), x
-00102$:
-;	main.c: 118: uint8_t set_buf[33] = {0x40};
+;	main.c: 99: uint8_t part[129]={0x40};
 	ld	a, #0x40
 	ld	(0x01, sp), a
-	clr	(0x02, sp)
-	clr	(0x03, sp)
-	clr	(0x04, sp)
-	clr	(0x05, sp)
-	clr	(0x06, sp)
-	clr	(0x07, sp)
-	clr	(0x08, sp)
-	clr	(0x09, sp)
-	clr	(0x0a, sp)
-	clr	(0x0b, sp)
-	clr	(0x0c, sp)
-	clr	(0x0d, sp)
-	clr	(0x0e, sp)
-	clr	(0x0f, sp)
-	clr	(0x10, sp)
-	clr	(0x11, sp)
-	clr	(0x12, sp)
-	clr	(0x13, sp)
-	clr	(0x14, sp)
-	clr	(0x15, sp)
-	clr	(0x16, sp)
-	clr	(0x17, sp)
-	clr	(0x18, sp)
-	clr	(0x19, sp)
-	clr	(0x1a, sp)
-	clr	(0x1b, sp)
-	clr	(0x1c, sp)
-	clr	(0x1d, sp)
-	clr	(0x1e, sp)
-	clr	(0x1f, sp)
-	clr	(0x20, sp)
-	clr	(0x21, sp)
-;	main.c: 119: for (int o = 0; o < 32; o++) {
-	clrw	x
-00106$:
-	cpw	x, #0x0020
-	jrsge	00101$
-;	main.c: 120: set_buf[o + 1] = data[i + o];
-	ld	a, xl
-	inc	a
-	ld	(0x23, sp), a
-	rlc	a
-	clr	a
-	sbc	a, #0x00
-	ld	(0x22, sp), a
-	ldw	y, sp
-	incw	y
-	addw	y, (0x22, sp)
-	ldw	(0x24, sp), y
-	ldw	y, x
-	addw	y, (0x28, sp)
-	addw	y, (0x26, sp)
-	ld	a, (y)
-	ldw	y, (0x24, sp)
-	ld	(y), a
-;	main.c: 119: for (int o = 0; o < 32; o++) {
-	incw	x
-	jra	00106$
-00101$:
-;	main.c: 122: i2c_write(I2C_DISPLAY_ADDR, 33, set_buf);
-	ldw	x, sp
-	incw	x
-	pushw	x
-	push	#0x21
-	ld	a, #0x3c
-	call	_i2c_write
-;	main.c: 123: i += 32;
-	ldw	x, (0x28, sp)
-	addw	x, #0x0020
-;	main.c: 124: } while (i < 512);
-	ldw	(0x28, sp), x
-	cpw	x, #0x0200
-	jrsge	00134$
-	jp	00102$
-00134$:
-;	main.c: 125: }
-	addw	sp, #41
-	ret
-;	main.c: 128: void display_clean(void)
-;	-----------------------------------------
-;	 function display_clean
-;	-----------------------------------------
-_display_clean:
-	sub	sp, #33
-;	main.c: 130: uint8_t clean_buf[33] = {0x40};
-	ld	a, #0x40
-	ld	(0x01, sp), a
-	clr	(0x02, sp)
-	clr	(0x03, sp)
-	clr	(0x04, sp)
-	clr	(0x05, sp)
-	clr	(0x06, sp)
-	clr	(0x07, sp)
-	clr	(0x08, sp)
-	clr	(0x09, sp)
-	clr	(0x0a, sp)
-	clr	(0x0b, sp)
-	clr	(0x0c, sp)
-	clr	(0x0d, sp)
-	clr	(0x0e, sp)
-	clr	(0x0f, sp)
-	clr	(0x10, sp)
-	clr	(0x11, sp)
-	clr	(0x12, sp)
-	clr	(0x13, sp)
-	clr	(0x14, sp)
-	clr	(0x15, sp)
-	clr	(0x16, sp)
-	clr	(0x17, sp)
-	clr	(0x18, sp)
-	clr	(0x19, sp)
-	clr	(0x1a, sp)
-	clr	(0x1b, sp)
-	clr	(0x1c, sp)
-	clr	(0x1d, sp)
-	clr	(0x1e, sp)
-	clr	(0x1f, sp)
-	clr	(0x20, sp)
-	clr	(0x21, sp)
-;	main.c: 132: display_set_params_to_write();
-	call	_display_set_params_to_write
-;	main.c: 134: for(int i = 0;i<16;i++)
-	clr	a
-00103$:
-	cp	a, #0x10
-	jrnc	00105$
-;	main.c: 135: i2c_write(I2C_DISPLAY_ADDR,33,clean_buf);
-	push	a
-	ldw	x, sp
-	incw	x
-	incw	x
-	pushw	x
-	push	#0x21
-	ld	a, #0x3c
-	call	_i2c_write
-	pop	a
-;	main.c: 134: for(int i = 0;i<16;i++)
-	inc	a
-	jra	00103$
-00105$:
-;	main.c: 137: }
-	addw	sp, #33
-	ret
-;	main.c: 139: void gg(void)
-;	-----------------------------------------
-;	 function gg
-;	-----------------------------------------
-_gg:
-	ldw	y, sp
-	subw	y, #263
-	ldw	sp, y
-	sub	sp, #249
-;	main.c: 141: display_init();
-	pushw	y
-	call	_display_init
-	call	_display_clean
-	popw	y
-;	main.c: 144: uint8_t buffer[512] = {0};
-	clr	(0x01, sp)
 	clr	(0x02, sp)
 	clr	(0x03, sp)
 	clr	(0x04, sp)
@@ -1521,418 +1282,284 @@ _gg:
 	clr	(0x7f, sp)
 	clr	(0x80, sp)
 	clr	(0x81, sp)
-	clr	(0x82, sp)
-	clr	(0x83, sp)
-	clr	(0x84, sp)
-	clr	(0x85, sp)
-	clr	(0x86, sp)
-	clr	(0x87, sp)
-	clr	(0x88, sp)
-	clr	(0x89, sp)
-	clr	(0x8a, sp)
-	clr	(0x8b, sp)
-	clr	(0x8c, sp)
-	clr	(0x8d, sp)
-	clr	(0x8e, sp)
-	clr	(0x8f, sp)
-	clr	(0x90, sp)
-	clr	(0x91, sp)
-	clr	(0x92, sp)
-	clr	(0x93, sp)
-	clr	(0x94, sp)
-	clr	(0x95, sp)
-	clr	(0x96, sp)
-	clr	(0x97, sp)
-	clr	(0x98, sp)
-	clr	(0x99, sp)
-	clr	(0x9a, sp)
-	clr	(0x9b, sp)
-	clr	(0x9c, sp)
-	clr	(0x9d, sp)
-	clr	(0x9e, sp)
-	clr	(0x9f, sp)
-	clr	(0xa0, sp)
-	clr	(0xa1, sp)
-	clr	(0xa2, sp)
-	clr	(0xa3, sp)
-	clr	(0xa4, sp)
-	clr	(0xa5, sp)
-	clr	(0xa6, sp)
-	clr	(0xa7, sp)
-	clr	(0xa8, sp)
-	clr	(0xa9, sp)
-	clr	(0xaa, sp)
-	clr	(0xab, sp)
-	clr	(0xac, sp)
-	clr	(0xad, sp)
-	clr	(0xae, sp)
-	clr	(0xaf, sp)
-	clr	(0xb0, sp)
-	clr	(0xb1, sp)
-	clr	(0xb2, sp)
-	clr	(0xb3, sp)
-	clr	(0xb4, sp)
-	clr	(0xb5, sp)
-	clr	(0xb6, sp)
-	clr	(0xb7, sp)
-	clr	(0xb8, sp)
-	clr	(0xb9, sp)
-	clr	(0xba, sp)
-	clr	(0xbb, sp)
-	clr	(0xbc, sp)
-	clr	(0xbd, sp)
-	clr	(0xbe, sp)
-	clr	(0xbf, sp)
-	clr	(0xc0, sp)
-	clr	(0xc1, sp)
-	clr	(0xc2, sp)
-	clr	(0xc3, sp)
-	clr	(0xc4, sp)
-	clr	(0xc5, sp)
-	clr	(0xc6, sp)
-	clr	(0xc7, sp)
-	clr	(0xc8, sp)
-	clr	(0xc9, sp)
-	clr	(0xca, sp)
-	clr	(0xcb, sp)
-	clr	(0xcc, sp)
-	clr	(0xcd, sp)
-	clr	(0xce, sp)
-	clr	(0xcf, sp)
-	clr	(0xd0, sp)
-	clr	(0xd1, sp)
-	clr	(0xd2, sp)
-	clr	(0xd3, sp)
-	clr	(0xd4, sp)
-	clr	(0xd5, sp)
-	clr	(0xd6, sp)
-	clr	(0xd7, sp)
-	clr	(0xd8, sp)
-	clr	(0xd9, sp)
-	clr	(0xda, sp)
-	clr	(0xdb, sp)
-	clr	(0xdc, sp)
-	clr	(0xdd, sp)
-	clr	(0xde, sp)
-	clr	(0xdf, sp)
-	clr	(0xe0, sp)
-	clr	(0xe1, sp)
-	clr	(0xe2, sp)
-	clr	(0xe3, sp)
-	clr	(0xe4, sp)
-	clr	(0xe5, sp)
-	clr	(0xe6, sp)
-	clr	(0xe7, sp)
-	clr	(0xe8, sp)
-	clr	(0xe9, sp)
-	clr	(0xea, sp)
-	clr	(0xeb, sp)
-	clr	(0xec, sp)
-	clr	(0xed, sp)
-	clr	(0xee, sp)
-	clr	(0xef, sp)
-	clr	(0xf0, sp)
-	clr	(0xf1, sp)
-	clr	(0xf2, sp)
-	clr	(0xf3, sp)
-	clr	(0xf4, sp)
-	clr	(0xf5, sp)
-	clr	(0xf6, sp)
-	clr	(0xf7, sp)
-	clr	(0xf8, sp)
-	clr	(0xf9, sp)
-	clr	(0xfa, sp)
-	clr	(0xfb, sp)
-	clr	(0xfc, sp)
-	clr	(0xfd, sp)
-	clr	(0xfe, sp)
-	clr	(0xff, sp)
-	clr	(0x7, y)
-	clr	(0x8, y)
-	clr	(0x9, y)
-	clr	(0xa, y)
-	clr	(0xb, y)
-	clr	(0xc, y)
-	clr	(0xd, y)
-	clr	(0xe, y)
-	clr	(0xf, y)
-	clr	(0x10, y)
-	clr	(0x11, y)
-	clr	(0x12, y)
-	clr	(0x13, y)
-	clr	(0x14, y)
-	clr	(0x15, y)
-	clr	(0x16, y)
-	clr	(0x17, y)
-	clr	(0x18, y)
-	clr	(0x19, y)
-	clr	(0x1a, y)
-	clr	(0x1b, y)
-	clr	(0x1c, y)
-	clr	(0x1d, y)
-	clr	(0x1e, y)
-	clr	(0x1f, y)
-	clr	(0x20, y)
-	clr	(0x21, y)
-	clr	(0x22, y)
-	clr	(0x23, y)
-	clr	(0x24, y)
-	clr	(0x25, y)
-	clr	(0x26, y)
-	clr	(0x27, y)
-	clr	(0x28, y)
-	clr	(0x29, y)
-	clr	(0x2a, y)
-	clr	(0x2b, y)
-	clr	(0x2c, y)
-	clr	(0x2d, y)
-	clr	(0x2e, y)
-	clr	(0x2f, y)
-	clr	(0x30, y)
-	clr	(0x31, y)
-	clr	(0x32, y)
-	clr	(0x33, y)
-	clr	(0x34, y)
-	clr	(0x35, y)
-	clr	(0x36, y)
-	clr	(0x37, y)
-	clr	(0x38, y)
-	clr	(0x39, y)
-	clr	(0x3a, y)
-	clr	(0x3b, y)
-	clr	(0x3c, y)
-	clr	(0x3d, y)
-	clr	(0x3e, y)
-	clr	(0x3f, y)
-	clr	(0x40, y)
-	clr	(0x41, y)
-	clr	(0x42, y)
-	clr	(0x43, y)
-	clr	(0x44, y)
-	clr	(0x45, y)
-	clr	(0x46, y)
-	clr	(0x47, y)
-	clr	(0x48, y)
-	clr	(0x49, y)
-	clr	(0x4a, y)
-	clr	(0x4b, y)
-	clr	(0x4c, y)
-	clr	(0x4d, y)
-	clr	(0x4e, y)
-	clr	(0x4f, y)
-	clr	(0x50, y)
-	clr	(0x51, y)
-	clr	(0x52, y)
-	clr	(0x53, y)
-	clr	(0x54, y)
-	clr	(0x55, y)
-	clr	(0x56, y)
-	clr	(0x57, y)
-	clr	(0x58, y)
-	clr	(0x59, y)
-	clr	(0x5a, y)
-	clr	(0x5b, y)
-	clr	(0x5c, y)
-	clr	(0x5d, y)
-	clr	(0x5e, y)
-	clr	(0x5f, y)
-	clr	(0x60, y)
-	clr	(0x61, y)
-	clr	(0x62, y)
-	clr	(0x63, y)
-	clr	(0x64, y)
-	clr	(0x65, y)
-	clr	(0x66, y)
-	clr	(0x67, y)
-	clr	(0x68, y)
-	clr	(0x69, y)
-	clr	(0x6a, y)
-	clr	(0x6b, y)
-	clr	(0x6c, y)
-	clr	(0x6d, y)
-	clr	(0x6e, y)
-	clr	(0x6f, y)
-	clr	(0x70, y)
-	clr	(0x71, y)
-	clr	(0x72, y)
-	clr	(0x73, y)
-	clr	(0x74, y)
-	clr	(0x75, y)
-	clr	(0x76, y)
-	clr	(0x77, y)
-	clr	(0x78, y)
-	clr	(0x79, y)
-	clr	(0x7a, y)
-	clr	(0x7b, y)
-	clr	(0x7c, y)
-	clr	(0x7d, y)
-	clr	(0x7e, y)
-	clr	(0x7f, y)
-	clr	(0x80, y)
-	clr	(0x81, y)
-	clr	(0x82, y)
-	clr	(0x83, y)
-	clr	(0x84, y)
-	clr	(0x85, y)
-	clr	(0x86, y)
-	clr	(0x87, y)
-	clr	(0x88, y)
-	clr	(0x89, y)
-	clr	(0x8a, y)
-	clr	(0x8b, y)
-	clr	(0x8c, y)
-	clr	(0x8d, y)
-	clr	(0x8e, y)
-	clr	(0x8f, y)
-	clr	(0x90, y)
-	clr	(0x91, y)
-	clr	(0x92, y)
-	clr	(0x93, y)
-	clr	(0x94, y)
-	clr	(0x95, y)
-	clr	(0x96, y)
-	clr	(0x97, y)
-	clr	(0x98, y)
-	clr	(0x99, y)
-	clr	(0x9a, y)
-	clr	(0x9b, y)
-	clr	(0x9c, y)
-	clr	(0x9d, y)
-	clr	(0x9e, y)
-	clr	(0x9f, y)
-	clr	(0xa0, y)
-	clr	(0xa1, y)
-	clr	(0xa2, y)
-	clr	(0xa3, y)
-	clr	(0xa4, y)
-	clr	(0xa5, y)
-	clr	(0xa6, y)
-	clr	(0xa7, y)
-	clr	(0xa8, y)
-	clr	(0xa9, y)
-	clr	(0xaa, y)
-	clr	(0xab, y)
-	clr	(0xac, y)
-	clr	(0xad, y)
-	clr	(0xae, y)
-	clr	(0xaf, y)
-	clr	(0xb0, y)
-	clr	(0xb1, y)
-	clr	(0xb2, y)
-	clr	(0xb3, y)
-	clr	(0xb4, y)
-	clr	(0xb5, y)
-	clr	(0xb6, y)
-	clr	(0xb7, y)
-	clr	(0xb8, y)
-	clr	(0xb9, y)
-	clr	(0xba, y)
-	clr	(0xbb, y)
-	clr	(0xbc, y)
-	clr	(0xbd, y)
-	clr	(0xbe, y)
-	clr	(0xbf, y)
-	clr	(0xc0, y)
-	clr	(0xc1, y)
-	clr	(0xc2, y)
-	clr	(0xc3, y)
-	clr	(0xc4, y)
-	clr	(0xc5, y)
-	clr	(0xc6, y)
-	clr	(0xc7, y)
-	clr	(0xc8, y)
-	clr	(0xc9, y)
-	clr	(0xca, y)
-	clr	(0xcb, y)
-	clr	(0xcc, y)
-	clr	(0xcd, y)
-	clr	(0xce, y)
-	clr	(0xcf, y)
-	clr	(0xd0, y)
-	clr	(0xd1, y)
-	clr	(0xd2, y)
-	clr	(0xd3, y)
-	clr	(0xd4, y)
-	clr	(0xd5, y)
-	clr	(0xd6, y)
-	clr	(0xd7, y)
-	clr	(0xd8, y)
-	clr	(0xd9, y)
-	clr	(0xda, y)
-	clr	(0xdb, y)
-	clr	(0xdc, y)
-	clr	(0xdd, y)
-	clr	(0xde, y)
-	clr	(0xdf, y)
-	clr	(0xe0, y)
-	clr	(0xe1, y)
-	clr	(0xe2, y)
-	clr	(0xe3, y)
-	clr	(0xe4, y)
-	clr	(0xe5, y)
-	clr	(0xe6, y)
-	clr	(0xe7, y)
-	clr	(0xe8, y)
-	clr	(0xe9, y)
-	clr	(0xea, y)
-	clr	(0xeb, y)
-	clr	(0xec, y)
-	clr	(0xed, y)
-	clr	(0xee, y)
-	clr	(0xef, y)
-	clr	(0xf0, y)
-	clr	(0xf1, y)
-	clr	(0xf2, y)
-	clr	(0xf3, y)
-	clr	(0xf4, y)
-	clr	(0xf5, y)
-	clr	(0xf6, y)
-	clr	(0xf7, y)
-	clr	(0xf8, y)
-	clr	(0xf9, y)
-	clr	(0xfa, y)
-	clr	(0xfb, y)
-	clr	(0xfc, y)
-	clr	(0xfd, y)
-	clr	(0xfe, y)
-	clr	(0xff, y)
-	clr	(0x100, y)
-	clr	(0x101, y)
-	clr	(0x102, y)
-	clr	(0x103, y)
-	clr	(0x104, y)
-	clr	(0x105, y)
-	clr	(0x106, y)
-	clr	(0x107, y)
-;	main.c: 145: display_buffer_fill_entire(splash,buffer);
+;	main.c: 101: for(int page = 0;page <= 384;page+=128)
+	clrw	x
+	ldw	(0x88, sp), x
+00111$:
+	ldw	x, (0x88, sp)
+	cpw	x, #0x0180
+	jrsle	00160$
+	jp	00113$
+00160$:
+;	main.c: 103: for (int height = 0; height < 8; height++) 
+	clrw	x
+	ldw	(0x8a, sp), x
+00108$:
+	ldw	x, (0x8a, sp)
+	cpw	x, #0x0008
+	jrsge	00102$
+;	main.c: 105: for (int width = 0; width < 128; width++) 
+	ldw	x, (0x8a, sp)
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	addw	x, (0x88, sp)
+	ldw	(0x82, sp), x
+	clrw	x
+	ldw	(0x8c, sp), x
+00105$:
+	ldw	x, (0x8c, sp)
+	cpw	x, #0x0080
+	jrsge	00109$
+;	main.c: 108: display_draw_pixel(&part[1], width, height, get_bit(in_data[page+(height*16) + (width / 8)], 7 - (width % 8)));
+	push	#0x08
+	push	#0x00
+	ldw	x, (0x8e, sp)
+	call	__modsint
+	ldw	(0x84, sp), x
+	ldw	y, #0x0007
+	subw	y, (0x84, sp)
+	ldw	x, (0x8c, sp)
+	jrpl	00163$
+	addw	x, #0x0007
+00163$:
+	sraw	x
+	sraw	x
+	sraw	x
+	addw	x, (0x82, sp)
+	addw	x, (0x86, sp)
+	ld	a, (x)
+	clrw	x
 	pushw	y
-	ldw	x, sp
-	addw	x, #3
+	ld	xl, a
+	call	_get_bit
+	ld	a, (0x8b, sp)
+	rlwa	x
+	ld	a, (0x8d, sp)
+	rrwa	x
 	pushw	x
-	ldw	x, #(_splash+0)
-	call	_display_buffer_fill_entire
+	addw	sp, #1
+	push	a
+	ld	a, xh
 	ldw	x, sp
-	addw	x, #3
-	call	_display_set
-	popw	y
-;	main.c: 147: }
-	addw	sp, #255
-	addw	sp, #255
-	addw	sp, #2
+	addw	x, #4
+	call	_display_draw_pixel
+;	main.c: 105: for (int width = 0; width < 128; width++) 
+	ldw	x, (0x8c, sp)
+	incw	x
+	ldw	(0x8c, sp), x
+	jra	00105$
+00109$:
+;	main.c: 103: for (int height = 0; height < 8; height++) 
+	ldw	x, (0x8a, sp)
+	incw	x
+	ldw	(0x8a, sp), x
+	jra	00108$
+00102$:
+;	main.c: 113: i2c_write(I2C_DISPLAY_ADDR, 129, part);
+	ldw	x, sp
+	incw	x
+	pushw	x
+	push	#0x81
+	ld	a, #0x3c
+	call	_i2c_write
+;	main.c: 101: for(int page = 0;page <= 384;page+=128)
+	ldw	x, (0x88, sp)
+	addw	x, #0x0080
+	ldw	(0x88, sp), x
+	jp	00111$
+00113$:
+;	main.c: 115: }
+	addw	sp, #141
 	ret
-;	main.c: 149: int main(void)
+;	main.c: 117: void display_clean(void)
+;	-----------------------------------------
+;	 function display_clean
+;	-----------------------------------------
+_display_clean:
+	sub	sp, #129
+;	main.c: 119: uint8_t clean_buf[129] = {0x40};
+	ld	a, #0x40
+	ld	(0x01, sp), a
+	clr	(0x02, sp)
+	clr	(0x03, sp)
+	clr	(0x04, sp)
+	clr	(0x05, sp)
+	clr	(0x06, sp)
+	clr	(0x07, sp)
+	clr	(0x08, sp)
+	clr	(0x09, sp)
+	clr	(0x0a, sp)
+	clr	(0x0b, sp)
+	clr	(0x0c, sp)
+	clr	(0x0d, sp)
+	clr	(0x0e, sp)
+	clr	(0x0f, sp)
+	clr	(0x10, sp)
+	clr	(0x11, sp)
+	clr	(0x12, sp)
+	clr	(0x13, sp)
+	clr	(0x14, sp)
+	clr	(0x15, sp)
+	clr	(0x16, sp)
+	clr	(0x17, sp)
+	clr	(0x18, sp)
+	clr	(0x19, sp)
+	clr	(0x1a, sp)
+	clr	(0x1b, sp)
+	clr	(0x1c, sp)
+	clr	(0x1d, sp)
+	clr	(0x1e, sp)
+	clr	(0x1f, sp)
+	clr	(0x20, sp)
+	clr	(0x21, sp)
+	clr	(0x22, sp)
+	clr	(0x23, sp)
+	clr	(0x24, sp)
+	clr	(0x25, sp)
+	clr	(0x26, sp)
+	clr	(0x27, sp)
+	clr	(0x28, sp)
+	clr	(0x29, sp)
+	clr	(0x2a, sp)
+	clr	(0x2b, sp)
+	clr	(0x2c, sp)
+	clr	(0x2d, sp)
+	clr	(0x2e, sp)
+	clr	(0x2f, sp)
+	clr	(0x30, sp)
+	clr	(0x31, sp)
+	clr	(0x32, sp)
+	clr	(0x33, sp)
+	clr	(0x34, sp)
+	clr	(0x35, sp)
+	clr	(0x36, sp)
+	clr	(0x37, sp)
+	clr	(0x38, sp)
+	clr	(0x39, sp)
+	clr	(0x3a, sp)
+	clr	(0x3b, sp)
+	clr	(0x3c, sp)
+	clr	(0x3d, sp)
+	clr	(0x3e, sp)
+	clr	(0x3f, sp)
+	clr	(0x40, sp)
+	clr	(0x41, sp)
+	clr	(0x42, sp)
+	clr	(0x43, sp)
+	clr	(0x44, sp)
+	clr	(0x45, sp)
+	clr	(0x46, sp)
+	clr	(0x47, sp)
+	clr	(0x48, sp)
+	clr	(0x49, sp)
+	clr	(0x4a, sp)
+	clr	(0x4b, sp)
+	clr	(0x4c, sp)
+	clr	(0x4d, sp)
+	clr	(0x4e, sp)
+	clr	(0x4f, sp)
+	clr	(0x50, sp)
+	clr	(0x51, sp)
+	clr	(0x52, sp)
+	clr	(0x53, sp)
+	clr	(0x54, sp)
+	clr	(0x55, sp)
+	clr	(0x56, sp)
+	clr	(0x57, sp)
+	clr	(0x58, sp)
+	clr	(0x59, sp)
+	clr	(0x5a, sp)
+	clr	(0x5b, sp)
+	clr	(0x5c, sp)
+	clr	(0x5d, sp)
+	clr	(0x5e, sp)
+	clr	(0x5f, sp)
+	clr	(0x60, sp)
+	clr	(0x61, sp)
+	clr	(0x62, sp)
+	clr	(0x63, sp)
+	clr	(0x64, sp)
+	clr	(0x65, sp)
+	clr	(0x66, sp)
+	clr	(0x67, sp)
+	clr	(0x68, sp)
+	clr	(0x69, sp)
+	clr	(0x6a, sp)
+	clr	(0x6b, sp)
+	clr	(0x6c, sp)
+	clr	(0x6d, sp)
+	clr	(0x6e, sp)
+	clr	(0x6f, sp)
+	clr	(0x70, sp)
+	clr	(0x71, sp)
+	clr	(0x72, sp)
+	clr	(0x73, sp)
+	clr	(0x74, sp)
+	clr	(0x75, sp)
+	clr	(0x76, sp)
+	clr	(0x77, sp)
+	clr	(0x78, sp)
+	clr	(0x79, sp)
+	clr	(0x7a, sp)
+	clr	(0x7b, sp)
+	clr	(0x7c, sp)
+	clr	(0x7d, sp)
+	clr	(0x7e, sp)
+	clr	(0x7f, sp)
+	clr	(0x80, sp)
+	clr	(0x81, sp)
+;	main.c: 121: display_set_params_to_write();
+	call	_display_set_params_to_write
+;	main.c: 123: for(int i = 0;i<4;i++)
+	clr	a
+00103$:
+	cp	a, #0x04
+	jrnc	00105$
+;	main.c: 124: i2c_write(I2C_DISPLAY_ADDR,129,clean_buf);
+	push	a
+	ldw	x, sp
+	incw	x
+	incw	x
+	pushw	x
+	push	#0x81
+	ld	a, #0x3c
+	call	_i2c_write
+	pop	a
+;	main.c: 123: for(int i = 0;i<4;i++)
+	inc	a
+	jra	00103$
+00105$:
+;	main.c: 126: }
+	addw	sp, #129
+	ret
+;	main.c: 128: void gg(void)
+;	-----------------------------------------
+;	 function gg
+;	-----------------------------------------
+_gg:
+;	main.c: 130: display_init();
+	call	_display_init
+;	main.c: 131: display_clean();
+	call	_display_clean
+;	main.c: 132: display_buffer_fill_entire(splash);
+	ldw	x, #(_splash+0)
+;	main.c: 133: }
+	jp	_display_buffer_fill_entire
+;	main.c: 135: int main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	main.c: 151: setup();
+;	main.c: 137: setup();
 	call	_setup
-;	main.c: 152: gg();
+;	main.c: 138: gg();
 	call	_gg
-;	main.c: 153: while(1);
+;	main.c: 139: while(1);
 00102$:
 	jra	00102$
-;	main.c: 154: }
+;	main.c: 140: }
 	ret
 	.area CODE
 	.area CONST
@@ -2008,10 +1635,10 @@ __xinit__splash:
 	.db #0xff	; 255
 	.db #0xf8	; 248
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
+	.db #0x1d	; 29
+	.db #0x1d	; 29
+	.db #0x5c	; 92
+	.db #0xed	; 237
 	.db #0x80	; 128
 	.db #0xfe	; 254
 	.db #0x03	; 3
@@ -2024,10 +1651,10 @@ __xinit__splash:
 	.db #0xff	; 255
 	.db #0xf8	; 248
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
+	.db #0x15	; 21
+	.db #0x15	; 21
+	.db #0x54	; 84	'T'
+	.db #0xa5	; 165
 	.db #0x80	; 128
 	.db #0xfe	; 254
 	.db #0x03	; 3
@@ -2040,10 +1667,10 @@ __xinit__splash:
 	.db #0xff	; 255
 	.db #0xf8	; 248
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
+	.db #0x1d	; 29
+	.db #0x1d	; 29
+	.db #0xdc	; 220
+	.db #0xa5	; 165
 	.db #0x80	; 128
 	.db #0xfe	; 254
 	.db #0x03	; 3
@@ -2056,10 +1683,10 @@ __xinit__splash:
 	.db #0xff	; 255
 	.db #0xf8	; 248
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
+	.db #0x15	; 21
+	.db #0xd1	; 209
+	.db #0x54	; 84	'T'
+	.db #0xe5	; 229
 	.db #0x80	; 128
 	.db #0xfe	; 254
 	.db #0x03	; 3

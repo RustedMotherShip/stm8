@@ -5,8 +5,7 @@
 #ifndef _STH8_H
 #define _STH8_H
 #include <stdint.h>
-#include "libs/i2c_lib.c"
-// #include "libs/uart_lib.c"
+#include "libs/libs.h"
 /* Handy macros for GPIO */
 #define CONCAT(a, b)    a##_##b
 #define PORT(a, b)      CONCAT(a , b)
