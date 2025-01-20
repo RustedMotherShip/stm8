@@ -1,4 +1,5 @@
-#include "libs/uart_lib.h"
+#ifndef I2C_LIB_H
+#define I2C_LIB_H
 
 struct I2C_CR1_
 {
@@ -160,3 +161,24 @@ I2C_IRQ_t I2C_IRQ = {0};
 #define clr_sr3() {__asm__("ld a,0x5219\n");}  // очистка SR3 
 #define enableInterrupts()    {__asm__("rim\n");}  /* enable interrupts */
 #define disableInterrupts()   {__asm__("sim\n");}  /* disable interrupts */
+
+void i2c_init(void);
+void i2c_start(void);
+void i2c_stop(void);
+uint8_t i2c_send_address(uint8_t address,uint8_t rw_type);
+uint8_t i2c_read_byte(void);
+void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data);
+uint8_t i2c_send_byte(uint8_t data);
+void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data);
+uint8_t i2c_scan(void);
+
+void i2c_start_irq(void);
+void i2c_stop_irq(void);
+uint8_t i2c_send_address_irq(uint8_t address,uint8_t rw_type);
+uint8_t i2c_read_byte_irq(void);
+void i2c_read_irq(uint8_t dev_addr, uint8_t size,uint8_t *data);
+uint8_t i2c_send_byte_irq(uint8_t data);
+void i2c_write_irq(uint8_t dev_addr,uint8_t size,uint8_t *data);
+uint8_t i2c_scan_irq(void);
+
+#endif

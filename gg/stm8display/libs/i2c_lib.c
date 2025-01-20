@@ -47,7 +47,8 @@ uint8_t i2c_send_address(uint8_t address,uint8_t rw_type)
     return 1;
 }
 
-uint8_t i2c_read_byte(void){
+uint8_t i2c_read_byte(void)
+{
     while(!I2C_SR1 -> RXNE);
     return I2C_DR -> DR;
 }

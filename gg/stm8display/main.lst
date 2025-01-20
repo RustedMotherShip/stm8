@@ -1,0 +1,171 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module main
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _gg
+                                     13 	.globl _setup
+                                     14 	.globl _uart_write_byte
+                                     15 	.globl _uart_init
+                                     16 	.globl _I2C_IRQ
+                                     17 	.globl _buf_size
+                                     18 	.globl _buf_pos
+                                     19 	.globl _rx_buf_pointer
+                                     20 	.globl _tx_buf_pointer
+                                     21 ;--------------------------------------------------------
+                                     22 ; ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area DATA
+      000000                         25 _tx_buf_pointer::
+      000000                         26 	.ds 2
+      000002                         27 _rx_buf_pointer::
+      000002                         28 	.ds 2
+      000004                         29 _buf_pos::
+      000004                         30 	.ds 1
+      000005                         31 _buf_size::
+      000005                         32 	.ds 1
+                                     33 ;--------------------------------------------------------
+                                     34 ; ram data
+                                     35 ;--------------------------------------------------------
+                                     36 	.area INITIALIZED
+      000000                         37 _I2C_IRQ::
+      000000                         38 	.ds 1
+                                     39 ;--------------------------------------------------------
+                                     40 ; Stack segment in internal ram
+                                     41 ;--------------------------------------------------------
+                                     42 	.area SSEG
+      000000                         43 __start__stack:
+      000000                         44 	.ds	1
+                                     45 
+                                     46 ;--------------------------------------------------------
+                                     47 ; absolute external ram data
+                                     48 ;--------------------------------------------------------
+                                     49 	.area DABS (ABS)
+                                     50 
+                                     51 ; default segment ordering for linker
+                                     52 	.area HOME
+                                     53 	.area GSINIT
+                                     54 	.area GSFINAL
+                                     55 	.area CONST
+                                     56 	.area INITIALIZER
+                                     57 	.area CODE
+                                     58 
+                                     59 ;--------------------------------------------------------
+                                     60 ; interrupt vector
+                                     61 ;--------------------------------------------------------
+                                     62 	.area HOME
+      000000                         63 __interrupt_vect:
+      000000 82v00u00u00             64 	int s_GSINIT ; reset
+      000004 82 00 00 00             65 	int 0x000000 ; trap
+      000008 82 00 00 00             66 	int 0x000000 ; int0
+      00000C 82 00 00 00             67 	int 0x000000 ; int1
+      000010 82 00 00 00             68 	int 0x000000 ; int2
+      000014 82 00 00 00             69 	int 0x000000 ; int3
+      000018 82 00 00 00             70 	int 0x000000 ; int4
+      00001C 82 00 00 00             71 	int 0x000000 ; int5
+      000020 82 00 00 00             72 	int 0x000000 ; int6
+      000024 82 00 00 00             73 	int 0x000000 ; int7
+      000028 82 00 00 00             74 	int 0x000000 ; int8
+      00002C 82 00 00 00             75 	int 0x000000 ; int9
+      000030 82 00 00 00             76 	int 0x000000 ; int10
+      000034 82 00 00 00             77 	int 0x000000 ; int11
+      000038 82 00 00 00             78 	int 0x000000 ; int12
+      00003C 82 00 00 00             79 	int 0x000000 ; int13
+      000040 82 00 00 00             80 	int 0x000000 ; int14
+      000044 82 00 00 00             81 	int 0x000000 ; int15
+      000048 82 00 00 00             82 	int 0x000000 ; int16
+      00004C 82v00u00u00             83 	int _uart_transmission_irq ; int17
+      000050 82v00u00u00             84 	int _uart_reciever_irq ; int18
+                                     85 ;--------------------------------------------------------
+                                     86 ; global & static initialisations
+                                     87 ;--------------------------------------------------------
+                                     88 	.area HOME
+                                     89 	.area GSINIT
+                                     90 	.area GSFINAL
+                                     91 	.area GSINIT
+      000000 CDr00r00         [ 4]   92 	call	___sdcc_external_startup
+      000003 4D               [ 1]   93 	tnz	a
+      000004 27 03            [ 1]   94 	jreq	__sdcc_init_data
+      000006 CCr00r54         [ 2]   95 	jp	__sdcc_program_startup
+      000009                         96 __sdcc_init_data:
+                                     97 ; stm8_genXINIT() start
+      000009 AEr00r00         [ 2]   98 	ldw x, #l_DATA
+      00000C 27 07            [ 1]   99 	jreq	00002$
+      00000E                        100 00001$:
+      00000E 72 4FuFFuFF      [ 1]  101 	clr (s_DATA - 1, x)
+      000012 5A               [ 2]  102 	decw x
+      000013 26 F9            [ 1]  103 	jrne	00001$
+      000015                        104 00002$:
+      000015 AEr00r00         [ 2]  105 	ldw	x, #l_INITIALIZER
+      000018 27 09            [ 1]  106 	jreq	00004$
+      00001A                        107 00003$:
+      00001A D6uFFuFF         [ 1]  108 	ld	a, (s_INITIALIZER - 1, x)
+      00001D D7uFFuFF         [ 1]  109 	ld	(s_INITIALIZED - 1, x), a
+      000020 5A               [ 2]  110 	decw	x
+      000021 26 F7            [ 1]  111 	jrne	00003$
+      000023                        112 00004$:
+                                    113 ; stm8_genXINIT() end
+                                    114 	.area GSFINAL
+      000000 CCr00r54         [ 2]  115 	jp	__sdcc_program_startup
+                                    116 ;--------------------------------------------------------
+                                    117 ; Home
+                                    118 ;--------------------------------------------------------
+                                    119 	.area HOME
+                                    120 	.area HOME
+      000054                        121 __sdcc_program_startup:
+      000054 CCr00r12         [ 2]  122 	jp	_main
+                                    123 ;	return from main will return to caller
+                                    124 ;--------------------------------------------------------
+                                    125 ; code
+                                    126 ;--------------------------------------------------------
+                                    127 	.area CODE
+                                    128 ;	main.c: 4: void setup(void)
+                                    129 ;	-----------------------------------------
+                                    130 ;	 function setup
+                                    131 ;	-----------------------------------------
+      000000                        132 _setup:
+                                    133 ;	main.c: 7: CLK_CKDIVR = 0;
+      000000 35 00 50 C6      [ 1]  134 	mov	0x50c6+0, #0x00
+                                    135 ;	main.c: 9: uart_init(9600,0);
+      000004 4F               [ 1]  136 	clr	a
+      000005 AE 25 80         [ 2]  137 	ldw	x, #0x2580
+      000008 CDr00r00         [ 4]  138 	call	_uart_init
+                                    139 ;	main.c: 12: enableInterrupts();
+      00000B 9A               [ 1]  140 	rim
+                                    141 ;	main.c: 13: }
+      00000C 81               [ 4]  142 	ret
+                                    143 ;	main.c: 35: void gg(void)
+                                    144 ;	-----------------------------------------
+                                    145 ;	 function gg
+                                    146 ;	-----------------------------------------
+      00000D                        147 _gg:
+                                    148 ;	main.c: 40: uart_write_byte(0xAA);
+      00000D A6 AA            [ 1]  149 	ld	a, #0xaa
+                                    150 ;	main.c: 41: }
+      00000F CCr00r00         [ 2]  151 	jp	_uart_write_byte
+                                    152 ;	main.c: 43: int main(void)
+                                    153 ;	-----------------------------------------
+                                    154 ;	 function main
+                                    155 ;	-----------------------------------------
+      000012                        156 _main:
+                                    157 ;	main.c: 45: setup();
+      000012 CDr00r00         [ 4]  158 	call	_setup
+                                    159 ;	main.c: 46: gg();
+      000015 CDr00r0D         [ 4]  160 	call	_gg
+                                    161 ;	main.c: 47: while(1);
+      000018                        162 00102$:
+      000018 20 FE            [ 2]  163 	jra	00102$
+                                    164 ;	main.c: 48: }
+      00001A 81               [ 4]  165 	ret
+                                    166 	.area CODE
+                                    167 	.area CONST
+                                    168 	.area INITIALIZER
+      000000                        169 __xinit__I2C_IRQ:
+      000000 00                     170 	.db #0x00	; 0
+                                    171 	.area CABS (ABS)

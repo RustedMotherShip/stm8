@@ -1,0 +1,79 @@
+ASxxxx Linker V03.00/V05.40 + sdld,  page 1.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000000  .__.ABS.                           uart_lib
+     00000000  l_CABS                          
+     00000000  l_CONST                         
+     00000000  l_DABS                          
+     00000000  l_GSFINAL                       
+     00000000  l_GSINIT                        
+     00000000  l_HOME                          
+     00000000  l_INITIALIZED                   
+     00000000  l_INITIALIZER                   
+     00000000  l__CODE                         
+     00000000  s_CABS                          
+     00000000  s_DABS                          
+     00000000  s__CODE                         
+     00000001  s_DATA                          
+     00000006  l_DATA                          
+     00000007  s_INITIALIZED                   
+     0000021E  l_CODE                          
+     00008000  s_CODE                          
+     00008000  s_CONST                         
+     00008000  s_GSFINAL                       
+     00008000  s_GSINIT                        
+     00008000  s_HOME                          
+     00008000  s_INITIALIZER                   
+
+ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+DATA                                00000001    00000006 =           6. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000001  _tx_buf_pointer                    uart_lib
+     00000003  _rx_buf_pointer                    uart_lib
+     00000005  _buf_pos                           uart_lib
+     00000006  _buf_size                          uart_lib
+
+ASxxxx Linker V03.00/V05.40 + sdld,  page 3.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CODE                                00008000    0000021E =         542. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00008000  _uart_transmission_irq             uart_lib
+     0000803C  _uart_reciever_irq                 uart_lib
+     0000806F  _uart_write_irq                    uart_lib
+     00008099  _uart_read_irq                     uart_lib
+     000080B7  _uart_init                         uart_lib
+     000081B9  _uart_read_byte                    uart_lib
+     000081C1  _uart_write_byte                   uart_lib
+     000081CC  _uart_write                        uart_lib
+     000081F0  _uart_read                         uart_lib
+ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
+
+Files Linked                              [ module(s) ]
+
+uart_lib.rel                              [ uart_lib ]
+
+ASxxxx Linker V03.00/V05.40 + sdld,  page 5.
+
+User Base Address Definitions
+
+HOME = 0x8000
+DATA = 0x0001
+
+

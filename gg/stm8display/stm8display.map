@@ -7,31 +7,35 @@ Area                                    Addr        Size        Decimal Bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000000  .__.ABS.                           
+     00000000  .__.ABS.                           _startup
+     00000000  _uart_init                      
+     00000000  _uart_reciever_irq              
+     00000000  _uart_transmission_irq          
+     00000000  _uart_write_byte                
      00000000  l_CABS                          
+     00000000  l_CONST                         
      00000000  l_DABS                          
      00000000  l__CODE                         
      00000000  s_CABS                          
      00000000  s_DABS                          
      00000000  s__CODE                         
+     00000001  l_INITIALIZED                   
+     00000001  l_INITIALIZER                   
      00000001  l_SSEG                          
      00000001  s_DATA                          
      00000003  l_GSFINAL                       
      00000006  l_DATA                          
      00000007  s_INITIALIZED                   
+     00000008  s_SSEG                          
+     0000001D  l_CODE                          
      00000023  l_GSINIT                        
-     00000029  l_CONST                         
      00000057  l_HOME                          
-     00000201  l_INITIALIZED                   
-     00000201  l_INITIALIZER                   
-     00000208  s_SSEG                          
-     000007CA  l_CODE                          
      00008000  s_HOME                          
      00008057  s_GSINIT                        
      0000807A  s_GSFINAL                       
      0000807D  s_CONST                         
-     000080A6  s_INITIALIZER                   
-     000082A7  s_CODE                          
+     0000807D  s_INITIALIZER                   
+     0000807E  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -52,19 +56,18 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000007    00000201 =         513. bytes (REL,CON)
+INITIALIZED                         00000007    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000007  _I2C_IRQ                           main
-     00000008  _splash                            main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000208    00000001 =           1. bytes (REL,CON)
+SSEG                                00000008    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -100,7 +103,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               0000807D    00000029 =          41. bytes (REL,CON)
+INITIALIZER                         0000807D    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -109,50 +112,16 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         000080A6    00000201 =         513. bytes (REL,CON)
+CODE                                0000807E    0000001D =          29. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     0000807E  _setup                             main
+     0000808B  _gg                                main
+     00008090  _main                              main
+     00008099  ___sdcc_external_startup           _startup
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
-Hexadecimal  [32-Bits]
-
-Area                                    Addr        Size        Decimal Bytes (Attributes)
---------------------------------        ----        ----        ------- ----- ------------
-CODE                                000082A7    000007CA =        1994. bytes (REL,CON)
-
-      Value  Global                              Global Defined In Module
-      -----  --------------------------------   ------------------------
-     000082A7  _uart_transmission_irq             main
-     000082E3  _uart_reciever_irq                 main
-     00008316  _uart_init                         main
-     00008418  _uart_read_byte                    main
-     00008420  _uart_write_byte                   main
-     0000842B  _uart_write                        main
-     00008455  _uart_read                         main
-     0000848B  _i2c_init                          main
-     000084B6  _i2c_start                         main
-     000084C0  _i2c_stop                          main
-     000084C5  _i2c_send_address                  main
-     000084F4  _i2c_read_byte                     main
-     000084FD  _i2c_read                          main
-     0000855E  _i2c_send_byte                     main
-     00008570  _i2c_write                         main
-     000085A0  _i2c_scan                          main
-     000085D3  _setup                             main
-     000085E3  _get_bit                           main
-     000085F8  _set_bit                           main
-     0000862B  _delay                             main
-     00008635  _display_init                      main
-     00008718  _display_set_params_to_write       main
-     0000873E  _display_draw_pixel                main
-     00008789  _display_buffer_fill_entire        main
-     00008921  _display_clean                     main
-     00008A42  _gg                                main
-     00008A4E  _main                              main
-     00008A57  ___sdcc_external_startup           _startup
-     00008A59  __modsint                          
-
-ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 
 Files Linked                              [ module(s) ]
 
@@ -162,9 +131,8 @@ main.rel                                  [ main ]
 Libraries Linked                          [ object file ]
 
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
 
-ASxxxx Linker V03.00/V05.40 + sdld,  page 12.
+ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 
 User Base Address Definitions
 
@@ -172,3 +140,10 @@ HOME = 0x8000
 DATA = 0x0001
 
 
+?ASlink-Warning-Undefined Global '_uart_transmission_irq' referenced by module 'main'
+
+?ASlink-Warning-Undefined Global '_uart_init' referenced by module 'main'
+
+?ASlink-Warning-Undefined Global '_uart_write_byte' referenced by module 'main'
+
+?ASlink-Warning-Undefined Global '_uart_reciever_irq' referenced by module 'main'
