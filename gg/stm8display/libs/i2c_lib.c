@@ -63,15 +63,14 @@ void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data)
             data[i] = i2c_read_byte();//функция записи байта в элемент массива
         }
         I2C_CR2 -> ACK = 0;//выключение ответа на посылки
-        uart_write_byte(0x00);
+        //uart_write_byte(0x00);
         data[size-1] = i2c_read_byte();
-        uart_write_byte(0x01);
+        //uart_write_byte(0x01);
         i2c_stop();
     }
-    uart_write_byte(0x02);
+    //uart_write_byte(0x02);
     i2c_stop();
-    i2c_stop();
-    uart_write_byte(0x03); 
+    //uart_write_byte(0x03); 
 }
 
 uint8_t i2c_send_byte(uint8_t data)

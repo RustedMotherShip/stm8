@@ -8,7 +8,7 @@ HEADERS=$(wildcard *.h $(COMMONDIR)/*.h)
 CC = sdcc
 PROGRAMMER = stlinkv2
 
-CPPFLAGS = -I.
+CPPFLAGS = -I../i2c
 CFLAGS = --std-sdcc99 -mstm8 -DSTM8S103
 
 .PHONY: all clean

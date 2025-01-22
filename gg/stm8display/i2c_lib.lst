@@ -1,0 +1,339 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module i2c_lib
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _I2C_IRQ
+                                     12 	.globl _i2c_init
+                                     13 	.globl _i2c_start
+                                     14 	.globl _i2c_stop
+                                     15 	.globl _i2c_send_address
+                                     16 	.globl _i2c_read_byte
+                                     17 	.globl _i2c_read
+                                     18 	.globl _i2c_send_byte
+                                     19 	.globl _i2c_write
+                                     20 	.globl _i2c_scan
+                                     21 ;--------------------------------------------------------
+                                     22 ; ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area DATA
+                                     25 ;--------------------------------------------------------
+                                     26 ; ram data
+                                     27 ;--------------------------------------------------------
+                                     28 	.area INITIALIZED
+      000000                         29 _I2C_IRQ::
+      000000                         30 	.ds 1
+                                     31 ;--------------------------------------------------------
+                                     32 ; absolute external ram data
+                                     33 ;--------------------------------------------------------
+                                     34 	.area DABS (ABS)
+                                     35 
+                                     36 ; default segment ordering for linker
+                                     37 	.area HOME
+                                     38 	.area GSINIT
+                                     39 	.area GSFINAL
+                                     40 	.area CONST
+                                     41 	.area INITIALIZER
+                                     42 	.area CODE
+                                     43 
+                                     44 ;--------------------------------------------------------
+                                     45 ; global & static initialisations
+                                     46 ;--------------------------------------------------------
+                                     47 	.area HOME
+                                     48 	.area GSINIT
+                                     49 	.area GSFINAL
+                                     50 	.area GSINIT
+                                     51 ;--------------------------------------------------------
+                                     52 ; Home
+                                     53 ;--------------------------------------------------------
+                                     54 	.area HOME
+                                     55 	.area HOME
+                                     56 ;--------------------------------------------------------
+                                     57 ; code
+                                     58 ;--------------------------------------------------------
+                                     59 	.area CODE
+                                     60 ;	libs/i2c_lib.c: 3: void i2c_init(void)
+                                     61 ;	-----------------------------------------
+                                     62 ;	 function i2c_init
+                                     63 ;	-----------------------------------------
+      000000                         64 _i2c_init:
+                                     65 ;	libs/i2c_lib.c: 7: I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
+      000000 72 11 52 10      [ 1]   66 	bres	0x5210, #0
+                                     67 ;	libs/i2c_lib.c: 8: I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
+      000004 C6 52 12         [ 1]   68 	ld	a, 0x5212
+      000007 A4 C0            [ 1]   69 	and	a, #0xc0
+      000009 AA 10            [ 1]   70 	or	a, #0x10
+      00000B C7 52 12         [ 1]   71 	ld	0x5212, a
+                                     72 ;	libs/i2c_lib.c: 9: I2C_CCRH -> CCR = 0;// =0
+      00000E C6 52 1C         [ 1]   73 	ld	a, 0x521c
+      000011 A4 F0            [ 1]   74 	and	a, #0xf0
+      000013 C7 52 1C         [ 1]   75 	ld	0x521c, a
+                                     76 ;	libs/i2c_lib.c: 10: I2C_CCRL -> CCR = 80;// 100kHz for I2C
+      000016 35 50 52 1B      [ 1]   77 	mov	0x521b+0, #0x50
+                                     78 ;	libs/i2c_lib.c: 11: I2C_CCRH -> FS = 0;// set standart mode(100кHz)
+      00001A 72 1F 52 1C      [ 1]   79 	bres	0x521c, #7
+                                     80 ;	libs/i2c_lib.c: 12: I2C_OARH -> ADDMODE = 0;// 7-bit address mode
+      00001E 72 1F 52 14      [ 1]   81 	bres	0x5214, #7
+                                     82 ;	libs/i2c_lib.c: 13: I2C_OARH -> ADDCONF = 1;// see reference manual
+      000022 72 10 52 14      [ 1]   83 	bset	0x5214, #0
+                                     84 ;	libs/i2c_lib.c: 14: I2C_CR1 -> PE = 1;// PE=1, enable I2C
+      000026 72 10 52 10      [ 1]   85 	bset	0x5210, #0
+                                     86 ;	libs/i2c_lib.c: 15: }
+      00002A 81               [ 4]   87 	ret
+                                     88 ;	libs/i2c_lib.c: 17: void i2c_start(void)
+                                     89 ;	-----------------------------------------
+                                     90 ;	 function i2c_start
+                                     91 ;	-----------------------------------------
+      00002B                         92 _i2c_start:
+                                     93 ;	libs/i2c_lib.c: 19: I2C_CR2 -> START = 1;// Отправляем стартовый сигнал
+      00002B 72 10 52 11      [ 1]   94 	bset	0x5211, #0
+                                     95 ;	libs/i2c_lib.c: 20: while(!I2C_SR1 -> SB);// Ожидание отправки стартового сигнала
+      00002F                         96 00101$:
+      00002F 72 01 52 17 FB   [ 2]   97 	btjf	0x5217, #0, 00101$
+                                     98 ;	libs/i2c_lib.c: 21: }
+      000034 81               [ 4]   99 	ret
+                                    100 ;	libs/i2c_lib.c: 23: void i2c_stop(void)
+                                    101 ;	-----------------------------------------
+                                    102 ;	 function i2c_stop
+                                    103 ;	-----------------------------------------
+      000035                        104 _i2c_stop:
+                                    105 ;	libs/i2c_lib.c: 25: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала  
+      000035 72 12 52 11      [ 1]  106 	bset	0x5211, #1
+                                    107 ;	libs/i2c_lib.c: 26: }
+      000039 81               [ 4]  108 	ret
+                                    109 ;	libs/i2c_lib.c: 28: uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
+                                    110 ;	-----------------------------------------
+                                    111 ;	 function i2c_send_address
+                                    112 ;	-----------------------------------------
+      00003A                        113 _i2c_send_address:
+                                    114 ;	libs/i2c_lib.c: 33: address = address << 1;
+      00003A 48               [ 1]  115 	sll	a
+                                    116 ;	libs/i2c_lib.c: 30: switch(rw_type)
+      00003B 88               [ 1]  117 	push	a
+      00003C 7B 04            [ 1]  118 	ld	a, (0x04, sp)
+      00003E 4A               [ 1]  119 	dec	a
+      00003F 84               [ 1]  120 	pop	a
+      000040 26 02            [ 1]  121 	jrne	00102$
+                                    122 ;	libs/i2c_lib.c: 33: address = address << 1;
+                                    123 ;	libs/i2c_lib.c: 34: address |= 0x01; // Отправка адреса устройства с битом на чтение
+      000042 AA 01            [ 1]  124 	or	a, #0x01
+                                    125 ;	libs/i2c_lib.c: 35: break;
+                                    126 ;	libs/i2c_lib.c: 36: default:
+                                    127 ;	libs/i2c_lib.c: 37: address = address << 1; // Отправка адреса устройства с битом на запись
+                                    128 ;	libs/i2c_lib.c: 39: }
+      000044                        129 00102$:
+                                    130 ;	libs/i2c_lib.c: 40: i2c_start();
+      000044 88               [ 1]  131 	push	a
+      000045 CDr00r2B         [ 4]  132 	call	_i2c_start
+      000048 84               [ 1]  133 	pop	a
+                                    134 ;	libs/i2c_lib.c: 41: I2C_DR -> DR = address;
+      000049 C7 52 16         [ 1]  135 	ld	0x5216, a
+                                    136 ;	libs/i2c_lib.c: 42: while(!I2C_SR1 -> ADDR)
+      00004C                        137 00106$:
+      00004C AE 52 17         [ 2]  138 	ldw	x, #0x5217
+      00004F F6               [ 1]  139 	ld	a, (x)
+      000050 44               [ 1]  140 	srl	a
+      000051 A4 01            [ 1]  141 	and	a, #0x01
+      000053 26 08            [ 1]  142 	jrne	00108$
+                                    143 ;	libs/i2c_lib.c: 43: if(I2C_SR2 -> AF)
+      000055 72 05 52 18 F2   [ 2]  144 	btjf	0x5218, #2, 00106$
+                                    145 ;	libs/i2c_lib.c: 44: return 0;
+      00005A 4F               [ 1]  146 	clr	a
+      00005B 20 08            [ 2]  147 	jra	00109$
+      00005D                        148 00108$:
+                                    149 ;	libs/i2c_lib.c: 45: clr_sr1();
+      00005D C6 52 17         [ 1]  150 	ld	a,0x5217
+                                    151 ;	libs/i2c_lib.c: 46: clr_sr3();
+      000060 C6 52 19         [ 1]  152 	ld	a,0x5219
+                                    153 ;	libs/i2c_lib.c: 47: return 1;
+      000063 A6 01            [ 1]  154 	ld	a, #0x01
+      000065                        155 00109$:
+                                    156 ;	libs/i2c_lib.c: 48: }
+      000065 85               [ 2]  157 	popw	x
+      000066 5B 01            [ 2]  158 	addw	sp, #1
+      000068 FC               [ 2]  159 	jp	(x)
+                                    160 ;	libs/i2c_lib.c: 50: uint8_t i2c_read_byte(void)
+                                    161 ;	-----------------------------------------
+                                    162 ;	 function i2c_read_byte
+                                    163 ;	-----------------------------------------
+      000069                        164 _i2c_read_byte:
+                                    165 ;	libs/i2c_lib.c: 52: while(!I2C_SR1 -> RXNE);
+      000069                        166 00101$:
+      000069 72 0D 52 17 FB   [ 2]  167 	btjf	0x5217, #6, 00101$
+                                    168 ;	libs/i2c_lib.c: 53: return I2C_DR -> DR;
+      00006E C6 52 16         [ 1]  169 	ld	a, 0x5216
+                                    170 ;	libs/i2c_lib.c: 54: }
+      000071 81               [ 4]  171 	ret
+                                    172 ;	libs/i2c_lib.c: 56: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data)
+                                    173 ;	-----------------------------------------
+                                    174 ;	 function i2c_read
+                                    175 ;	-----------------------------------------
+      000072                        176 _i2c_read:
+      000072 52 04            [ 2]  177 	sub	sp, #4
+                                    178 ;	libs/i2c_lib.c: 58: if(i2c_send_address(dev_addr, 1))//проверка на ACK
+      000074 4B 01            [ 1]  179 	push	#0x01
+      000076 CDr00r3A         [ 4]  180 	call	_i2c_send_address
+      000079 4D               [ 1]  181 	tnz	a
+      00007A 27 3C            [ 1]  182 	jreq	00103$
+                                    183 ;	libs/i2c_lib.c: 60: I2C_CR2 -> ACK = 1;//включение ответа на посылки 
+      00007C 72 14 52 11      [ 1]  184 	bset	0x5211, #2
+                                    185 ;	libs/i2c_lib.c: 61: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
+      000080 5F               [ 1]  186 	clrw	x
+      000081 1F 03            [ 2]  187 	ldw	(0x03, sp), x
+      000083                        188 00105$:
+      000083 5F               [ 1]  189 	clrw	x
+      000084 7B 07            [ 1]  190 	ld	a, (0x07, sp)
+      000086 97               [ 1]  191 	ld	xl, a
+      000087 5A               [ 2]  192 	decw	x
+      000088 1F 01            [ 2]  193 	ldw	(0x01, sp), x
+      00008A 1E 03            [ 2]  194 	ldw	x, (0x03, sp)
+      00008C 13 01            [ 2]  195 	cpw	x, (0x01, sp)
+      00008E 2E 12            [ 1]  196 	jrsge	00101$
+                                    197 ;	libs/i2c_lib.c: 63: data[i] = i2c_read_byte();//функция записи байта в элемент массива
+      000090 1E 08            [ 2]  198 	ldw	x, (0x08, sp)
+      000092 72 FB 03         [ 2]  199 	addw	x, (0x03, sp)
+      000095 89               [ 2]  200 	pushw	x
+      000096 CDr00r69         [ 4]  201 	call	_i2c_read_byte
+      000099 85               [ 2]  202 	popw	x
+      00009A F7               [ 1]  203 	ld	(x), a
+                                    204 ;	libs/i2c_lib.c: 61: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
+      00009B 1E 03            [ 2]  205 	ldw	x, (0x03, sp)
+      00009D 5C               [ 1]  206 	incw	x
+      00009E 1F 03            [ 2]  207 	ldw	(0x03, sp), x
+      0000A0 20 E1            [ 2]  208 	jra	00105$
+      0000A2                        209 00101$:
+                                    210 ;	libs/i2c_lib.c: 65: I2C_CR2 -> ACK = 0;//выключение ответа на посылки
+      0000A2 C6 52 11         [ 1]  211 	ld	a, 0x5211
+      0000A5 A4 FB            [ 1]  212 	and	a, #0xfb
+      0000A7 C7 52 11         [ 1]  213 	ld	0x5211, a
+                                    214 ;	libs/i2c_lib.c: 67: data[size-1] = i2c_read_byte();
+      0000AA 1E 08            [ 2]  215 	ldw	x, (0x08, sp)
+      0000AC 72 FB 01         [ 2]  216 	addw	x, (0x01, sp)
+      0000AF 89               [ 2]  217 	pushw	x
+      0000B0 CDr00r69         [ 4]  218 	call	_i2c_read_byte
+      0000B3 85               [ 2]  219 	popw	x
+      0000B4 F7               [ 1]  220 	ld	(x), a
+                                    221 ;	libs/i2c_lib.c: 69: i2c_stop();
+      0000B5 CDr00r35         [ 4]  222 	call	_i2c_stop
+      0000B8                        223 00103$:
+                                    224 ;	libs/i2c_lib.c: 72: i2c_stop();
+      0000B8 1E 05            [ 2]  225 	ldw	x, (5, sp)
+      0000BA 1F 08            [ 2]  226 	ldw	(8, sp), x
+      0000BC 5B 07            [ 2]  227 	addw	sp, #7
+                                    228 ;	libs/i2c_lib.c: 74: }
+      0000BE CCr00r35         [ 2]  229 	jp	_i2c_stop
+                                    230 ;	libs/i2c_lib.c: 76: uint8_t i2c_send_byte(uint8_t data)
+                                    231 ;	-----------------------------------------
+                                    232 ;	 function i2c_send_byte
+                                    233 ;	-----------------------------------------
+      0000C1                        234 _i2c_send_byte:
+                                    235 ;	libs/i2c_lib.c: 78: I2C_DR -> DR = data; //Отправка данных
+      0000C1 C7 52 16         [ 1]  236 	ld	0x5216, a
+                                    237 ;	libs/i2c_lib.c: 79: while(!I2C_SR1 -> TXE)
+      0000C4                        238 00103$:
+      0000C4 72 0E 52 17 08   [ 2]  239 	btjt	0x5217, #7, 00105$
+                                    240 ;	libs/i2c_lib.c: 80: if(I2C_SR2 -> AF)
+      0000C9 72 05 52 18 F6   [ 2]  241 	btjf	0x5218, #2, 00103$
+                                    242 ;	libs/i2c_lib.c: 81: return 1;
+      0000CE A6 01            [ 1]  243 	ld	a, #0x01
+      0000D0 81               [ 4]  244 	ret
+      0000D1                        245 00105$:
+                                    246 ;	libs/i2c_lib.c: 82: return 0;//флаг ответа
+      0000D1 4F               [ 1]  247 	clr	a
+                                    248 ;	libs/i2c_lib.c: 83: }
+      0000D2 81               [ 4]  249 	ret
+                                    250 ;	libs/i2c_lib.c: 85: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
+                                    251 ;	-----------------------------------------
+                                    252 ;	 function i2c_write
+                                    253 ;	-----------------------------------------
+      0000D3                        254 _i2c_write:
+      0000D3 52 02            [ 2]  255 	sub	sp, #2
+                                    256 ;	libs/i2c_lib.c: 87: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
+      0000D5 4B 00            [ 1]  257 	push	#0x00
+      0000D7 CDr00r3A         [ 4]  258 	call	_i2c_send_address
+      0000DA 4D               [ 1]  259 	tnz	a
+      0000DB 27 1D            [ 1]  260 	jreq	00105$
+                                    261 ;	libs/i2c_lib.c: 88: for(int i = 0;i < size;i++)
+      0000DD 5F               [ 1]  262 	clrw	x
+      0000DE                        263 00107$:
+      0000DE 7B 05            [ 1]  264 	ld	a, (0x05, sp)
+      0000E0 6B 02            [ 1]  265 	ld	(0x02, sp), a
+      0000E2 0F 01            [ 1]  266 	clr	(0x01, sp)
+      0000E4 13 01            [ 2]  267 	cpw	x, (0x01, sp)
+      0000E6 2E 12            [ 1]  268 	jrsge	00105$
+                                    269 ;	libs/i2c_lib.c: 90: if(i2c_send_byte(data[i]))//Проверка на АСК бит
+      0000E8 90 93            [ 1]  270 	ldw	y, x
+      0000EA 72 F9 06         [ 2]  271 	addw	y, (0x06, sp)
+      0000ED 90 F6            [ 1]  272 	ld	a, (y)
+      0000EF 89               [ 2]  273 	pushw	x
+      0000F0 CDr00rC1         [ 4]  274 	call	_i2c_send_byte
+      0000F3 85               [ 2]  275 	popw	x
+      0000F4 4D               [ 1]  276 	tnz	a
+      0000F5 26 03            [ 1]  277 	jrne	00105$
+                                    278 ;	libs/i2c_lib.c: 88: for(int i = 0;i < size;i++)
+      0000F7 5C               [ 1]  279 	incw	x
+      0000F8 20 E4            [ 2]  280 	jra	00107$
+      0000FA                        281 00105$:
+                                    282 ;	libs/i2c_lib.c: 95: i2c_stop();
+      0000FA 1E 03            [ 2]  283 	ldw	x, (3, sp)
+      0000FC 1F 06            [ 2]  284 	ldw	(6, sp), x
+      0000FE 5B 05            [ 2]  285 	addw	sp, #5
+                                    286 ;	libs/i2c_lib.c: 96: }
+      000100 CCr00r35         [ 2]  287 	jp	_i2c_stop
+                                    288 ;	libs/i2c_lib.c: 98: uint8_t i2c_scan(void) 
+                                    289 ;	-----------------------------------------
+                                    290 ;	 function i2c_scan
+                                    291 ;	-----------------------------------------
+      000103                        292 _i2c_scan:
+      000103 52 02            [ 2]  293 	sub	sp, #2
+                                    294 ;	libs/i2c_lib.c: 100: for (uint8_t addr = 1; addr < 127; addr++)
+      000105 A6 01            [ 1]  295 	ld	a, #0x01
+      000107 6B 01            [ 1]  296 	ld	(0x01, sp), a
+      000109                        297 00105$:
+      000109 A1 7F            [ 1]  298 	cp	a, #0x7f
+      00010B 24 22            [ 1]  299 	jrnc	00103$
+                                    300 ;	libs/i2c_lib.c: 102: if(i2c_send_address(addr, 0))//отправка адреса на проверку 
+      00010D 88               [ 1]  301 	push	a
+      00010E 4B 00            [ 1]  302 	push	#0x00
+      000110 CDr00r3A         [ 4]  303 	call	_i2c_send_address
+      000113 6B 03            [ 1]  304 	ld	(0x03, sp), a
+      000115 84               [ 1]  305 	pop	a
+      000116 0D 02            [ 1]  306 	tnz	(0x02, sp)
+      000118 27 07            [ 1]  307 	jreq	00102$
+                                    308 ;	libs/i2c_lib.c: 104: i2c_stop();//адрес совпал 
+      00011A CDr00r35         [ 4]  309 	call	_i2c_stop
+                                    310 ;	libs/i2c_lib.c: 105: return addr;// выход из цикла
+      00011D 7B 01            [ 1]  311 	ld	a, (0x01, sp)
+      00011F 20 12            [ 2]  312 	jra	00107$
+      000121                        313 00102$:
+                                    314 ;	libs/i2c_lib.c: 107: I2C_SR2 -> AF = 0;//очистка флага ошибки
+      000121 AE 52 18         [ 2]  315 	ldw	x, #0x5218
+      000124 88               [ 1]  316 	push	a
+      000125 F6               [ 1]  317 	ld	a, (x)
+      000126 A4 FB            [ 1]  318 	and	a, #0xfb
+      000128 F7               [ 1]  319 	ld	(x), a
+      000129 84               [ 1]  320 	pop	a
+                                    321 ;	libs/i2c_lib.c: 100: for (uint8_t addr = 1; addr < 127; addr++)
+      00012A 4C               [ 1]  322 	inc	a
+      00012B 6B 01            [ 1]  323 	ld	(0x01, sp), a
+      00012D 20 DA            [ 2]  324 	jra	00105$
+      00012F                        325 00103$:
+                                    326 ;	libs/i2c_lib.c: 109: i2c_stop();//совпадений нет выход из функции
+      00012F CDr00r35         [ 4]  327 	call	_i2c_stop
+                                    328 ;	libs/i2c_lib.c: 110: return 0;
+      000132 4F               [ 1]  329 	clr	a
+      000133                        330 00107$:
+                                    331 ;	libs/i2c_lib.c: 111: }
+      000133 5B 02            [ 2]  332 	addw	sp, #2
+      000135 81               [ 4]  333 	ret
+                                    334 	.area CODE
+                                    335 	.area CONST
+                                    336 	.area INITIALIZER
+      000000                        337 __xinit__I2C_IRQ:
+      000000 00                     338 	.db #0x00	; 0
+                                    339 	.area CABS (ABS)

@@ -1,5 +1,5 @@
-#ifndef UART_LIB_H
-#define UART_LIB_H
+#ifndef _UART_LIB_H
+#define _UART_LIB_H
 
 #include <stdint.h>
 

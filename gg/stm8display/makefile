@@ -1,44 +1,41 @@
-## Select one of these
-#DEVICE=stm8s003f3
 DEVICE=stm8s103f3
 
-## A directory for common include files
-COMMONDIR =  ../libs
+COMMONDIR = ./libs
 
-## Get program name from enclosing directory name
 PROGRAM = $(lastword $(subst /, ,$(CURDIR)))
 
-SOURCES=$(wildcard *.c $(COMMONDIR)/*.c)
-OBJECTS=$(SOURCES:.c=.rel)
-HEADERS=$(wildcard *.h $(COMMONDIR)/*.h)
+# Определяем исходные файлы
+SOURCES = main.c $(wildcard $(COMMONDIR)/*.c)
+OBJECTS = $(SOURCES:.c=.rel)
+HEADERS = $(wildcard *.h $(COMMONDIR)/*.h)
 
 CC = sdcc
 PROGRAMMER = stlinkv2
 
-
-DEFINES=
-## Set MCU-type DEFINE
-ifeq ($(DEVICE),stm8s003f3)
-    DEFINES += -DSTM8S003
-endif
-ifeq ($(DEVICE),stm8s103f3)
-    DEFINES += -DSTM8S103
-endif
-
-CPPFLAGS = -I $(COMMONDIR)
-CFLAGS = --std-sdcc99 -mstm8 $(DEFINES)
+CPPFLAGS = -I$(COMMONDIR)
+CFLAGS = --std-sdcc99 -mstm8 -DSTM8S103
 LDFLAGS = -lstm8 -mstm8 --out-fmt-ihx
 
 .PHONY: all clean flash
 
-$(PROGRAM).ihx: $(OBJECTS)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+# Основная цель
+all: $(PROGRAM).ihx
 
-%.rel : %.c $(HEADERS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+# Цель для прошивки
+$(PROGRAM).ihx: main.rel $(OBJECTS)
+	$(CC) $(LDFLAGS) main.rel $(OBJECTS) -o $@
+
+# Правила для компиляции каждого файла отдельно
+%.rel: %.c $(HEADERS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+
+# Цель для компиляции main.c отдельно
+main.rel: main.c $(HEADERS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
 
 CCOMPILEDFILES=$(SOURCES:.c=.asm) $(SOURCES:.c=.lst) $(SOURCES:.c=.rel) \
                $(SOURCES:.c=.rst) $(SOURCES:.c=.sym)
+
 clean:
 	rm -f $(PROGRAM).ihx $(PROGRAM).cdb $(PROGRAM).lk $(PROGRAM).map $(CCOMPILEDFILES)
 

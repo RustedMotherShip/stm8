@@ -7,5 +7,9 @@
 -l stm8
 -l stm8
 main.rel
+main.rel
+./libs/i2c_lib.rel
+./libs/ssd1306_lib.rel
+./libs/uart_lib.rel
 
 -e

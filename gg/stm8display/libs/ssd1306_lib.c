@@ -1,5 +1,25 @@
 #include "ssd1306_lib.h"
 
+int get_bit(int data,int bit)
+{
+    return ((data >> bit) & 1) ? 1 : 0;
+}
+int set_bit(int data,int bit, int value)
+{
+    int mask = 1 << bit ;
+    switch(value)
+    {
+        case 1:
+            data |= mask;
+        break;
+
+        default:
+            data &= ~mask;
+        break;
+    }
+    return data;
+}
+
 void display_init(void)
 {
     uint8_t setup_buf[7] = {0x00,0xAE,0xD5,0x80,0xA8,0x1F,0xAF};

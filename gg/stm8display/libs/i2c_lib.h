@@ -1,5 +1,7 @@
-#ifndef I2C_LIB_H
-#define I2C_LIB_H
+#ifndef _I2C_LIB_H
+#define _I2C_LIB_H
+
+#include <stdint.h>
 
 struct I2C_CR1_
 {
@@ -154,7 +156,7 @@ struct I2C_IRQ_
 
 #define I2C_vector 0x13
 
-I2C_IRQ_t I2C_IRQ = {0};
+extern I2C_IRQ_t I2C_IRQ = {0};
 
 #define wfi() {__asm__("wfi\n");}
 #define clr_sr1() {__asm__("ld a,0x5217\n");}  // очистка SR1 	
