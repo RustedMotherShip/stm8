@@ -62,19 +62,7 @@ void i2c_irq(void) __interrupt(I2C_vector)
 
   enableInterrupts(); 
 }
-void i2c_init(void)
-{
-    // Включение I2C
-    //----------- Setup I2C ------------------------
-    I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
-    I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
-    I2C_CCRH -> CCR = 0;// =0
-    I2C_CCRL -> CCR = 80;// 100kHz for I2C
-    I2C_CCRH -> FS = 0;// set standart mode(100кHz)
-    I2C_OARH -> ADDMODE = 0;// 7-bit address mode
-    I2C_OARH -> ADDCONF = 1;// see reference manual
-    I2C_CR1 -> PE = 1;// PE=1, enable I2C
-}
+z
 
 void i2c_start(void)
 {

@@ -10,6 +10,7 @@ Symbol Table
   2 _I2C_IRQ                                                       000200 GR
     ___sdcc_external_startup                                       ****** GX
   5 __interrupt_vect                                               000000 R
+    __modsint                                                      ****** GX
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000054 R
   3 __start__stack                                                 000000 R
@@ -17,18 +18,37 @@ Symbol Table
   9 __xinit__splash                                                000000 R
   1 _buf_pos                                                       000004 GR
   1 _buf_size                                                      000005 GR
-    _display_buffer_fill_entire                                    ****** GX
-    _display_clean                                                 ****** GX
-    _display_init                                                  ****** GX
-  A _gg                                                            000009 GR
-    _i2c_init                                                      ****** GX
-  A _main                                                          000015 GR
+  A _get_bit                                                       000354 GR
+  A _gg                                                            000741 GR
+  A _i2c_init                                                      00021E GR
+  A _i2c_read                                                      000290 GR
+  A _i2c_read_byte                                                 000287 GR
+  A _i2c_scan                                                      000321 GR
+  A _i2c_send_address                                              000258 GR
+  A _i2c_send_byte                                                 0002DF GR
+  A _i2c_start                                                     000249 GR
+  A _i2c_stop                                                      000253 GR
+  A _i2c_write                                                     0002F1 GR
+  A _main                                                          00074D GR
   1 _rx_buf_pointer                                                000002 GR
-  A _setup                                                         000000 GR
+  A _set_bit                                                       000369 GR
+  A _setup                                                         000738 GR
   2 _splash                                                        000000 GR
+  A _ssd1306_buffer_fill_entire                                    00047F GR
+  A _ssd1306_clean                                                 000617 GR
+  A _ssd1306_draw_pixel                                            000434 GR
+  A _ssd1306_init                                                  00039C GR
+  A _ssd1306_set_params_to_write                                   000410 GR
   1 _tx_buf_pointer                                                000000 GR
-    _uart_reciever_irq                                             ****** GX
-    _uart_transmission_irq                                         ****** GX
+  A _uart_init                                                     0000B7 GR
+  A _uart_read                                                     0001F0 GR
+  A _uart_read_byte                                                0001B9 GR
+  A _uart_read_irq                                                 000099 GR
+  A _uart_reciever_irq                                             00003C GR
+  A _uart_transmission_irq                                         000000 GR
+  A _uart_write                                                    0001CC GR
+  A _uart_write_byte                                               0001C1 GR
+  A _uart_write_irq                                                00006F GR
     l_DATA                                                         ****** GX
     l_INITIALIZER                                                  ****** GX
     s_DATA                                                         ****** GX
@@ -52,6 +72,6 @@ Area Table
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size      0   flags    0
    9 INITIALIZER                                size    201   flags    0
-   A CODE                                       size     1E   flags    0
+   A CODE                                       size    756   flags    0
    B CABS                                       size      0   flags    8
 

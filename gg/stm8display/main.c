@@ -13,12 +13,12 @@ void setup(void)
 
 void gg(void)
 {
-    display_init();
-    display_clean();
-    display_buffer_fill_entire(splash);
+    ssd1306_init();
+    ssd1306_clean();
+    ssd1306_buffer_splash();
     
 }
-
+ 
 int main(void)
 {
     setup();

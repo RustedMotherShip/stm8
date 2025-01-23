@@ -156,7 +156,7 @@ struct I2C_IRQ_
 
 #define I2C_vector 0x13
 
-extern I2C_IRQ_t I2C_IRQ = {0};
+I2C_IRQ_t I2C_IRQ = {0};
 
 #define wfi() {__asm__("wfi\n");}
 #define clr_sr1() {__asm__("ld a,0x5217\n");}  // очистка SR1 	
