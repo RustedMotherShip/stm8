@@ -11,10 +11,50 @@
 	.globl _main
 	.globl _gg
 	.globl _setup
+	.globl _ssd1306_send_buffer
+	.globl _ssd1306_buffer_clean
 	.globl _set_bit
 	.globl _get_bit
+	.globl _i2c_irq
+	.globl _memset
+	.globl _main_buffer
+	.globl _ttf_eng_0
+	.globl _ttf_eng_9
+	.globl _ttf_eng_8
+	.globl _ttf_eng_7
+	.globl _ttf_eng_6
+	.globl _ttf_eng_5
+	.globl _ttf_eng_4
+	.globl _ttf_eng_3
+	.globl _ttf_eng_2
+	.globl _ttf_eng_1
+	.globl _ttf_eng_z
+	.globl _ttf_eng_y
+	.globl _ttf_eng_x
+	.globl _ttf_eng_w
+	.globl _ttf_eng_v
+	.globl _ttf_eng_u
+	.globl _ttf_eng_t
+	.globl _ttf_eng_s
+	.globl _ttf_eng_r
+	.globl _ttf_eng_q
+	.globl _ttf_eng_p
+	.globl _ttf_eng_o
+	.globl _ttf_eng_n
+	.globl _ttf_eng_m
+	.globl _ttf_eng_l
+	.globl _ttf_eng_k
+	.globl _ttf_eng_j
+	.globl _ttf_eng_i
+	.globl _ttf_eng_h
+	.globl _ttf_eng_g
+	.globl _ttf_eng_f
+	.globl _ttf_eng_e
+	.globl _ttf_eng_d
+	.globl _ttf_eng_c
+	.globl _ttf_eng_b
+	.globl _ttf_eng_a
 	.globl _I2C_IRQ
-	.globl _splash
 	.globl _buf_size
 	.globl _buf_pos
 	.globl _rx_buf_pointer
@@ -37,10 +77,13 @@
 	.globl _i2c_send_byte
 	.globl _i2c_write
 	.globl _i2c_scan
+	.globl _i2c_start_irq
+	.globl _i2c_stop_irq
 	.globl _ssd1306_init
 	.globl _ssd1306_set_params_to_write
 	.globl _ssd1306_draw_pixel
-	.globl _ssd1306_buffer_fill_entire
+	.globl _ssd1306_buffer_splash
+	.globl _ssd1306_buffer_write
 	.globl _ssd1306_clean
 ;--------------------------------------------------------
 ; ram data
@@ -58,10 +101,82 @@ _buf_size::
 ; ram data
 ;--------------------------------------------------------
 	.area INITIALIZED
-_splash::
-	.ds 512
 _I2C_IRQ::
 	.ds 1
+_ttf_eng_a::
+	.ds 8
+_ttf_eng_b::
+	.ds 8
+_ttf_eng_c::
+	.ds 8
+_ttf_eng_d::
+	.ds 8
+_ttf_eng_e::
+	.ds 8
+_ttf_eng_f::
+	.ds 8
+_ttf_eng_g::
+	.ds 8
+_ttf_eng_h::
+	.ds 8
+_ttf_eng_i::
+	.ds 8
+_ttf_eng_j::
+	.ds 8
+_ttf_eng_k::
+	.ds 8
+_ttf_eng_l::
+	.ds 8
+_ttf_eng_m::
+	.ds 8
+_ttf_eng_n::
+	.ds 8
+_ttf_eng_o::
+	.ds 8
+_ttf_eng_p::
+	.ds 8
+_ttf_eng_q::
+	.ds 8
+_ttf_eng_r::
+	.ds 8
+_ttf_eng_s::
+	.ds 8
+_ttf_eng_t::
+	.ds 8
+_ttf_eng_u::
+	.ds 8
+_ttf_eng_v::
+	.ds 8
+_ttf_eng_w::
+	.ds 8
+_ttf_eng_x::
+	.ds 8
+_ttf_eng_y::
+	.ds 8
+_ttf_eng_z::
+	.ds 8
+_ttf_eng_1::
+	.ds 8
+_ttf_eng_2::
+	.ds 8
+_ttf_eng_3::
+	.ds 8
+_ttf_eng_4::
+	.ds 8
+_ttf_eng_5::
+	.ds 8
+_ttf_eng_6::
+	.ds 8
+_ttf_eng_7::
+	.ds 8
+_ttf_eng_8::
+	.ds 8
+_ttf_eng_9::
+	.ds 8
+_ttf_eng_0::
+	.ds 8
+_main_buffer::
+	.ds 512
 ;--------------------------------------------------------
 ; Stack segment in internal ram
 ;--------------------------------------------------------
@@ -108,6 +223,7 @@ __interrupt_vect:
 	int 0x000000 ; int16
 	int _uart_transmission_irq ; int17
 	int _uart_reciever_irq ; int18
+	int _i2c_irq ; int19
 ;--------------------------------------------------------
 ; global & static initialisations
 ;--------------------------------------------------------
@@ -558,132 +674,262 @@ _uart_read:
 	popw	y
 	addw	sp, #2
 	jp	(y)
-;	./libs/i2c_lib.c: 3: void i2c_init(void)
+;	./libs/i2c_lib.c: 3: void i2c_irq(void) __interrupt(I2C_vector)
+;	-----------------------------------------
+;	 function i2c_irq
+;	-----------------------------------------
+_i2c_irq:
+	clr	a
+	div	x, a
+;	./libs/i2c_lib.c: 6: disableInterrupts();
+	sim
+;	./libs/i2c_lib.c: 7: I2C_IRQ.all = 0;//обнуление флагов регистров
+	mov	_I2C_IRQ+0, #0x00
+;	./libs/i2c_lib.c: 9: if(I2C_SR1 -> ADDR)//прерывание адреса
+	ldw	x, #0x5217
+	ld	a, (x)
+	srl	a
+	and	a, #0x01
+	jreq	00102$
+;	./libs/i2c_lib.c: 11: clr_sr1();
+	ld	a,0x5217
+;	./libs/i2c_lib.c: 12: I2C_IRQ.ADDR = 1;
+	bset	_I2C_IRQ+0, #1
+;	./libs/i2c_lib.c: 13: clr_sr3();//EV6
+	ld	a,0x5219
+;	./libs/i2c_lib.c: 14: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 15: uart_write_byte(0xE1);
+	ld	a, #0xe1
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 16: return;
+	jp	00113$
+00102$:
+;	./libs/i2c_lib.c: 19: if(I2C_SR1 -> TXE) //прерывание регистра данных(он пуст)
+	ld	a, 0x5217
+	swap	a
+	srl	a
+	srl	a
+	srl	a
+	bcp	a, #0x01
+	jreq	00104$
+;	./libs/i2c_lib.c: 21: I2C_IRQ.TXE = 1;
+	bset	_I2C_IRQ+0, #4
+;	./libs/i2c_lib.c: 22: I2C_ITR -> ITBUFEN = 0;
+	bres	0x521a, #2
+;	./libs/i2c_lib.c: 23: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 24: I2C_ITR -> ITERREN = 0;
+	bres	0x521a, #0
+;	./libs/i2c_lib.c: 25: uart_write_byte(0xEA);
+	ld	a, #0xea
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 26: return;
+	jra	00113$
+00104$:
+;	./libs/i2c_lib.c: 28: if(I2C_SR1 -> RXNE) //прерывание регистра данных(он не пуст)
+	ld	a, 0x5217
+	swap	a
+	srl	a
+	srl	a
+	bcp	a, #0x01
+	jreq	00106$
+;	./libs/i2c_lib.c: 30: I2C_IRQ.RXNE = 1;
+	bset	_I2C_IRQ+0, #3
+;	./libs/i2c_lib.c: 31: I2C_ITR -> ITBUFEN = 0;
+	bres	0x521a, #2
+;	./libs/i2c_lib.c: 32: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 33: I2C_ITR -> ITERREN = 0;
+	bres	0x521a, #0
+;	./libs/i2c_lib.c: 34: uart_write_byte(0xEB);
+	ld	a, #0xeb
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 35: return;
+	jra	00113$
+00106$:
+;	./libs/i2c_lib.c: 38: if(I2C_SR1 -> SB)//EV5 прерывание стартового импульса
+	ld	a, 0x5217
+	bcp	a, #0x01
+	jreq	00108$
+;	./libs/i2c_lib.c: 40: I2C_IRQ.SB = 1;
+	bset	_I2C_IRQ+0, #0
+;	./libs/i2c_lib.c: 41: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 42: uart_write_byte(0xE2);
+	ld	a, #0xe2
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 43: return;
+	jra	00113$
+00108$:
+;	./libs/i2c_lib.c: 45: if(I2C_SR1 -> BTF) //прерывание отправки данных
+	ld	a, 0x5217
+	srl	a
+	srl	a
+	bcp	a, #0x01
+	jreq	00110$
+;	./libs/i2c_lib.c: 47: I2C_IRQ.BTF = 1;
+	bset	_I2C_IRQ+0, #2
+;	./libs/i2c_lib.c: 48: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 49: uart_write_byte(0xE3);
+	ld	a, #0xe3
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 50: return;
+	jra	00113$
+00110$:
+;	./libs/i2c_lib.c: 53: if(I2C_SR2 -> AF) //прерывание ошибки NACK
+	ldw	x, #0x5218
+	ld	a, (x)
+	srl	a
+	srl	a
+	and	a, #0x01
+	jreq	00112$
+;	./libs/i2c_lib.c: 55: I2C_IRQ.AF = 1;
+	bset	_I2C_IRQ+0, #5
+;	./libs/i2c_lib.c: 56: I2C_ITR -> ITEVTEN = 0;
+	bres	0x521a, #1
+;	./libs/i2c_lib.c: 57: I2C_ITR -> ITERREN = 0;
+	bres	0x521a, #0
+;	./libs/i2c_lib.c: 58: I2C_ITR -> ITBUFEN = 0;
+	bres	0x521a, #2
+;	./libs/i2c_lib.c: 59: uart_write_byte(0xEE);
+	ld	a, #0xee
+	call	_uart_write_byte
+;	./libs/i2c_lib.c: 60: return;
+	jra	00113$
+00112$:
+;	./libs/i2c_lib.c: 63: enableInterrupts(); 
+	rim
+00113$:
+;	./libs/i2c_lib.c: 64: }
+	iret
+;	./libs/i2c_lib.c: 66: void i2c_init(void)
 ;	-----------------------------------------
 ;	 function i2c_init
 ;	-----------------------------------------
 _i2c_init:
-;	./libs/i2c_lib.c: 7: I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
+;	./libs/i2c_lib.c: 70: I2C_CR1 -> PE = 0;// PE=0, disable I2C before setup
 	bres	0x5210, #0
-;	./libs/i2c_lib.c: 8: I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
+;	./libs/i2c_lib.c: 71: I2C_FREQR -> FREQ = 16;// peripheral frequence =16MHz
 	ld	a, 0x5212
 	and	a, #0xc0
 	or	a, #0x10
 	ld	0x5212, a
-;	./libs/i2c_lib.c: 9: I2C_CCRH -> CCR = 0;// =0
+;	./libs/i2c_lib.c: 72: I2C_CCRH -> CCR = 0;// =0
 	ld	a, 0x521c
 	and	a, #0xf0
 	ld	0x521c, a
-;	./libs/i2c_lib.c: 10: I2C_CCRL -> CCR = 80;// 100kHz for I2C
+;	./libs/i2c_lib.c: 73: I2C_CCRL -> CCR = 80;// 100kHz for I2C
 	mov	0x521b+0, #0x50
-;	./libs/i2c_lib.c: 11: I2C_CCRH -> FS = 0;// set standart mode(100кHz)
+;	./libs/i2c_lib.c: 74: I2C_CCRH -> FS = 0;// set standart mode(100кHz)
 	bres	0x521c, #7
-;	./libs/i2c_lib.c: 12: I2C_OARH -> ADDMODE = 0;// 7-bit address mode
+;	./libs/i2c_lib.c: 75: I2C_OARH -> ADDMODE = 0;// 7-bit address mode
 	bres	0x5214, #7
-;	./libs/i2c_lib.c: 13: I2C_OARH -> ADDCONF = 1;// see reference manual
+;	./libs/i2c_lib.c: 76: I2C_OARH -> ADDCONF = 1;// see reference manual
 	bset	0x5214, #0
-;	./libs/i2c_lib.c: 14: I2C_CR1 -> PE = 1;// PE=1, enable I2C
+;	./libs/i2c_lib.c: 77: I2C_CR1 -> PE = 1;// PE=1, enable I2C
 	bset	0x5210, #0
-;	./libs/i2c_lib.c: 15: }
+;	./libs/i2c_lib.c: 78: }
 	ret
-;	./libs/i2c_lib.c: 17: void i2c_start(void)
+;	./libs/i2c_lib.c: 80: void i2c_start(void)
 ;	-----------------------------------------
 ;	 function i2c_start
 ;	-----------------------------------------
 _i2c_start:
-;	./libs/i2c_lib.c: 19: I2C_CR2 -> START = 1;// Отправляем стартовый сигнал
+;	./libs/i2c_lib.c: 82: I2C_CR2 -> START = 1;// Отправляем стартовый сигнал
 	bset	0x5211, #0
-;	./libs/i2c_lib.c: 20: while(!I2C_SR1 -> SB);// Ожидание отправки стартового сигнала
+;	./libs/i2c_lib.c: 83: while(!I2C_SR1 -> SB);// Ожидание отправки стартового сигнала
 00101$:
 	btjf	0x5217, #0, 00101$
-;	./libs/i2c_lib.c: 21: }
+;	./libs/i2c_lib.c: 84: }
 	ret
-;	./libs/i2c_lib.c: 23: void i2c_stop(void)
+;	./libs/i2c_lib.c: 86: void i2c_stop(void)
 ;	-----------------------------------------
 ;	 function i2c_stop
 ;	-----------------------------------------
 _i2c_stop:
-;	./libs/i2c_lib.c: 25: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала  
+;	./libs/i2c_lib.c: 88: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала  
 	bset	0x5211, #1
-;	./libs/i2c_lib.c: 26: }
+;	./libs/i2c_lib.c: 89: }
 	ret
-;	./libs/i2c_lib.c: 28: uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
+;	./libs/i2c_lib.c: 91: uint8_t i2c_send_address(uint8_t address,uint8_t rw_type) 
 ;	-----------------------------------------
 ;	 function i2c_send_address
 ;	-----------------------------------------
 _i2c_send_address:
-;	./libs/i2c_lib.c: 33: address = address << 1;
+;	./libs/i2c_lib.c: 96: address = address << 1;
 	sll	a
-;	./libs/i2c_lib.c: 30: switch(rw_type)
+;	./libs/i2c_lib.c: 93: switch(rw_type)
 	push	a
 	ld	a, (0x04, sp)
 	dec	a
 	pop	a
 	jrne	00102$
-;	./libs/i2c_lib.c: 33: address = address << 1;
-;	./libs/i2c_lib.c: 34: address |= 0x01; // Отправка адреса устройства с битом на чтение
+;	./libs/i2c_lib.c: 96: address = address << 1;
+;	./libs/i2c_lib.c: 97: address |= 0x01; // Отправка адреса устройства с битом на чтение
 	or	a, #0x01
-;	./libs/i2c_lib.c: 35: break;
-;	./libs/i2c_lib.c: 36: default:
-;	./libs/i2c_lib.c: 37: address = address << 1; // Отправка адреса устройства с битом на запись
-;	./libs/i2c_lib.c: 39: }
+;	./libs/i2c_lib.c: 98: break;
+;	./libs/i2c_lib.c: 99: default:
+;	./libs/i2c_lib.c: 100: address = address << 1; // Отправка адреса устройства с битом на запись
+;	./libs/i2c_lib.c: 102: }
 00102$:
-;	./libs/i2c_lib.c: 40: i2c_start();
+;	./libs/i2c_lib.c: 103: i2c_start();
 	push	a
 	call	_i2c_start
 	pop	a
-;	./libs/i2c_lib.c: 41: I2C_DR -> DR = address;
+;	./libs/i2c_lib.c: 104: I2C_DR -> DR = address;
 	ld	0x5216, a
-;	./libs/i2c_lib.c: 42: while(!I2C_SR1 -> ADDR)
+;	./libs/i2c_lib.c: 105: while(!I2C_SR1 -> ADDR)
 00106$:
 	ldw	x, #0x5217
 	ld	a, (x)
 	srl	a
 	and	a, #0x01
 	jrne	00108$
-;	./libs/i2c_lib.c: 43: if(I2C_SR2 -> AF)
+;	./libs/i2c_lib.c: 106: if(I2C_SR2 -> AF)
 	btjf	0x5218, #2, 00106$
-;	./libs/i2c_lib.c: 44: return 0;
+;	./libs/i2c_lib.c: 107: return 0;
 	clr	a
 	jra	00109$
 00108$:
-;	./libs/i2c_lib.c: 45: clr_sr1();
+;	./libs/i2c_lib.c: 108: clr_sr1();
 	ld	a,0x5217
-;	./libs/i2c_lib.c: 46: clr_sr3();
+;	./libs/i2c_lib.c: 109: clr_sr3();
 	ld	a,0x5219
-;	./libs/i2c_lib.c: 47: return 1;
+;	./libs/i2c_lib.c: 110: return 1;
 	ld	a, #0x01
 00109$:
-;	./libs/i2c_lib.c: 48: }
+;	./libs/i2c_lib.c: 111: }
 	popw	x
 	addw	sp, #1
 	jp	(x)
-;	./libs/i2c_lib.c: 50: uint8_t i2c_read_byte(void)
+;	./libs/i2c_lib.c: 113: uint8_t i2c_read_byte(void)
 ;	-----------------------------------------
 ;	 function i2c_read_byte
 ;	-----------------------------------------
 _i2c_read_byte:
-;	./libs/i2c_lib.c: 52: while(!I2C_SR1 -> RXNE);
+;	./libs/i2c_lib.c: 115: while(!I2C_SR1 -> RXNE);
 00101$:
 	btjf	0x5217, #6, 00101$
-;	./libs/i2c_lib.c: 53: return I2C_DR -> DR;
+;	./libs/i2c_lib.c: 116: return I2C_DR -> DR;
 	ld	a, 0x5216
-;	./libs/i2c_lib.c: 54: }
+;	./libs/i2c_lib.c: 117: }
 	ret
-;	./libs/i2c_lib.c: 56: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data)
+;	./libs/i2c_lib.c: 119: void i2c_read(uint8_t dev_addr, uint8_t size,uint8_t *data)
 ;	-----------------------------------------
 ;	 function i2c_read
 ;	-----------------------------------------
 _i2c_read:
 	sub	sp, #4
-;	./libs/i2c_lib.c: 58: if(i2c_send_address(dev_addr, 1))//проверка на ACK
+;	./libs/i2c_lib.c: 121: if(i2c_send_address(dev_addr, 1))//проверка на ACK
 	push	#0x01
 	call	_i2c_send_address
 	tnz	a
 	jreq	00103$
-;	./libs/i2c_lib.c: 60: I2C_CR2 -> ACK = 1;//включение ответа на посылки 
+;	./libs/i2c_lib.c: 123: I2C_CR2 -> ACK = 1;//включение ответа на посылки 
 	bset	0x5211, #2
-;	./libs/i2c_lib.c: 61: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
+;	./libs/i2c_lib.c: 124: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
 	clrw	x
 	ldw	(0x03, sp), x
 00105$:
@@ -695,71 +941,71 @@ _i2c_read:
 	ldw	x, (0x03, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00101$
-;	./libs/i2c_lib.c: 63: data[i] = i2c_read_byte();//функция записи байта в элемент массива
+;	./libs/i2c_lib.c: 126: data[i] = i2c_read_byte();//функция записи байта в элемент массива
 	ldw	x, (0x08, sp)
 	addw	x, (0x03, sp)
 	pushw	x
 	call	_i2c_read_byte
 	popw	x
 	ld	(x), a
-;	./libs/i2c_lib.c: 61: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
+;	./libs/i2c_lib.c: 124: for(int i = 0;i < size-1;i++) //цикл чтения данных с шины
 	ldw	x, (0x03, sp)
 	incw	x
 	ldw	(0x03, sp), x
 	jra	00105$
 00101$:
-;	./libs/i2c_lib.c: 65: I2C_CR2 -> ACK = 0;//выключение ответа на посылки
+;	./libs/i2c_lib.c: 128: I2C_CR2 -> ACK = 0;//выключение ответа на посылки
 	ld	a, 0x5211
 	and	a, #0xfb
 	ld	0x5211, a
-;	./libs/i2c_lib.c: 67: data[size-1] = i2c_read_byte();
+;	./libs/i2c_lib.c: 130: data[size-1] = i2c_read_byte();
 	ldw	x, (0x08, sp)
 	addw	x, (0x01, sp)
 	pushw	x
 	call	_i2c_read_byte
 	popw	x
 	ld	(x), a
-;	./libs/i2c_lib.c: 69: i2c_stop();
+;	./libs/i2c_lib.c: 132: i2c_stop();
 	call	_i2c_stop
 00103$:
-;	./libs/i2c_lib.c: 72: i2c_stop();
+;	./libs/i2c_lib.c: 135: i2c_stop();
 	ldw	x, (5, sp)
 	ldw	(8, sp), x
 	addw	sp, #7
-;	./libs/i2c_lib.c: 74: }
+;	./libs/i2c_lib.c: 137: }
 	jp	_i2c_stop
-;	./libs/i2c_lib.c: 76: uint8_t i2c_send_byte(uint8_t data)
+;	./libs/i2c_lib.c: 139: uint8_t i2c_send_byte(uint8_t data)
 ;	-----------------------------------------
 ;	 function i2c_send_byte
 ;	-----------------------------------------
 _i2c_send_byte:
-;	./libs/i2c_lib.c: 78: I2C_DR -> DR = data; //Отправка данных
+;	./libs/i2c_lib.c: 141: I2C_DR -> DR = data; //Отправка данных
 	ld	0x5216, a
-;	./libs/i2c_lib.c: 79: while(!I2C_SR1 -> TXE)
+;	./libs/i2c_lib.c: 142: while(!I2C_SR1 -> TXE)
 00103$:
 	btjt	0x5217, #7, 00105$
-;	./libs/i2c_lib.c: 80: if(I2C_SR2 -> AF)
+;	./libs/i2c_lib.c: 143: if(I2C_SR2 -> AF)
 	btjf	0x5218, #2, 00103$
-;	./libs/i2c_lib.c: 81: return 1;
+;	./libs/i2c_lib.c: 144: return 1;
 	ld	a, #0x01
 	ret
 00105$:
-;	./libs/i2c_lib.c: 82: return 0;//флаг ответа
+;	./libs/i2c_lib.c: 145: return 0;//флаг ответа
 	clr	a
-;	./libs/i2c_lib.c: 83: }
+;	./libs/i2c_lib.c: 146: }
 	ret
-;	./libs/i2c_lib.c: 85: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
+;	./libs/i2c_lib.c: 148: void i2c_write(uint8_t dev_addr,uint8_t size,uint8_t *data)
 ;	-----------------------------------------
 ;	 function i2c_write
 ;	-----------------------------------------
 _i2c_write:
 	sub	sp, #2
-;	./libs/i2c_lib.c: 87: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
+;	./libs/i2c_lib.c: 150: if(i2c_send_address(dev_addr, 0))//Проверка на АСК бит
 	push	#0x00
 	call	_i2c_send_address
 	tnz	a
 	jreq	00105$
-;	./libs/i2c_lib.c: 88: for(int i = 0;i < size;i++)
+;	./libs/i2c_lib.c: 151: for(int i = 0;i < size;i++)
 	clrw	x
 00107$:
 	ld	a, (0x05, sp)
@@ -767,7 +1013,7 @@ _i2c_write:
 	clr	(0x01, sp)
 	cpw	x, (0x01, sp)
 	jrsge	00105$
-;	./libs/i2c_lib.c: 90: if(i2c_send_byte(data[i]))//Проверка на АСК бит
+;	./libs/i2c_lib.c: 153: if(i2c_send_byte(data[i]))//Проверка на АСК бит
 	ldw	y, x
 	addw	y, (0x06, sp)
 	ld	a, (y)
@@ -776,29 +1022,29 @@ _i2c_write:
 	popw	x
 	tnz	a
 	jrne	00105$
-;	./libs/i2c_lib.c: 88: for(int i = 0;i < size;i++)
+;	./libs/i2c_lib.c: 151: for(int i = 0;i < size;i++)
 	incw	x
 	jra	00107$
 00105$:
-;	./libs/i2c_lib.c: 95: i2c_stop();
+;	./libs/i2c_lib.c: 158: i2c_stop();
 	ldw	x, (3, sp)
 	ldw	(6, sp), x
 	addw	sp, #5
-;	./libs/i2c_lib.c: 96: }
+;	./libs/i2c_lib.c: 159: }
 	jp	_i2c_stop
-;	./libs/i2c_lib.c: 98: uint8_t i2c_scan(void) 
+;	./libs/i2c_lib.c: 161: uint8_t i2c_scan(void) 
 ;	-----------------------------------------
 ;	 function i2c_scan
 ;	-----------------------------------------
 _i2c_scan:
 	sub	sp, #2
-;	./libs/i2c_lib.c: 100: for (uint8_t addr = 1; addr < 127; addr++)
+;	./libs/i2c_lib.c: 163: for (uint8_t addr = 1; addr < 127; addr++)
 	ld	a, #0x01
 	ld	(0x01, sp), a
 00105$:
 	cp	a, #0x7f
 	jrnc	00103$
-;	./libs/i2c_lib.c: 102: if(i2c_send_address(addr, 0))//отправка адреса на проверку 
+;	./libs/i2c_lib.c: 165: if(i2c_send_address(addr, 0))//отправка адреса на проверку 
 	push	a
 	push	#0x00
 	call	_i2c_send_address
@@ -806,31 +1052,56 @@ _i2c_scan:
 	pop	a
 	tnz	(0x02, sp)
 	jreq	00102$
-;	./libs/i2c_lib.c: 104: i2c_stop();//адрес совпал 
+;	./libs/i2c_lib.c: 167: i2c_stop();//адрес совпал 
 	call	_i2c_stop
-;	./libs/i2c_lib.c: 105: return addr;// выход из цикла
+;	./libs/i2c_lib.c: 168: return addr;// выход из цикла
 	ld	a, (0x01, sp)
 	jra	00107$
 00102$:
-;	./libs/i2c_lib.c: 107: I2C_SR2 -> AF = 0;//очистка флага ошибки
+;	./libs/i2c_lib.c: 170: I2C_SR2 -> AF = 0;//очистка флага ошибки
 	ldw	x, #0x5218
 	push	a
 	ld	a, (x)
 	and	a, #0xfb
 	ld	(x), a
 	pop	a
-;	./libs/i2c_lib.c: 100: for (uint8_t addr = 1; addr < 127; addr++)
+;	./libs/i2c_lib.c: 163: for (uint8_t addr = 1; addr < 127; addr++)
 	inc	a
 	ld	(0x01, sp), a
 	jra	00105$
 00103$:
-;	./libs/i2c_lib.c: 109: i2c_stop();//совпадений нет выход из функции
+;	./libs/i2c_lib.c: 172: i2c_stop();//совпадений нет выход из функции
 	call	_i2c_stop
-;	./libs/i2c_lib.c: 110: return 0;
+;	./libs/i2c_lib.c: 173: return 0;
 	clr	a
 00107$:
-;	./libs/i2c_lib.c: 111: }
+;	./libs/i2c_lib.c: 174: }
 	addw	sp, #2
+	ret
+;	./libs/i2c_lib.c: 176: void i2c_start_irq(void)
+;	-----------------------------------------
+;	 function i2c_start_irq
+;	-----------------------------------------
+_i2c_start_irq:
+;	./libs/i2c_lib.c: 179: I2C_ITR -> ITEVTEN = 1;//Включение прерываний для обработки сигнала старт
+	bset	0x521a, #1
+;	./libs/i2c_lib.c: 180: I2C_CR2 -> START = 1;// Отправляем стартовый сигнал
+	bset	0x5211, #0
+;	./libs/i2c_lib.c: 181: while(I2C_ITR -> ITEVTEN);// Ожидание отправки стартового сигнала
+00101$:
+	ld	a, 0x521a
+	bcp	a, #2
+	jrne	00101$
+;	./libs/i2c_lib.c: 182: }
+	ret
+;	./libs/i2c_lib.c: 184: void i2c_stop_irq(void)
+;	-----------------------------------------
+;	 function i2c_stop_irq
+;	-----------------------------------------
+_i2c_stop_irq:
+;	./libs/i2c_lib.c: 186: I2C_CR2 -> STOP = 1;// Отправка стопового сигнала  
+	bset	0x5211, #1
+;	./libs/i2c_lib.c: 187: }
 	ret
 ;	./libs/ssd1306_lib.c: 3: int get_bit(int data,int bit)
 ;	-----------------------------------------
@@ -911,7 +1182,7 @@ _set_bit:
 ;	-----------------------------------------
 _ssd1306_init:
 	sub	sp, #27
-;	./libs/ssd1306_lib.c: 26: uint8_t setup_buf[27] = {COMMAND, DISPLAY_OFF, 
+;	./libs/ssd1306_lib.c: 25: uint8_t setup_buffer[27] = {COMMAND, DISPLAY_OFF, 
 	ldw	x, sp
 	incw	x
 	clr	(x)
@@ -965,21 +1236,21 @@ _ssd1306_init:
 	ld	(0x1a, sp), a
 	ld	a, #0xaf
 	ld	(0x1b, sp), a
-;	./libs/ssd1306_lib.c: 43: i2c_write(I2C_DISPLAY_ADDR, 27, setup_buf);
+;	./libs/ssd1306_lib.c: 41: i2c_write(I2C_DISPLAY_ADDR, 27, setup_buffer);
 	pushw	x
 	push	#0x1b
 	ld	a, #0x3c
 	call	_i2c_write
-;	./libs/ssd1306_lib.c: 44: }
+;	./libs/ssd1306_lib.c: 43: }
 	addw	sp, #27
 	ret
-;	./libs/ssd1306_lib.c: 46: void ssd1306_set_params_to_write(void)
+;	./libs/ssd1306_lib.c: 45: void ssd1306_set_params_to_write(void)
 ;	-----------------------------------------
 ;	 function ssd1306_set_params_to_write
 ;	-----------------------------------------
 _ssd1306_set_params_to_write:
 	sub	sp, #7
-;	./libs/ssd1306_lib.c: 48: uint8_t set_params_buf[7] = {COMMAND,
+;	./libs/ssd1306_lib.c: 47: uint8_t set_params_buf[7] = {COMMAND,
 	ldw	x, sp
 	incw	x
 	clr	(x)
@@ -993,22 +1264,22 @@ _ssd1306_set_params_to_write:
 	clr	(0x06, sp)
 	ld	a, #0x7f
 	ld	(0x07, sp), a
-;	./libs/ssd1306_lib.c: 52: i2c_write(I2C_DISPLAY_ADDR,7,set_params_buf);
+;	./libs/ssd1306_lib.c: 51: i2c_write(I2C_DISPLAY_ADDR,7,set_params_buf);
 	pushw	x
 	push	#0x07
 	ld	a, #0x3c
 	call	_i2c_write
-;	./libs/ssd1306_lib.c: 53: }
+;	./libs/ssd1306_lib.c: 52: }
 	addw	sp, #7
 	ret
-;	./libs/ssd1306_lib.c: 55: void ssd1306_draw_pixel(uint8_t *buffer, uint8_t x, uint8_t y, uint8_t color)
+;	./libs/ssd1306_lib.c: 54: void ssd1306_draw_pixel(uint8_t *buffer, uint8_t x, uint8_t y, uint8_t color)
 ;	-----------------------------------------
 ;	 function ssd1306_draw_pixel
 ;	-----------------------------------------
 _ssd1306_draw_pixel:
 	sub	sp, #8
 	ldw	(0x07, sp), x
-;	./libs/ssd1306_lib.c: 57: buffer[x + ((y / 8) * SSD1306_LCDWIDTH)] = set_bit(buffer[x + ((y / 8) * SSD1306_LCDWIDTH)],(y % 8),color);
+;	./libs/ssd1306_lib.c: 56: buffer[x + ((y / 8) * SSD1306_LCDWIDTH)] = set_bit(buffer[x + ((y / 8) * SSD1306_LCDWIDTH)],(y % 8),color);
 	ld	(0x06, sp), a
 	clr	(0x05, sp)
 	ld	a, (0x0b, sp)
@@ -1052,20 +1323,96 @@ _ssd1306_draw_pixel:
 	ld	a, xl
 	ldw	x, (0x03, sp)
 	ld	(x), a
-;	./libs/ssd1306_lib.c: 58: }
+;	./libs/ssd1306_lib.c: 57: }
 	ldw	x, (9, sp)
 	addw	sp, #12
 	jp	(x)
-;	./libs/ssd1306_lib.c: 60: void ssd1306_buffer_fill_entire(uint8_t *in_data)
+;	./libs/ssd1306_lib.c: 59: void ssd1306_buffer_clean(void)
 ;	-----------------------------------------
-;	 function ssd1306_buffer_fill_entire
+;	 function ssd1306_buffer_clean
 ;	-----------------------------------------
-_ssd1306_buffer_fill_entire:
-	sub	sp, #141
-	ldw	(0x86, sp), x
-;	./libs/ssd1306_lib.c: 63: ssd1306_set_params_to_write();
+_ssd1306_buffer_clean:
+;	./libs/ssd1306_lib.c: 61: memset(main_buffer,0,512);
+	push	#0x00
+	push	#0x02
+	clrw	x
+	pushw	x
+	ldw	x, #(_main_buffer+0)
+	call	_memset
+;	./libs/ssd1306_lib.c: 62: }
+	ret
+;	./libs/ssd1306_lib.c: 63: void ssd1306_send_buffer(void)
+;	-----------------------------------------
+;	 function ssd1306_send_buffer
+;	-----------------------------------------
+_ssd1306_send_buffer:
+	sub	sp, #2
+;	./libs/ssd1306_lib.c: 65: ssd1306_set_params_to_write();
 	call	_ssd1306_set_params_to_write
-;	./libs/ssd1306_lib.c: 64: uint8_t part[129]={SET_DISPLAY_START_LINE};
+;	./libs/ssd1306_lib.c: 66: for(int j = 1;j<5;j++)
+	clrw	x
+	incw	x
+	ldw	(0x01, sp), x
+00112$:
+	ldw	x, (0x01, sp)
+	cpw	x, #0x0005
+	jrsge	00114$
+;	./libs/ssd1306_lib.c: 68: if(i2c_send_address(I2C_DISPLAY_ADDR, 0))//Проверка на АСК бит
+	push	#0x00
+	ld	a, #0x3c
+	call	_i2c_send_address
+	tnz	a
+	jreq	00105$
+;	./libs/ssd1306_lib.c: 70: i2c_send_byte(SET_DISPLAY_START_LINE);
+	ld	a, #0x40
+	call	_i2c_send_byte
+;	./libs/ssd1306_lib.c: 71: for(int i = 0;i < 128;i++)
+	clrw	x
+00109$:
+	cpw	x, #0x0080
+	jrsge	00103$
+;	./libs/ssd1306_lib.c: 73: if(i2c_send_byte(main_buffer[i*j]))//Проверка на АСК бит
+	pushw	x
+	ldw	y, (0x03, sp)
+	pushw	y
+	call	__mulint
+	exgw	x, y
+	popw	x
+	ld	a, (_main_buffer+0, y)
+	pushw	x
+	call	_i2c_send_byte
+	popw	x
+	tnz	a
+	jrne	00103$
+;	./libs/ssd1306_lib.c: 71: for(int i = 0;i < 128;i++)
+	incw	x
+	jra	00109$
+00103$:
+;	./libs/ssd1306_lib.c: 78: i2c_stop();
+	call	_i2c_stop
+	jra	00113$
+00105$:
+;	./libs/ssd1306_lib.c: 81: i2c_stop();
+	call	_i2c_stop
+00113$:
+;	./libs/ssd1306_lib.c: 66: for(int j = 1;j<5;j++)
+	ldw	x, (0x01, sp)
+	incw	x
+	ldw	(0x01, sp), x
+	jra	00112$
+00114$:
+;	./libs/ssd1306_lib.c: 83: }
+	addw	sp, #2
+	ret
+;	./libs/ssd1306_lib.c: 84: void ssd1306_buffer_splash(void)
+;	-----------------------------------------
+;	 function ssd1306_buffer_splash
+;	-----------------------------------------
+_ssd1306_buffer_splash:
+	sub	sp, #139
+;	./libs/ssd1306_lib.c: 87: ssd1306_set_params_to_write();
+	call	_ssd1306_set_params_to_write
+;	./libs/ssd1306_lib.c: 88: uint8_t part[129]={SET_DISPLAY_START_LINE};
 	ld	a, #0x40
 	ld	(0x01, sp), a
 	clr	(0x02, sp)
@@ -1196,45 +1543,43 @@ _ssd1306_buffer_fill_entire:
 	clr	(0x7f, sp)
 	clr	(0x80, sp)
 	clr	(0x81, sp)
-;	./libs/ssd1306_lib.c: 66: for(int page = 0;page <= 384;page+=128)
+;	./libs/ssd1306_lib.c: 90: for(int page = 0;page <= 384;page+=128)
+	clrw	x
+	ldw	(0x86, sp), x
+00111$:
+	ldw	x, (0x86, sp)
+	cpw	x, #0x0180
+	jrsgt	00113$
+;	./libs/ssd1306_lib.c: 92: for (int height = 0; height < 8; height++) 
 	clrw	x
 	ldw	(0x88, sp), x
-00111$:
-	ldw	x, (0x88, sp)
-	cpw	x, #0x0180
-	jrsle	00160$
-	jp	00113$
-00160$:
-;	./libs/ssd1306_lib.c: 68: for (int height = 0; height < 8; height++) 
-	clrw	x
-	ldw	(0x8a, sp), x
 00108$:
-	ldw	x, (0x8a, sp)
+	ldw	x, (0x88, sp)
 	cpw	x, #0x0008
 	jrsge	00102$
-;	./libs/ssd1306_lib.c: 70: for (int width = 0; width < 128; width++) 
-	ldw	x, (0x8a, sp)
+;	./libs/ssd1306_lib.c: 94: for (int width = 0; width < 128; width++) 
+	ldw	x, (0x88, sp)
 	sllw	x
 	sllw	x
 	sllw	x
 	sllw	x
-	addw	x, (0x88, sp)
+	addw	x, (0x86, sp)
 	ldw	(0x82, sp), x
 	clrw	x
-	ldw	(0x8c, sp), x
+	ldw	(0x8a, sp), x
 00105$:
-	ldw	x, (0x8c, sp)
+	ldw	x, (0x8a, sp)
 	cpw	x, #0x0080
 	jrsge	00109$
-;	./libs/ssd1306_lib.c: 72: ssd1306_draw_pixel(&part[1], width, height, get_bit(in_data[page+(height*16) + (width / 8)], 7 - (width % 8)));
+;	./libs/ssd1306_lib.c: 96: ssd1306_draw_pixel(&part[1], width, height, get_bit(main_buffer[page+(height*16) + (width / 8)], 7 - (width % 8)));
 	push	#0x08
 	push	#0x00
-	ldw	x, (0x8e, sp)
+	ldw	x, (0x8c, sp)
 	call	__modsint
 	ldw	(0x84, sp), x
 	ldw	y, #0x0007
 	subw	y, (0x84, sp)
-	ldw	x, (0x8c, sp)
+	ldw	x, (0x8a, sp)
 	jrpl	00163$
 	addw	x, #0x0007
 00163$:
@@ -1242,15 +1587,14 @@ _ssd1306_buffer_fill_entire:
 	sraw	x
 	sraw	x
 	addw	x, (0x82, sp)
-	addw	x, (0x86, sp)
-	ld	a, (x)
+	ld	a, (_main_buffer+0, x)
 	clrw	x
 	pushw	y
 	ld	xl, a
 	call	_get_bit
-	ld	a, (0x8b, sp)
+	ld	a, (0x89, sp)
 	rlwa	x
-	ld	a, (0x8d, sp)
+	ld	a, (0x8b, sp)
 	rrwa	x
 	pushw	x
 	addw	sp, #1
@@ -1259,195 +1603,143 @@ _ssd1306_buffer_fill_entire:
 	ldw	x, sp
 	addw	x, #4
 	call	_ssd1306_draw_pixel
-;	./libs/ssd1306_lib.c: 70: for (int width = 0; width < 128; width++) 
-	ldw	x, (0x8c, sp)
-	incw	x
-	ldw	(0x8c, sp), x
-	jra	00105$
-00109$:
-;	./libs/ssd1306_lib.c: 68: for (int height = 0; height < 8; height++) 
+;	./libs/ssd1306_lib.c: 94: for (int width = 0; width < 128; width++) 
 	ldw	x, (0x8a, sp)
 	incw	x
 	ldw	(0x8a, sp), x
+	jra	00105$
+00109$:
+;	./libs/ssd1306_lib.c: 92: for (int height = 0; height < 8; height++) 
+	ldw	x, (0x88, sp)
+	incw	x
+	ldw	(0x88, sp), x
 	jra	00108$
 00102$:
-;	./libs/ssd1306_lib.c: 75: i2c_write(I2C_DISPLAY_ADDR, 129, part);
+;	./libs/ssd1306_lib.c: 99: i2c_write(I2C_DISPLAY_ADDR, 129, part);
 	ldw	x, sp
 	incw	x
 	pushw	x
 	push	#0x81
 	ld	a, #0x3c
 	call	_i2c_write
-;	./libs/ssd1306_lib.c: 66: for(int page = 0;page <= 384;page+=128)
-	ldw	x, (0x88, sp)
+;	./libs/ssd1306_lib.c: 90: for(int page = 0;page <= 384;page+=128)
+	ldw	x, (0x86, sp)
 	addw	x, #0x0080
-	ldw	(0x88, sp), x
+	ldw	(0x86, sp), x
 	jp	00111$
 00113$:
-;	./libs/ssd1306_lib.c: 77: }
-	addw	sp, #141
+;	./libs/ssd1306_lib.c: 101: }
+	addw	sp, #139
 	ret
-;	./libs/ssd1306_lib.c: 79: void ssd1306_clean(void)
+;	./libs/ssd1306_lib.c: 103: void ssd1306_buffer_write(int x, int y, const uint8_t *data)
+;	-----------------------------------------
+;	 function ssd1306_buffer_write
+;	-----------------------------------------
+_ssd1306_buffer_write:
+	sub	sp, #13
+	ldw	(0x08, sp), x
+;	./libs/ssd1306_lib.c: 105: for (int height = 0; height < 8; height++)
+	clrw	x
+	ldw	(0x0a, sp), x
+00109$:
+	ldw	x, (0x0a, sp)
+	cpw	x, #0x0008
+	jrslt	00150$
+	jp	00111$
+00150$:
+;	./libs/ssd1306_lib.c: 107: for (int width = 0; width < 8; width++)
+	ldw	x, (0x0a, sp)
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	ldw	(0x05, sp), x
+	clrw	x
+	ldw	(0x0c, sp), x
+00106$:
+	ldw	x, (0x0c, sp)
+	cpw	x, #0x0008
+	jrsge	00110$
+;	./libs/ssd1306_lib.c: 108: if(data[height + width / 8] & (128 >> (width & 7)))
+	ldw	x, (0x0a, sp)
+	addw	x, (0x12, sp)
+	ld	a, (x)
+	ld	xl, a
+	ld	a, (0x0d, sp)
+	and	a, #0x07
+	ldw	y, #0x0080
+	tnz	a
+	jreq	00153$
+00152$:
+	sraw	y
+	dec	a
+	jrne	00152$
+00153$:
+	ldw	(0x01, sp), y
+	ld	a, xl
+	and	a, (0x02, sp)
+	ld	(0x04, sp), a
+	clr	(0x03, sp)
+	ldw	x, (0x03, sp)
+	jreq	00107$
+;	./libs/ssd1306_lib.c: 109: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(main_buffer[(height*16) + (width / 8)], 7 - (width % 8)));
+	push	#0x08
+	push	#0x00
+	ldw	x, (0x0e, sp)
+	call	__modsint
+	ldw	(0x03, sp), x
+	ldw	y, #0x0007
+	subw	y, (0x03, sp)
+	ldw	x, (0x05, sp)
+	ld	a, (_main_buffer+0, x)
+	clrw	x
+	pushw	y
+	ld	xl, a
+	call	_get_bit
+	ld	a, (0x11, sp)
+	ld	(0x07, sp), a
+	ld	a, (0x0b, sp)
+	add	a, (0x07, sp)
+	ld	xh, a
+	ld	a, (0x09, sp)
+	ld	(0x07, sp), a
+	ld	a, (0x0d, sp)
+	add	a, (0x07, sp)
+	ld	(0x07, sp), a
+	ld	a, xl
+	push	a
+	ld	a, xh
+	push	a
+	ld	a, (0x09, sp)
+	ldw	x, #(_main_buffer+0)
+	call	_ssd1306_draw_pixel
+00107$:
+;	./libs/ssd1306_lib.c: 107: for (int width = 0; width < 8; width++)
+	ldw	x, (0x0c, sp)
+	incw	x
+	ldw	(0x0c, sp), x
+	jra	00106$
+00110$:
+;	./libs/ssd1306_lib.c: 105: for (int height = 0; height < 8; height++)
+	ldw	x, (0x0a, sp)
+	incw	x
+	ldw	(0x0a, sp), x
+	jp	00109$
+00111$:
+;	./libs/ssd1306_lib.c: 111: }
+	ldw	x, (14, sp)
+	addw	sp, #19
+	jp	(x)
+;	./libs/ssd1306_lib.c: 113: void ssd1306_clean(void)
 ;	-----------------------------------------
 ;	 function ssd1306_clean
 ;	-----------------------------------------
 _ssd1306_clean:
-	sub	sp, #129
-;	./libs/ssd1306_lib.c: 81: uint8_t clean_buf[129] = {SET_DISPLAY_START_LINE};
-	ld	a, #0x40
-	ld	(0x01, sp), a
-	clr	(0x02, sp)
-	clr	(0x03, sp)
-	clr	(0x04, sp)
-	clr	(0x05, sp)
-	clr	(0x06, sp)
-	clr	(0x07, sp)
-	clr	(0x08, sp)
-	clr	(0x09, sp)
-	clr	(0x0a, sp)
-	clr	(0x0b, sp)
-	clr	(0x0c, sp)
-	clr	(0x0d, sp)
-	clr	(0x0e, sp)
-	clr	(0x0f, sp)
-	clr	(0x10, sp)
-	clr	(0x11, sp)
-	clr	(0x12, sp)
-	clr	(0x13, sp)
-	clr	(0x14, sp)
-	clr	(0x15, sp)
-	clr	(0x16, sp)
-	clr	(0x17, sp)
-	clr	(0x18, sp)
-	clr	(0x19, sp)
-	clr	(0x1a, sp)
-	clr	(0x1b, sp)
-	clr	(0x1c, sp)
-	clr	(0x1d, sp)
-	clr	(0x1e, sp)
-	clr	(0x1f, sp)
-	clr	(0x20, sp)
-	clr	(0x21, sp)
-	clr	(0x22, sp)
-	clr	(0x23, sp)
-	clr	(0x24, sp)
-	clr	(0x25, sp)
-	clr	(0x26, sp)
-	clr	(0x27, sp)
-	clr	(0x28, sp)
-	clr	(0x29, sp)
-	clr	(0x2a, sp)
-	clr	(0x2b, sp)
-	clr	(0x2c, sp)
-	clr	(0x2d, sp)
-	clr	(0x2e, sp)
-	clr	(0x2f, sp)
-	clr	(0x30, sp)
-	clr	(0x31, sp)
-	clr	(0x32, sp)
-	clr	(0x33, sp)
-	clr	(0x34, sp)
-	clr	(0x35, sp)
-	clr	(0x36, sp)
-	clr	(0x37, sp)
-	clr	(0x38, sp)
-	clr	(0x39, sp)
-	clr	(0x3a, sp)
-	clr	(0x3b, sp)
-	clr	(0x3c, sp)
-	clr	(0x3d, sp)
-	clr	(0x3e, sp)
-	clr	(0x3f, sp)
-	clr	(0x40, sp)
-	clr	(0x41, sp)
-	clr	(0x42, sp)
-	clr	(0x43, sp)
-	clr	(0x44, sp)
-	clr	(0x45, sp)
-	clr	(0x46, sp)
-	clr	(0x47, sp)
-	clr	(0x48, sp)
-	clr	(0x49, sp)
-	clr	(0x4a, sp)
-	clr	(0x4b, sp)
-	clr	(0x4c, sp)
-	clr	(0x4d, sp)
-	clr	(0x4e, sp)
-	clr	(0x4f, sp)
-	clr	(0x50, sp)
-	clr	(0x51, sp)
-	clr	(0x52, sp)
-	clr	(0x53, sp)
-	clr	(0x54, sp)
-	clr	(0x55, sp)
-	clr	(0x56, sp)
-	clr	(0x57, sp)
-	clr	(0x58, sp)
-	clr	(0x59, sp)
-	clr	(0x5a, sp)
-	clr	(0x5b, sp)
-	clr	(0x5c, sp)
-	clr	(0x5d, sp)
-	clr	(0x5e, sp)
-	clr	(0x5f, sp)
-	clr	(0x60, sp)
-	clr	(0x61, sp)
-	clr	(0x62, sp)
-	clr	(0x63, sp)
-	clr	(0x64, sp)
-	clr	(0x65, sp)
-	clr	(0x66, sp)
-	clr	(0x67, sp)
-	clr	(0x68, sp)
-	clr	(0x69, sp)
-	clr	(0x6a, sp)
-	clr	(0x6b, sp)
-	clr	(0x6c, sp)
-	clr	(0x6d, sp)
-	clr	(0x6e, sp)
-	clr	(0x6f, sp)
-	clr	(0x70, sp)
-	clr	(0x71, sp)
-	clr	(0x72, sp)
-	clr	(0x73, sp)
-	clr	(0x74, sp)
-	clr	(0x75, sp)
-	clr	(0x76, sp)
-	clr	(0x77, sp)
-	clr	(0x78, sp)
-	clr	(0x79, sp)
-	clr	(0x7a, sp)
-	clr	(0x7b, sp)
-	clr	(0x7c, sp)
-	clr	(0x7d, sp)
-	clr	(0x7e, sp)
-	clr	(0x7f, sp)
-	clr	(0x80, sp)
-	clr	(0x81, sp)
-;	./libs/ssd1306_lib.c: 83: ssd1306_set_params_to_write();
-	call	_ssd1306_set_params_to_write
-;	./libs/ssd1306_lib.c: 85: for(int i = 0;i<4;i++)
-	clr	a
-00103$:
-	cp	a, #0x04
-	jrnc	00105$
-;	./libs/ssd1306_lib.c: 86: i2c_write(I2C_DISPLAY_ADDR,129,clean_buf);
-	push	a
-	ldw	x, sp
-	incw	x
-	incw	x
-	pushw	x
-	push	#0x81
-	ld	a, #0x3c
-	call	_i2c_write
-	pop	a
-;	./libs/ssd1306_lib.c: 85: for(int i = 0;i<4;i++)
-	inc	a
-	jra	00103$
-00105$:
-;	./libs/ssd1306_lib.c: 88: }
-	addw	sp, #129
-	ret
+;	./libs/ssd1306_lib.c: 115: ssd1306_buffer_clean();
+	call	_ssd1306_buffer_clean
+;	./libs/ssd1306_lib.c: 116: ssd1306_send_buffer();
+;	./libs/ssd1306_lib.c: 117: }
+	jp	_ssd1306_send_buffer
 ;	main.c: 3: void setup(void)
 ;	-----------------------------------------
 ;	 function setup
@@ -1468,30 +1760,353 @@ _setup:
 _gg:
 ;	main.c: 16: ssd1306_init();
 	call	_ssd1306_init
-;	main.c: 17: ssd1306_clean();
-	call	_ssd1306_clean
-;	main.c: 18: ssd1306_buffer_fill_entire(splash);
-	ldw	x, #(_splash+0)
-;	main.c: 20: }
-	jp	_ssd1306_buffer_fill_entire
-;	main.c: 22: int main(void)
+;	main.c: 17: ssd1306_buffer_splash();
+;	main.c: 21: }
+	jp	_ssd1306_buffer_splash
+;	main.c: 23: int main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	main.c: 24: setup();
+;	main.c: 25: setup();
 	call	_setup
-;	main.c: 25: gg();
+;	main.c: 26: gg();
 	call	_gg
-;	main.c: 26: while(1);
+;	main.c: 27: while(1);
 00102$:
 	jra	00102$
-;	main.c: 27: }
+;	main.c: 28: }
 	ret
 	.area CODE
 	.area CONST
 	.area INITIALIZER
-__xinit__splash:
+__xinit__I2C_IRQ:
+	.db #0x00	; 0
+__xinit__ttf_eng_a:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_b:
+	.db #0x00	; 0
+	.db #0x7c	; 124
+	.db #0x42	; 66	'B'
+	.db #0x7c	; 124
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_c:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_d:
+	.db #0x00	; 0
+	.db #0x7c	; 124
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_e:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x40	; 64
+	.db #0x7c	; 124
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_f:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x7c	; 124
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x00	; 0
+__xinit__ttf_eng_g:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x40	; 64
+	.db #0x4e	; 78	'N'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_h:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_i:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_j:
+	.db #0x00	; 0
+	.db #0x0c	; 12
+	.db #0x0c	; 12
+	.db #0x0c	; 12
+	.db #0x0c	; 12
+	.db #0x6c	; 108	'l'
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_k:
+	.db #0x00	; 0
+	.db #0x66	; 102	'f'
+	.db #0x68	; 104	'h'
+	.db #0x70	; 112	'p'
+	.db #0x70	; 112	'p'
+	.db #0x68	; 104	'h'
+	.db #0x66	; 102	'f'
+	.db #0x00	; 0
+__xinit__ttf_eng_l:
+	.db #0x00	; 0
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_m:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x66	; 102	'f'
+	.db #0x5a	; 90	'Z'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_n:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x62	; 98	'b'
+	.db #0x52	; 82	'R'
+	.db #0x4a	; 74	'J'
+	.db #0x46	; 70	'F'
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_o:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_p:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x40	; 64
+	.db #0x40	; 64
+	.db #0x00	; 0
+__xinit__ttf_eng_q:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x04	; 4
+	.db #0x00	; 0
+__xinit__ttf_eng_r:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7c	; 124
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_s:
+	.db #0x00	; 0
+	.db #0x3e	; 62
+	.db #0x40	; 64
+	.db #0x3c	; 60
+	.db #0x02	; 2
+	.db #0x02	; 2
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_t:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x00	; 0
+__xinit__ttf_eng_u:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x3e	; 62
+	.db #0x00	; 0
+__xinit__ttf_eng_v:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x24	; 36
+	.db #0x24	; 36
+	.db #0x18	; 24
+	.db #0x00	; 0
+__xinit__ttf_eng_w:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x5a	; 90	'Z'
+	.db #0x5a	; 90	'Z'
+	.db #0x24	; 36
+	.db #0x00	; 0
+__xinit__ttf_eng_x:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x24	; 36
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x22	; 34
+	.db #0x42	; 66	'B'
+	.db #0x00	; 0
+__xinit__ttf_eng_y:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x24	; 36
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x00	; 0
+__xinit__ttf_eng_z:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x04	; 4
+	.db #0x08	; 8
+	.db #0x10	; 16
+	.db #0x20	; 32
+	.db #0x7e	; 126
+	.db #0x00	; 0
+__xinit__ttf_eng_1:
+	.db #0x00	; 0
+	.db #0x18	; 24
+	.db #0x38	; 56	'8'
+	.db #0x38	; 56	'8'
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x00	; 0
+__xinit__ttf_eng_2:
+	.db #0x00	; 0
+	.db #0x38	; 56	'8'
+	.db #0x44	; 68	'D'
+	.db #0x08	; 8
+	.db #0x10	; 16
+	.db #0x20	; 32
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_3:
+	.db #0x00	; 0
+	.db #0x7c	; 124
+	.db #0x02	; 2
+	.db #0x3c	; 60
+	.db #0x02	; 2
+	.db #0x02	; 2
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_4:
+	.db #0x00	; 0
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x7e	; 126
+	.db #0x02	; 2
+	.db #0x02	; 2
+	.db #0x02	; 2
+	.db #0x00	; 0
+__xinit__ttf_eng_5:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x40	; 64
+	.db #0x7c	; 124
+	.db #0x02	; 2
+	.db #0x02	; 2
+	.db #0x7c	; 124
+	.db #0x00	; 0
+__xinit__ttf_eng_6:
+	.db #0x00	; 0
+	.db #0x3c	; 60
+	.db #0x40	; 64
+	.db #0x7c	; 124
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x3c	; 60
+	.db #0x00	; 0
+__xinit__ttf_eng_7:
+	.db #0x00	; 0
+	.db #0x7e	; 126
+	.db #0x02	; 2
+	.db #0x04	; 4
+	.db #0x08	; 8
+	.db #0x10	; 16
+	.db #0x20	; 32
+	.db #0x00	; 0
+__xinit__ttf_eng_8:
+	.db #0x00	; 0
+	.db #0x3c	; 60
+	.db #0x42	; 66	'B'
+	.db #0x3c	; 60
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x3c	; 60
+	.db #0x00	; 0
+__xinit__ttf_eng_9:
+	.db #0x00	; 0
+	.db #0x3c	; 60
+	.db #0x42	; 66	'B'
+	.db #0x42	; 66	'B'
+	.db #0x3e	; 62
+	.db #0x02	; 2
+	.db #0x3c	; 60
+	.db #0x00	; 0
+__xinit__ttf_eng_0:
+	.db #0x00	; 0
+	.db #0x3c	; 60
+	.db #0x46	; 70	'F'
+	.db #0x4a	; 74	'J'
+	.db #0x52	; 82	'R'
+	.db #0x62	; 98	'b'
+	.db #0x3c	; 60
+	.db #0x00	; 0
+__xinit__main_buffer:
 	.db #0xff	; 255
 	.db #0xff	; 255
 	.db #0xff	; 255
@@ -2004,6 +2619,4 @@ __xinit__splash:
 	.db #0xff	; 255
 	.db #0xff	; 255
 	.db #0xff	; 255
-__xinit__I2C_IRQ:
-	.db #0x00	; 0
 	.area CABS (ABS)

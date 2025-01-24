@@ -14,8 +14,9 @@ void setup(void)
 void gg(void)
 {
     ssd1306_init();
-    ssd1306_clean();
     ssd1306_buffer_splash();
+    //ssd1306_clean();
+    
     
 }
  

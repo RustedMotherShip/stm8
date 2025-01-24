@@ -177,7 +177,7 @@ uint8_t i2c_scan(void);
 void i2c_start_irq(void);
 void i2c_stop_irq(void);
 uint8_t i2c_send_address_irq(uint8_t address,uint8_t rw_type);
-uint8_t i2c_read_byte_irq(void);
+uint8_t i2c_read_byte_irq(unsigned char data);
 void i2c_read_irq(uint8_t dev_addr, uint8_t size,uint8_t *data);
 uint8_t i2c_send_byte_irq(uint8_t data);
 void i2c_write_irq(uint8_t dev_addr,uint8_t size,uint8_t *data);

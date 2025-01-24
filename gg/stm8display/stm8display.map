@@ -21,17 +21,17 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000006  l_DATA                          
      00000007  s_INITIALIZED                   
      00000023  l_GSINIT                        
-     00000057  l_HOME                          
-     00000201  l_INITIALIZED                   
-     00000201  l_INITIALIZER                   
-     00000208  s_SSEG                          
-     00000770  l_CODE                          
+     0000005B  l_HOME                          
+     00000321  l_INITIALIZED                   
+     00000321  l_INITIALIZER                   
+     00000328  s_SSEG                          
+     0000084C  l_CODE                          
      00008000  s_HOME                          
-     00008057  s_GSINIT                        
-     0000807A  s_GSFINAL                       
-     0000807D  s_CONST                         
-     0000807D  s_INITIALIZER                   
-     0000827E  s_CODE                          
+     0000805B  s_GSINIT                        
+     0000807E  s_GSFINAL                       
+     00008081  s_CONST                         
+     00008081  s_INITIALIZER                   
+     000083A2  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -52,19 +52,55 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000007    00000201 =         513. bytes (REL,CON)
+INITIALIZED                         00000007    00000321 =         801. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000007  _splash                            main
-     00000207  _I2C_IRQ                           main
+     00000007  _I2C_IRQ                           main
+     00000008  _ttf_eng_a                         main
+     00000010  _ttf_eng_b                         main
+     00000018  _ttf_eng_c                         main
+     00000020  _ttf_eng_d                         main
+     00000028  _ttf_eng_e                         main
+     00000030  _ttf_eng_f                         main
+     00000038  _ttf_eng_g                         main
+     00000040  _ttf_eng_h                         main
+     00000048  _ttf_eng_i                         main
+     00000050  _ttf_eng_j                         main
+     00000058  _ttf_eng_k                         main
+     00000060  _ttf_eng_l                         main
+     00000068  _ttf_eng_m                         main
+     00000070  _ttf_eng_n                         main
+     00000078  _ttf_eng_o                         main
+     00000080  _ttf_eng_p                         main
+     00000088  _ttf_eng_q                         main
+     00000090  _ttf_eng_r                         main
+     00000098  _ttf_eng_s                         main
+     000000A0  _ttf_eng_t                         main
+     000000A8  _ttf_eng_u                         main
+     000000B0  _ttf_eng_v                         main
+     000000B8  _ttf_eng_w                         main
+     000000C0  _ttf_eng_x                         main
+     000000C8  _ttf_eng_y                         main
+     000000D0  _ttf_eng_z                         main
+     000000D8  _ttf_eng_1                         main
+     000000E0  _ttf_eng_2                         main
+     000000E8  _ttf_eng_3                         main
+     000000F0  _ttf_eng_4                         main
+     000000F8  _ttf_eng_5                         main
+     00000100  _ttf_eng_6                         main
+     00000108  _ttf_eng_7                         main
+     00000110  _ttf_eng_8                         main
+     00000118  _ttf_eng_9                         main
+     00000120  _ttf_eng_0                         main
+     00000128  _main_buffer                       main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000208    00000001 =           1. bytes (REL,CON)
+SSEG                                00000328    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -73,7 +109,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-HOME                                00008000    00000057 =          87. bytes (REL,CON)
+HOME                                00008000    0000005B =          91. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -82,7 +118,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-GSINIT                              00008057    00000023 =          35. bytes (REL,CON)
+GSINIT                              0000805B    00000023 =          35. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -91,7 +127,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-GSFINAL                             0000807A    00000003 =           3. bytes (REL,CON)
+GSFINAL                             0000807E    00000003 =           3. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -100,7 +136,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         0000807D    00000201 =         513. bytes (REL,CON)
+INITIALIZER                         00008081    00000321 =         801. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -109,40 +145,49 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                0000827E    00000770 =        1904. bytes (REL,CON)
+CODE                                000083A2    0000084C =        2124. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000827E  _uart_transmission_irq             main
-     000082BA  _uart_reciever_irq                 main
-     000082ED  _uart_write_irq                    main
-     00008317  _uart_read_irq                     main
-     00008335  _uart_init                         main
-     00008437  _uart_read_byte                    main
-     0000843F  _uart_write_byte                   main
-     0000844A  _uart_write                        main
-     0000846E  _uart_read                         main
-     0000849C  _i2c_init                          main
-     000084C7  _i2c_start                         main
-     000084D1  _i2c_stop                          main
-     000084D6  _i2c_send_address                  main
-     00008505  _i2c_read_byte                     main
-     0000850E  _i2c_read                          main
-     0000855D  _i2c_send_byte                     main
-     0000856F  _i2c_write                         main
-     0000859F  _i2c_scan                          main
-     000085D2  _get_bit                           main
-     000085E7  _set_bit                           main
-     0000861A  _ssd1306_init                      main
-     0000868E  _ssd1306_set_params_to_write       main
-     000086B2  _ssd1306_draw_pixel                main
-     000086FD  _ssd1306_buffer_fill_entire        main
-     00008895  _ssd1306_clean                     main
-     000089B6  _setup                             main
-     000089BF  _gg                                main
-     000089CB  _main                              main
-     000089D4  ___sdcc_external_startup           _startup
-     000089D6  __modsint                          
+     000083A2  _uart_transmission_irq             main
+     000083DE  _uart_reciever_irq                 main
+     00008411  _uart_write_irq                    main
+     0000843B  _uart_read_irq                     main
+     00008459  _uart_init                         main
+     0000855B  _uart_read_byte                    main
+     00008563  _uart_write_byte                   main
+     0000856E  _uart_write                        main
+     00008592  _uart_read                         main
+     000085C0  _i2c_irq                           main
+     0000867A  _i2c_init                          main
+     000086A5  _i2c_start                         main
+     000086AF  _i2c_stop                          main
+     000086B4  _i2c_send_address                  main
+     000086E3  _i2c_read_byte                     main
+     000086EC  _i2c_read                          main
+     0000873B  _i2c_send_byte                     main
+     0000874D  _i2c_write                         main
+     0000877D  _i2c_scan                          main
+     000087B0  _i2c_start_irq                     main
+     000087C0  _i2c_stop_irq                      main
+     000087C5  _get_bit                           main
+     000087DA  _set_bit                           main
+     0000880D  _ssd1306_init                      main
+     00008881  _ssd1306_set_params_to_write       main
+     000088A5  _ssd1306_draw_pixel                main
+     000088F0  _ssd1306_buffer_clean              main
+     000088FD  _ssd1306_send_buffer               main
+     0000894D  _ssd1306_buffer_splash             main
+     00008ADF  _ssd1306_buffer_write              main
+     00008B77  _ssd1306_clean                     main
+     00008B7D  _setup                             main
+     00008B86  _gg                                main
+     00008B8C  _main                              main
+     00008B95  __mulint                           
+     00008BB2  _memset                            _memset
+     00008BD4  ___sdcc_external_startup           _startup
+     00008BD6  __modsint                          
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
 Files Linked                              [ module(s) ]
@@ -152,6 +197,8 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _mulint.rel ]
+/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memset.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
 /usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
 
