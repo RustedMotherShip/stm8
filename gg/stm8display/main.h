@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "pics/splash.h"
 
 #include "libs/libs.c"
 // #include "libs/uart_lib.h"

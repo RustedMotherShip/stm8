@@ -11,12 +11,11 @@ Symbol Table
     ___sdcc_external_startup                                       ****** GX
   5 __interrupt_vect                                               000000 R
     __modsint                                                      ****** GX
-    __mulint                                                       ****** GX
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000058 R
   3 __start__stack                                                 000000 R
   9 __xinit__I2C_IRQ                                               000000 R
-  9 __xinit__main_buffer                                           000121 R
+  9 __xinit__main_buffer                                           000161 R
   9 __xinit__ttf_eng_0                                             000119 R
   9 __xinit__ttf_eng_1                                             0000D1 R
   9 __xinit__ttf_eng_2                                             0000D9 R
@@ -30,6 +29,10 @@ Symbol Table
   9 __xinit__ttf_eng_a                                             000001 R
   9 __xinit__ttf_eng_b                                             000009 R
   9 __xinit__ttf_eng_c                                             000011 R
+  9 __xinit__ttf_eng_corner_left_down                              000131 R
+  9 __xinit__ttf_eng_corner_left_up                                000121 R
+  9 __xinit__ttf_eng_corner_right_down                             000139 R
+  9 __xinit__ttf_eng_corner_right_up                               000129 R
   9 __xinit__ttf_eng_d                                             000019 R
   9 __xinit__ttf_eng_e                                             000021 R
   9 __xinit__ttf_eng_f                                             000029 R
@@ -39,6 +42,10 @@ Symbol Table
   9 __xinit__ttf_eng_j                                             000049 R
   9 __xinit__ttf_eng_k                                             000051 R
   9 __xinit__ttf_eng_l                                             000059 R
+  9 __xinit__ttf_eng_line_down                                     000159 R
+  9 __xinit__ttf_eng_line_left                                     000149 R
+  9 __xinit__ttf_eng_line_right                                    000141 R
+  9 __xinit__ttf_eng_line_up                                       000151 R
   9 __xinit__ttf_eng_m                                             000061 R
   9 __xinit__ttf_eng_n                                             000069 R
   9 __xinit__ttf_eng_o                                             000071 R
@@ -51,18 +58,18 @@ Symbol Table
   9 __xinit__ttf_eng_v                                             0000A9 R
   9 __xinit__ttf_eng_w                                             0000B1 R
   9 __xinit__ttf_eng_x                                             0000B9 R
-  9 __xinit__ttf_eng_y                                             0000C1 R
-  9 __xinit__ttf_eng_z                                             0000C9 R
-  1 _buf_pos                                                       000004 GR
-  1 _buf_size                                                      000005 GR
-  A _get_bit                                                       000423 GR
-  A _gg                                                            0007E4 GR
-  A _i2c_init                                                      0002D8 GR
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
+  9 __xinit__ttf_eng_y                                             0000C1 R
+  9 __xinit__ttf_eng_z                                             0000C9 R
+  1 _buf_pos                                                       000004 GR
+  1 _buf_size                                                      000005 GR
+  A _get_bit                                                       000423 GR
+  A _gg                                                            00065E GR
+  A _i2c_init                                                      0002D8 GR
   A _i2c_irq                                                       00021E GR
   A _i2c_read                                                      00034A GR
   A _i2c_read_byte                                                 000341 GR
@@ -74,16 +81,15 @@ Symbol Table
   A _i2c_stop                                                      00030D GR
   A _i2c_stop_irq                                                  00041E GR
   A _i2c_write                                                     0003AB GR
-  A _main                                                          0007EA GR
-  2 _main_buffer                                                   000121 GR
+  A _main                                                          000664 GR
+  2 _main_buffer                                                   000161 GR
     _memset                                                        ****** GX
   1 _rx_buf_pointer                                                000002 GR
   A _set_bit                                                       000438 GR
-  A _setup                                                         0007DB GR
+  A _setup                                                         00064E GR
   A _ssd1306_buffer_clean                                          00054E GR
-  A _ssd1306_buffer_splash                                         0005AB GR
-  A _ssd1306_buffer_write                                          00073D GR
-  A _ssd1306_clean                                                 0007D5 GR
+  A _ssd1306_buffer_write                                          0005B0 GR
+  A _ssd1306_clean                                                 000648 GR
   A _ssd1306_draw_pixel                                            000503 GR
   A _ssd1306_init                                                  00046B GR
   A _ssd1306_send_buffer                                           00055B GR
@@ -101,6 +107,10 @@ Symbol Table
   2 _ttf_eng_a                                                     000001 GR
   2 _ttf_eng_b                                                     000009 GR
   2 _ttf_eng_c                                                     000011 GR
+  2 _ttf_eng_corner_left_down                                      000131 GR
+  2 _ttf_eng_corner_left_up                                        000121 GR
+  2 _ttf_eng_corner_right_down                                     000139 GR
+  2 _ttf_eng_corner_right_up                                       000129 GR
   2 _ttf_eng_d                                                     000019 GR
   2 _ttf_eng_e                                                     000021 GR
   2 _ttf_eng_f                                                     000029 GR
@@ -108,8 +118,17 @@ Symbol Table
   2 _ttf_eng_h                                                     000039 GR
   2 _ttf_eng_i                                                     000041 GR
   2 _ttf_eng_j                                                     000049 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
+Hexadecimal [24-Bits]
+
+Symbol Table
+
   2 _ttf_eng_k                                                     000051 GR
   2 _ttf_eng_l                                                     000059 GR
+  2 _ttf_eng_line_down                                             000159 GR
+  2 _ttf_eng_line_left                                             000149 GR
+  2 _ttf_eng_line_right                                            000141 GR
+  2 _ttf_eng_line_up                                               000151 GR
   2 _ttf_eng_m                                                     000061 GR
   2 _ttf_eng_n                                                     000069 GR
   2 _ttf_eng_o                                                     000071 GR
@@ -118,11 +137,6 @@ Symbol Table
   2 _ttf_eng_r                                                     000089 GR
   2 _ttf_eng_s                                                     000091 GR
   2 _ttf_eng_t                                                     000099 GR
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
-Hexadecimal [24-Bits]
-
-Symbol Table
-
   2 _ttf_eng_u                                                     0000A1 GR
   2 _ttf_eng_v                                                     0000A9 GR
   2 _ttf_eng_w                                                     0000B1 GR
@@ -146,6 +160,7 @@ Symbol Table
     s_INITIALIZED                                                  ****** GX
     s_INITIALIZER                                                  ****** GX
 
+
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 4
 Hexadecimal [24-Bits]
 
@@ -153,14 +168,14 @@ Area Table
 
    0 _CODE                                      size      0   flags    0
    1 DATA                                       size      6   flags    0
-   2 INITIALIZED                                size    321   flags    0
+   2 INITIALIZED                                size    361   flags    0
    3 SSEG                                       size      1   flags    0
    4 DABS                                       size      0   flags    8
    5 HOME                                       size     5B   flags    0
    6 GSINIT                                     size     23   flags    0
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size      0   flags    0
-   9 INITIALIZER                                size    321   flags    0
-   A CODE                                       size    7F3   flags    0
+   9 INITIALIZER                                size    361   flags    0
+   A CODE                                       size    66D   flags    0
    B CABS                                       size      0   flags    8
 

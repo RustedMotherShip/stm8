@@ -63,14 +63,14 @@ void ssd1306_buffer_clean(void)
 void ssd1306_send_buffer(void)
 {
     ssd1306_set_params_to_write();
-    for(int j = 1;j<5;j++)
+    for(int j = 0;j<4;j++)
     {
         if(i2c_send_address(I2C_DISPLAY_ADDR, 0))//Проверка на АСК бит
         {
             i2c_send_byte(SET_DISPLAY_START_LINE);
             for(int i = 0;i < 128;i++)
             {
-                if(i2c_send_byte(main_buffer[i*j]))//Проверка на АСК бит
+                if(i2c_send_byte(main_buffer[i+(128*j)]))//Проверка на АСК бит
                 {
                     break;//ошибка отправки нет ACK бита -> выход из цикла
                 } 
@@ -79,26 +79,6 @@ void ssd1306_send_buffer(void)
         }
         else
         i2c_stop();
-    }
-}
-void ssd1306_buffer_splash(void)
-{
-
-    ssd1306_set_params_to_write();
-    uint8_t part[129]={SET_DISPLAY_START_LINE};
-
-    for(int page = 0;page <= 384;page+=128)
-    {
-        for (int height = 0; height < 8; height++) 
-        {
-            for (int width = 0; width < 128; width++) 
-            {
-                ssd1306_draw_pixel(&part[1], width, height, get_bit(main_buffer[page+(height*16) + (width / 8)], 7 - (width % 8)));
-            }
-        }
-    i2c_write(I2C_DISPLAY_ADDR, 129, part);
-    for(int i = 1;i < 129;i++)
-        uart_write_byte(part[i]);
     }
 }
 

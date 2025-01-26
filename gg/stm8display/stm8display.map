@@ -22,16 +22,16 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000007  s_INITIALIZED                   
      00000023  l_GSINIT                        
      0000005B  l_HOME                          
-     00000321  l_INITIALIZED                   
-     00000321  l_INITIALIZER                   
-     00000328  s_SSEG                          
-     0000084C  l_CODE                          
+     00000361  l_INITIALIZED                   
+     00000361  l_INITIALIZER                   
+     00000368  s_SSEG                          
+     000006A9  l_CODE                          
      00008000  s_HOME                          
      0000805B  s_GSINIT                        
      0000807E  s_GSFINAL                       
      00008081  s_CONST                         
      00008081  s_INITIALIZER                   
-     000083A2  s_CODE                          
+     000083E2  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -52,7 +52,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000007    00000321 =         801. bytes (REL,CON)
+INITIALIZED                         00000007    00000361 =         865. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -93,14 +93,22 @@ INITIALIZED                         00000007    00000321 =         801. bytes (R
      00000110  _ttf_eng_8                         main
      00000118  _ttf_eng_9                         main
      00000120  _ttf_eng_0                         main
-     00000128  _main_buffer                       main
+     00000128  _ttf_eng_corner_left_up            main
+     00000130  _ttf_eng_corner_right_up           main
+     00000138  _ttf_eng_corner_left_down          main
+     00000140  _ttf_eng_corner_right_down         main
+     00000148  _ttf_eng_line_right                main
+     00000150  _ttf_eng_line_left                 main
+     00000158  _ttf_eng_line_up                   main
+     00000160  _ttf_eng_line_down                 main
+     00000168  _main_buffer                       main
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000328    00000001 =           1. bytes (REL,CON)
+SSEG                                00000368    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -136,7 +144,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         00008081    00000321 =         801. bytes (REL,CON)
+INITIALIZER                         00008081    00000361 =         865. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -145,49 +153,46 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000083A2    0000084C =        2124. bytes (REL,CON)
+CODE                                000083E2    000006A9 =        1705. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     000083A2  _uart_transmission_irq             main
-     000083DE  _uart_reciever_irq                 main
-     00008411  _uart_write_irq                    main
-     0000843B  _uart_read_irq                     main
-     00008459  _uart_init                         main
-     0000855B  _uart_read_byte                    main
-     00008563  _uart_write_byte                   main
-     0000856E  _uart_write                        main
-     00008592  _uart_read                         main
-     000085C0  _i2c_irq                           main
-     0000867A  _i2c_init                          main
-     000086A5  _i2c_start                         main
-     000086AF  _i2c_stop                          main
-     000086B4  _i2c_send_address                  main
-     000086E3  _i2c_read_byte                     main
-     000086EC  _i2c_read                          main
-     0000873B  _i2c_send_byte                     main
-     0000874D  _i2c_write                         main
-     0000877D  _i2c_scan                          main
-     000087B0  _i2c_start_irq                     main
-     000087C0  _i2c_stop_irq                      main
-     000087C5  _get_bit                           main
-     000087DA  _set_bit                           main
-     0000880D  _ssd1306_init                      main
-     00008881  _ssd1306_set_params_to_write       main
-     000088A5  _ssd1306_draw_pixel                main
-     000088F0  _ssd1306_buffer_clean              main
-     000088FD  _ssd1306_send_buffer               main
-     0000894D  _ssd1306_buffer_splash             main
-     00008ADF  _ssd1306_buffer_write              main
-     00008B77  _ssd1306_clean                     main
-     00008B7D  _setup                             main
-     00008B86  _gg                                main
-     00008B8C  _main                              main
-     00008B95  __mulint                           
-     00008BB2  _memset                            _memset
-     00008BD4  ___sdcc_external_startup           _startup
-     00008BD6  __modsint                          
-
+     000083E2  _uart_transmission_irq             main
+     0000841E  _uart_reciever_irq                 main
+     00008451  _uart_write_irq                    main
+     0000847B  _uart_read_irq                     main
+     00008499  _uart_init                         main
+     0000859B  _uart_read_byte                    main
+     000085A3  _uart_write_byte                   main
+     000085AE  _uart_write                        main
+     000085D2  _uart_read                         main
+     00008600  _i2c_irq                           main
+     000086BA  _i2c_init                          main
+     000086E5  _i2c_start                         main
+     000086EF  _i2c_stop                          main
+     000086F4  _i2c_send_address                  main
+     00008723  _i2c_read_byte                     main
+     0000872C  _i2c_read                          main
+     0000877B  _i2c_send_byte                     main
+     0000878D  _i2c_write                         main
+     000087BD  _i2c_scan                          main
+     000087F0  _i2c_start_irq                     main
+     00008800  _i2c_stop_irq                      main
+     00008805  _get_bit                           main
+     0000881A  _set_bit                           main
+     0000884D  _ssd1306_init                      main
+     000088C1  _ssd1306_set_params_to_write       main
+     000088E5  _ssd1306_draw_pixel                main
+     00008930  _ssd1306_buffer_clean              main
+     0000893D  _ssd1306_send_buffer               main
+     00008992  _ssd1306_buffer_write              main
+     00008A2A  _ssd1306_clean                     main
+     00008A30  _setup                             main
+     00008A40  _gg                                main
+     00008A46  _main                              main
+     00008A4F  _memset                            _memset
+     00008A71  ___sdcc_external_startup           _startup
+     00008A73  __modsint                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 
 Files Linked                              [ module(s) ]
@@ -197,10 +202,9 @@ main.rel                                  [ main ]
 
 Libraries Linked                          [ object file ]
 
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _mulint.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _memset.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _startup.rel ]
-/usr/bin/../share/sdcc/lib/stm8/stm8.lib  [ _modsint.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _memset.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _startup.rel ]
+/sbin/../share/sdcc/lib/stm8/stm8.lib     [ _modsint.rel ]
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 

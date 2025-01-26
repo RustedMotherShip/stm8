@@ -18,6 +18,14 @@
 	.globl _i2c_irq
 	.globl _memset
 	.globl _main_buffer
+	.globl _ttf_eng_line_down
+	.globl _ttf_eng_line_up
+	.globl _ttf_eng_line_left
+	.globl _ttf_eng_line_right
+	.globl _ttf_eng_corner_right_down
+	.globl _ttf_eng_corner_left_down
+	.globl _ttf_eng_corner_right_up
+	.globl _ttf_eng_corner_left_up
 	.globl _ttf_eng_0
 	.globl _ttf_eng_9
 	.globl _ttf_eng_8
@@ -82,7 +90,6 @@
 	.globl _ssd1306_init
 	.globl _ssd1306_set_params_to_write
 	.globl _ssd1306_draw_pixel
-	.globl _ssd1306_buffer_splash
 	.globl _ssd1306_buffer_write
 	.globl _ssd1306_clean
 ;--------------------------------------------------------
@@ -174,6 +181,22 @@ _ttf_eng_8::
 _ttf_eng_9::
 	.ds 8
 _ttf_eng_0::
+	.ds 8
+_ttf_eng_corner_left_up::
+	.ds 8
+_ttf_eng_corner_right_up::
+	.ds 8
+_ttf_eng_corner_left_down::
+	.ds 8
+_ttf_eng_corner_right_down::
+	.ds 8
+_ttf_eng_line_right::
+	.ds 8
+_ttf_eng_line_left::
+	.ds 8
+_ttf_eng_line_up::
+	.ds 8
+_ttf_eng_line_down::
 	.ds 8
 _main_buffer::
 	.ds 512
@@ -1346,16 +1369,15 @@ _ssd1306_buffer_clean:
 ;	 function ssd1306_send_buffer
 ;	-----------------------------------------
 _ssd1306_send_buffer:
-	sub	sp, #2
+	sub	sp, #4
 ;	./libs/ssd1306_lib.c: 65: ssd1306_set_params_to_write();
 	call	_ssd1306_set_params_to_write
-;	./libs/ssd1306_lib.c: 66: for(int j = 1;j<5;j++)
+;	./libs/ssd1306_lib.c: 66: for(int j = 0;j<4;j++)
 	clrw	x
-	incw	x
-	ldw	(0x01, sp), x
+	ldw	(0x03, sp), x
 00112$:
-	ldw	x, (0x01, sp)
-	cpw	x, #0x0005
+	ldw	x, (0x03, sp)
+	cpw	x, #0x0004
 	jrsge	00114$
 ;	./libs/ssd1306_lib.c: 68: if(i2c_send_address(I2C_DISPLAY_ADDR, 0))//Проверка на АСК бит
 	push	#0x00
@@ -1367,17 +1389,22 @@ _ssd1306_send_buffer:
 	ld	a, #0x40
 	call	_i2c_send_byte
 ;	./libs/ssd1306_lib.c: 71: for(int i = 0;i < 128;i++)
+	ldw	x, (0x03, sp)
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	sllw	x
+	ldw	(0x01, sp), x
 	clrw	x
 00109$:
 	cpw	x, #0x0080
 	jrsge	00103$
-;	./libs/ssd1306_lib.c: 73: if(i2c_send_byte(main_buffer[i*j]))//Проверка на АСК бит
-	pushw	x
-	ldw	y, (0x03, sp)
-	pushw	y
-	call	__mulint
-	exgw	x, y
-	popw	x
+;	./libs/ssd1306_lib.c: 73: if(i2c_send_byte(main_buffer[i+(128*j)]))//Проверка на АСК бит
+	ldw	y, x
+	addw	y, (0x01, sp)
 	ld	a, (_main_buffer+0, y)
 	pushw	x
 	call	_i2c_send_byte
@@ -1395,250 +1422,23 @@ _ssd1306_send_buffer:
 ;	./libs/ssd1306_lib.c: 81: i2c_stop();
 	call	_i2c_stop
 00113$:
-;	./libs/ssd1306_lib.c: 66: for(int j = 1;j<5;j++)
-	ldw	x, (0x01, sp)
+;	./libs/ssd1306_lib.c: 66: for(int j = 0;j<4;j++)
+	ldw	x, (0x03, sp)
 	incw	x
-	ldw	(0x01, sp), x
+	ldw	(0x03, sp), x
 	jra	00112$
 00114$:
 ;	./libs/ssd1306_lib.c: 83: }
-	addw	sp, #2
+	addw	sp, #4
 	ret
-;	./libs/ssd1306_lib.c: 84: void ssd1306_buffer_splash(void)
-;	-----------------------------------------
-;	 function ssd1306_buffer_splash
-;	-----------------------------------------
-_ssd1306_buffer_splash:
-	sub	sp, #139
-;	./libs/ssd1306_lib.c: 87: ssd1306_set_params_to_write();
-	call	_ssd1306_set_params_to_write
-;	./libs/ssd1306_lib.c: 88: uint8_t part[129]={SET_DISPLAY_START_LINE};
-	ld	a, #0x40
-	ld	(0x01, sp), a
-	clr	(0x02, sp)
-	clr	(0x03, sp)
-	clr	(0x04, sp)
-	clr	(0x05, sp)
-	clr	(0x06, sp)
-	clr	(0x07, sp)
-	clr	(0x08, sp)
-	clr	(0x09, sp)
-	clr	(0x0a, sp)
-	clr	(0x0b, sp)
-	clr	(0x0c, sp)
-	clr	(0x0d, sp)
-	clr	(0x0e, sp)
-	clr	(0x0f, sp)
-	clr	(0x10, sp)
-	clr	(0x11, sp)
-	clr	(0x12, sp)
-	clr	(0x13, sp)
-	clr	(0x14, sp)
-	clr	(0x15, sp)
-	clr	(0x16, sp)
-	clr	(0x17, sp)
-	clr	(0x18, sp)
-	clr	(0x19, sp)
-	clr	(0x1a, sp)
-	clr	(0x1b, sp)
-	clr	(0x1c, sp)
-	clr	(0x1d, sp)
-	clr	(0x1e, sp)
-	clr	(0x1f, sp)
-	clr	(0x20, sp)
-	clr	(0x21, sp)
-	clr	(0x22, sp)
-	clr	(0x23, sp)
-	clr	(0x24, sp)
-	clr	(0x25, sp)
-	clr	(0x26, sp)
-	clr	(0x27, sp)
-	clr	(0x28, sp)
-	clr	(0x29, sp)
-	clr	(0x2a, sp)
-	clr	(0x2b, sp)
-	clr	(0x2c, sp)
-	clr	(0x2d, sp)
-	clr	(0x2e, sp)
-	clr	(0x2f, sp)
-	clr	(0x30, sp)
-	clr	(0x31, sp)
-	clr	(0x32, sp)
-	clr	(0x33, sp)
-	clr	(0x34, sp)
-	clr	(0x35, sp)
-	clr	(0x36, sp)
-	clr	(0x37, sp)
-	clr	(0x38, sp)
-	clr	(0x39, sp)
-	clr	(0x3a, sp)
-	clr	(0x3b, sp)
-	clr	(0x3c, sp)
-	clr	(0x3d, sp)
-	clr	(0x3e, sp)
-	clr	(0x3f, sp)
-	clr	(0x40, sp)
-	clr	(0x41, sp)
-	clr	(0x42, sp)
-	clr	(0x43, sp)
-	clr	(0x44, sp)
-	clr	(0x45, sp)
-	clr	(0x46, sp)
-	clr	(0x47, sp)
-	clr	(0x48, sp)
-	clr	(0x49, sp)
-	clr	(0x4a, sp)
-	clr	(0x4b, sp)
-	clr	(0x4c, sp)
-	clr	(0x4d, sp)
-	clr	(0x4e, sp)
-	clr	(0x4f, sp)
-	clr	(0x50, sp)
-	clr	(0x51, sp)
-	clr	(0x52, sp)
-	clr	(0x53, sp)
-	clr	(0x54, sp)
-	clr	(0x55, sp)
-	clr	(0x56, sp)
-	clr	(0x57, sp)
-	clr	(0x58, sp)
-	clr	(0x59, sp)
-	clr	(0x5a, sp)
-	clr	(0x5b, sp)
-	clr	(0x5c, sp)
-	clr	(0x5d, sp)
-	clr	(0x5e, sp)
-	clr	(0x5f, sp)
-	clr	(0x60, sp)
-	clr	(0x61, sp)
-	clr	(0x62, sp)
-	clr	(0x63, sp)
-	clr	(0x64, sp)
-	clr	(0x65, sp)
-	clr	(0x66, sp)
-	clr	(0x67, sp)
-	clr	(0x68, sp)
-	clr	(0x69, sp)
-	clr	(0x6a, sp)
-	clr	(0x6b, sp)
-	clr	(0x6c, sp)
-	clr	(0x6d, sp)
-	clr	(0x6e, sp)
-	clr	(0x6f, sp)
-	clr	(0x70, sp)
-	clr	(0x71, sp)
-	clr	(0x72, sp)
-	clr	(0x73, sp)
-	clr	(0x74, sp)
-	clr	(0x75, sp)
-	clr	(0x76, sp)
-	clr	(0x77, sp)
-	clr	(0x78, sp)
-	clr	(0x79, sp)
-	clr	(0x7a, sp)
-	clr	(0x7b, sp)
-	clr	(0x7c, sp)
-	clr	(0x7d, sp)
-	clr	(0x7e, sp)
-	clr	(0x7f, sp)
-	clr	(0x80, sp)
-	clr	(0x81, sp)
-;	./libs/ssd1306_lib.c: 90: for(int page = 0;page <= 384;page+=128)
-	clrw	x
-	ldw	(0x86, sp), x
-00111$:
-	ldw	x, (0x86, sp)
-	cpw	x, #0x0180
-	jrsgt	00113$
-;	./libs/ssd1306_lib.c: 92: for (int height = 0; height < 8; height++) 
-	clrw	x
-	ldw	(0x88, sp), x
-00108$:
-	ldw	x, (0x88, sp)
-	cpw	x, #0x0008
-	jrsge	00102$
-;	./libs/ssd1306_lib.c: 94: for (int width = 0; width < 128; width++) 
-	ldw	x, (0x88, sp)
-	sllw	x
-	sllw	x
-	sllw	x
-	sllw	x
-	addw	x, (0x86, sp)
-	ldw	(0x82, sp), x
-	clrw	x
-	ldw	(0x8a, sp), x
-00105$:
-	ldw	x, (0x8a, sp)
-	cpw	x, #0x0080
-	jrsge	00109$
-;	./libs/ssd1306_lib.c: 96: ssd1306_draw_pixel(&part[1], width, height, get_bit(main_buffer[page+(height*16) + (width / 8)], 7 - (width % 8)));
-	push	#0x08
-	push	#0x00
-	ldw	x, (0x8c, sp)
-	call	__modsint
-	ldw	(0x84, sp), x
-	ldw	y, #0x0007
-	subw	y, (0x84, sp)
-	ldw	x, (0x8a, sp)
-	jrpl	00163$
-	addw	x, #0x0007
-00163$:
-	sraw	x
-	sraw	x
-	sraw	x
-	addw	x, (0x82, sp)
-	ld	a, (_main_buffer+0, x)
-	clrw	x
-	pushw	y
-	ld	xl, a
-	call	_get_bit
-	ld	a, (0x89, sp)
-	rlwa	x
-	ld	a, (0x8b, sp)
-	rrwa	x
-	pushw	x
-	addw	sp, #1
-	push	a
-	ld	a, xh
-	ldw	x, sp
-	addw	x, #4
-	call	_ssd1306_draw_pixel
-;	./libs/ssd1306_lib.c: 94: for (int width = 0; width < 128; width++) 
-	ldw	x, (0x8a, sp)
-	incw	x
-	ldw	(0x8a, sp), x
-	jra	00105$
-00109$:
-;	./libs/ssd1306_lib.c: 92: for (int height = 0; height < 8; height++) 
-	ldw	x, (0x88, sp)
-	incw	x
-	ldw	(0x88, sp), x
-	jra	00108$
-00102$:
-;	./libs/ssd1306_lib.c: 99: i2c_write(I2C_DISPLAY_ADDR, 129, part);
-	ldw	x, sp
-	incw	x
-	pushw	x
-	push	#0x81
-	ld	a, #0x3c
-	call	_i2c_write
-;	./libs/ssd1306_lib.c: 90: for(int page = 0;page <= 384;page+=128)
-	ldw	x, (0x86, sp)
-	addw	x, #0x0080
-	ldw	(0x86, sp), x
-	jp	00111$
-00113$:
-;	./libs/ssd1306_lib.c: 101: }
-	addw	sp, #139
-	ret
-;	./libs/ssd1306_lib.c: 103: void ssd1306_buffer_write(int x, int y, const uint8_t *data)
+;	./libs/ssd1306_lib.c: 105: void ssd1306_buffer_write(int x, int y, const uint8_t *data)
 ;	-----------------------------------------
 ;	 function ssd1306_buffer_write
 ;	-----------------------------------------
 _ssd1306_buffer_write:
 	sub	sp, #13
 	ldw	(0x08, sp), x
-;	./libs/ssd1306_lib.c: 105: for (int height = 0; height < 8; height++)
+;	./libs/ssd1306_lib.c: 107: for (int height = 0; height < 8; height++)
 	clrw	x
 	ldw	(0x0a, sp), x
 00109$:
@@ -1647,7 +1447,7 @@ _ssd1306_buffer_write:
 	jrslt	00150$
 	jp	00111$
 00150$:
-;	./libs/ssd1306_lib.c: 107: for (int width = 0; width < 8; width++)
+;	./libs/ssd1306_lib.c: 109: for (int width = 0; width < 8; width++)
 	ldw	x, (0x0a, sp)
 	sllw	x
 	sllw	x
@@ -1660,7 +1460,7 @@ _ssd1306_buffer_write:
 	ldw	x, (0x0c, sp)
 	cpw	x, #0x0008
 	jrsge	00110$
-;	./libs/ssd1306_lib.c: 108: if(data[height + width / 8] & (128 >> (width & 7)))
+;	./libs/ssd1306_lib.c: 110: if(data[height + width / 8] & (128 >> (width & 7)))
 	ldw	x, (0x0a, sp)
 	addw	x, (0x12, sp)
 	ld	a, (x)
@@ -1682,7 +1482,7 @@ _ssd1306_buffer_write:
 	clr	(0x03, sp)
 	ldw	x, (0x03, sp)
 	jreq	00107$
-;	./libs/ssd1306_lib.c: 109: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(main_buffer[(height*16) + (width / 8)], 7 - (width % 8)));
+;	./libs/ssd1306_lib.c: 111: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(main_buffer[(height*16) + (width / 8)], 7 - (width % 8)));
 	push	#0x08
 	push	#0x00
 	ldw	x, (0x0e, sp)
@@ -1714,31 +1514,31 @@ _ssd1306_buffer_write:
 	ldw	x, #(_main_buffer+0)
 	call	_ssd1306_draw_pixel
 00107$:
-;	./libs/ssd1306_lib.c: 107: for (int width = 0; width < 8; width++)
+;	./libs/ssd1306_lib.c: 109: for (int width = 0; width < 8; width++)
 	ldw	x, (0x0c, sp)
 	incw	x
 	ldw	(0x0c, sp), x
 	jra	00106$
 00110$:
-;	./libs/ssd1306_lib.c: 105: for (int height = 0; height < 8; height++)
+;	./libs/ssd1306_lib.c: 107: for (int height = 0; height < 8; height++)
 	ldw	x, (0x0a, sp)
 	incw	x
 	ldw	(0x0a, sp), x
 	jp	00109$
 00111$:
-;	./libs/ssd1306_lib.c: 111: }
+;	./libs/ssd1306_lib.c: 113: }
 	ldw	x, (14, sp)
 	addw	sp, #19
 	jp	(x)
-;	./libs/ssd1306_lib.c: 113: void ssd1306_clean(void)
+;	./libs/ssd1306_lib.c: 115: void ssd1306_clean(void)
 ;	-----------------------------------------
 ;	 function ssd1306_clean
 ;	-----------------------------------------
 _ssd1306_clean:
-;	./libs/ssd1306_lib.c: 115: ssd1306_buffer_clean();
+;	./libs/ssd1306_lib.c: 117: ssd1306_buffer_clean();
 	call	_ssd1306_buffer_clean
-;	./libs/ssd1306_lib.c: 116: ssd1306_send_buffer();
-;	./libs/ssd1306_lib.c: 117: }
+;	./libs/ssd1306_lib.c: 118: ssd1306_send_buffer();
+;	./libs/ssd1306_lib.c: 119: }
 	jp	_ssd1306_send_buffer
 ;	main.c: 3: void setup(void)
 ;	-----------------------------------------
@@ -1747,6 +1547,10 @@ _ssd1306_clean:
 _setup:
 ;	main.c: 6: CLK_CKDIVR = 0;
 	mov	0x50c6+0, #0x00
+;	main.c: 8: uart_init(9600,0);
+	clr	a
+	ldw	x, #0x2580
+	call	_uart_init
 ;	main.c: 9: i2c_init();
 	call	_i2c_init
 ;	main.c: 11: enableInterrupts();
@@ -1760,9 +1564,9 @@ _setup:
 _gg:
 ;	main.c: 16: ssd1306_init();
 	call	_ssd1306_init
-;	main.c: 17: ssd1306_buffer_splash();
+;	main.c: 17: ssd1306_send_buffer();
 ;	main.c: 21: }
-	jp	_ssd1306_buffer_splash
+	jp	_ssd1306_send_buffer
 ;	main.c: 23: int main(void)
 ;	-----------------------------------------
 ;	 function main
@@ -2106,502 +1910,242 @@ __xinit__ttf_eng_0:
 	.db #0x62	; 98	'b'
 	.db #0x3c	; 60
 	.db #0x00	; 0
+__xinit__ttf_eng_corner_left_up:
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+__xinit__ttf_eng_corner_right_up:
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+__xinit__ttf_eng_corner_left_down:
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xff	; 255
+	.db #0xff	; 255
+__xinit__ttf_eng_corner_right_down:
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0xff	; 255
+	.db #0xff	; 255
+__xinit__ttf_eng_line_right:
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+__xinit__ttf_eng_line_left:
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+	.db #0xc0	; 192
+__xinit__ttf_eng_line_up:
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+__xinit__ttf_eng_line_down:
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
 __xinit__main_buffer:
 	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x1d	; 29
-	.db #0x1d	; 29
-	.db #0x5c	; 92
-	.db #0xed	; 237
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0xfd	; 253
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x3d	; 61
 	.db #0x15	; 21
+	.db #0x3d	; 61
+	.db #0x01	; 1
+	.db #0x3d	; 61
+	.db #0x21	; 33
+	.db #0x21	; 33
+	.db #0x01	; 1
+	.db #0x3d	; 61
 	.db #0x15	; 21
-	.db #0x54	; 84	'T'
-	.db #0xa5	; 165
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
 	.db #0x1d	; 29
-	.db #0x1d	; 29
-	.db #0xdc	; 220
-	.db #0xa5	; 165
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x3d	; 61
+	.db #0x11	; 17
+	.db #0x3d	; 61
+	.db #0x01	; 1
+	.db #0x3d	; 61
 	.db #0x15	; 21
-	.db #0xd1	; 209
-	.db #0x54	; 84	'T'
-	.db #0xe5	; 229
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
+	.db #0x3d	; 61
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
+	.db #0x3d	; 61
+	.db #0x25	; 37
+	.db #0x3d	; 61
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
+	.db #0x05	; 5
+	.db #0x3d	; 61
 	.db #0x01	; 1
-	.db #0x80	; 128
 	.db #0xff	; 255
 	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
 	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
+	.db #0xfe	; 254
+	.db #0xfe	; 254
+	.db #0xfe	; 254
+	.db #0xfe	; 254
+	.db #0xfe	; 254
+	.db #0xfe	; 254
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0xff	; 255
-	.db #0xff	; 255
-	.db #0xfc	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0xfe	; 254
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0xfe	; 254
-	.db #0x7c	; 124
-	.db #0x7e	; 126
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x38	; 56	'8'
-	.db #0x7e	; 126
-	.db #0x7e	; 126
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x38	; 56	'8'
-	.db #0x66	; 102	'f'
-	.db #0x60	; 96
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x38	; 56	'8'
-	.db #0x66	; 102	'f'
-	.db #0x60	; 96
-	.db #0x00	; 0
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0xfe	; 254
-	.db #0x66	; 102	'f'
-	.db #0x7e	; 126
-	.db #0x18	; 24
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0x0f	; 15
-	.db #0xe0	; 224
-	.db #0x3f	; 63
-	.db #0x80	; 128
-	.db #0xfe	; 254
-	.db #0x03	; 3
-	.db #0xf8	; 248
-	.db #0xfe	; 254
-	.db #0x66	; 102	'f'
-	.db #0x7e	; 126
-	.db #0x18	; 24
-	.db #0x01	; 1
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x01	; 1
 	.db #0xff	; 255
 	.db #0xff	; 255
@@ -2610,6 +2154,13 @@ __xinit__main_buffer:
 	.db #0xff	; 255
 	.db #0xff	; 255
 	.db #0xff	; 255
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
 	.db #0xff	; 255
 	.db #0xff	; 255
 	.db #0xff	; 255
@@ -2617,6 +2168,331 @@ __xinit__main_buffer:
 	.db #0xff	; 255
 	.db #0xff	; 255
 	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
 	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x7f	; 127
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xff	; 255
+	.db #0xff	; 255
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xb1	; 177
+	.db #0xb1	; 177
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xb1	; 177
+	.db #0xb1	; 177
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0x83	; 131
+	.db #0x83	; 131
+	.db #0xbf	; 191
+	.db #0xbe	; 190
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xbf	; 191
+	.db #0xbf	; 191
+	.db #0xb3	; 179
+	.db #0xb3	; 179
+	.db #0xb3	; 179
+	.db #0xb3	; 179
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xb0	; 176
+	.db #0xb0	; 176
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
 	.db #0xff	; 255
 	.area CABS (ABS)
