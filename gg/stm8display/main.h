@@ -9,12 +9,6 @@
 
 
 #include "libs/libs.c"
-// #include "libs/uart_lib.h"
-
-// #include "libs/i2c_lib.h"
-
-// #include "libs/ssd1306_lib.h"
-
 
 #include "stm8.h"
 

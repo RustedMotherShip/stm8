@@ -11,12 +11,14 @@
 	.globl _main
 	.globl _gg
 	.globl _setup
+	.globl _tmr2_irq
 	.globl _ssd1306_send_buffer
 	.globl _ssd1306_buffer_clean
 	.globl _set_bit
 	.globl _get_bit
 	.globl _i2c_irq
 	.globl _memset
+	.globl _TIM2_IRQ
 	.globl _main_buffer
 	.globl _ttf_eng_line_down
 	.globl _ttf_eng_line_up
@@ -92,6 +94,7 @@
 	.globl _ssd1306_draw_pixel
 	.globl _ssd1306_buffer_write
 	.globl _ssd1306_clean
+	.globl _delay_s
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
@@ -200,6 +203,8 @@ _ttf_eng_line_down::
 	.ds 8
 _main_buffer::
 	.ds 512
+_TIM2_IRQ::
+	.ds 1
 ;--------------------------------------------------------
 ; Stack segment in internal ram
 ;--------------------------------------------------------
@@ -240,7 +245,7 @@ __interrupt_vect:
 	int 0x000000 ; int10
 	int 0x000000 ; int11
 	int 0x000000 ; int12
-	int 0x000000 ; int13
+	int _tmr2_irq ; int13
 	int 0x000000 ; int14
 	int 0x000000 ; int15
 	int 0x000000 ; int16
@@ -1431,41 +1436,35 @@ _ssd1306_send_buffer:
 ;	./libs/ssd1306_lib.c: 83: }
 	addw	sp, #4
 	ret
-;	./libs/ssd1306_lib.c: 105: void ssd1306_buffer_write(int x, int y, const uint8_t *data)
+;	./libs/ssd1306_lib.c: 85: void ssd1306_buffer_write(int x, int y, const uint8_t *data)
 ;	-----------------------------------------
 ;	 function ssd1306_buffer_write
 ;	-----------------------------------------
 _ssd1306_buffer_write:
-	sub	sp, #13
-	ldw	(0x08, sp), x
-;	./libs/ssd1306_lib.c: 107: for (int height = 0; height < 8; height++)
+	sub	sp, #10
+	ldw	(0x05, sp), x
+;	./libs/ssd1306_lib.c: 87: for (int height = 0; height < 8; height++)
 	clrw	x
-	ldw	(0x0a, sp), x
+	ldw	(0x07, sp), x
 00109$:
-	ldw	x, (0x0a, sp)
+	ldw	x, (0x07, sp)
 	cpw	x, #0x0008
 	jrslt	00150$
 	jp	00111$
 00150$:
-;	./libs/ssd1306_lib.c: 109: for (int width = 0; width < 8; width++)
-	ldw	x, (0x0a, sp)
-	sllw	x
-	sllw	x
-	sllw	x
-	sllw	x
-	ldw	(0x05, sp), x
+;	./libs/ssd1306_lib.c: 89: for (int width = 0; width < 8; width++)
 	clrw	x
-	ldw	(0x0c, sp), x
+	ldw	(0x09, sp), x
 00106$:
-	ldw	x, (0x0c, sp)
+	ldw	x, (0x09, sp)
 	cpw	x, #0x0008
 	jrsge	00110$
-;	./libs/ssd1306_lib.c: 110: if(data[height + width / 8] & (128 >> (width & 7)))
-	ldw	x, (0x0a, sp)
-	addw	x, (0x12, sp)
+;	./libs/ssd1306_lib.c: 90: if(data[height + width / 8] & (128 >> (width & 7)))
+	ldw	x, (0x07, sp)
+	addw	x, (0x0f, sp)
 	ld	a, (x)
 	ld	xl, a
-	ld	a, (0x0d, sp)
+	ld	a, (0x0a, sp)
 	and	a, #0x07
 	ldw	y, #0x0080
 	tnz	a
@@ -1482,64 +1481,141 @@ _ssd1306_buffer_write:
 	clr	(0x03, sp)
 	ldw	x, (0x03, sp)
 	jreq	00107$
-;	./libs/ssd1306_lib.c: 111: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(main_buffer[(height*16) + (width / 8)], 7 - (width % 8)));
+;	./libs/ssd1306_lib.c: 91: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(data[height + width], 7 - (width % 8)));
 	push	#0x08
 	push	#0x00
-	ldw	x, (0x0e, sp)
+	ldw	x, (0x0b, sp)
 	call	__modsint
 	ldw	(0x03, sp), x
 	ldw	y, #0x0007
 	subw	y, (0x03, sp)
-	ldw	x, (0x05, sp)
-	ld	a, (_main_buffer+0, x)
+	ldw	x, (0x07, sp)
+	addw	x, (0x09, sp)
+	addw	x, (0x0f, sp)
+	ld	a, (x)
 	clrw	x
 	pushw	y
 	ld	xl, a
 	call	_get_bit
-	ld	a, (0x11, sp)
-	ld	(0x07, sp), a
-	ld	a, (0x0b, sp)
-	add	a, (0x07, sp)
+	ld	a, (0x0e, sp)
+	ld	(0x04, sp), a
+	ld	a, (0x08, sp)
+	add	a, (0x04, sp)
 	ld	xh, a
-	ld	a, (0x09, sp)
-	ld	(0x07, sp), a
-	ld	a, (0x0d, sp)
-	add	a, (0x07, sp)
-	ld	(0x07, sp), a
+	ld	a, (0x06, sp)
+	ld	(0x04, sp), a
+	ld	a, (0x0a, sp)
+	add	a, (0x04, sp)
+	ld	(0x04, sp), a
 	ld	a, xl
 	push	a
 	ld	a, xh
 	push	a
-	ld	a, (0x09, sp)
+	ld	a, (0x06, sp)
 	ldw	x, #(_main_buffer+0)
 	call	_ssd1306_draw_pixel
 00107$:
-;	./libs/ssd1306_lib.c: 109: for (int width = 0; width < 8; width++)
-	ldw	x, (0x0c, sp)
+;	./libs/ssd1306_lib.c: 89: for (int width = 0; width < 8; width++)
+	ldw	x, (0x09, sp)
 	incw	x
-	ldw	(0x0c, sp), x
+	ldw	(0x09, sp), x
 	jra	00106$
 00110$:
-;	./libs/ssd1306_lib.c: 107: for (int height = 0; height < 8; height++)
-	ldw	x, (0x0a, sp)
+;	./libs/ssd1306_lib.c: 87: for (int height = 0; height < 8; height++)
+	ldw	x, (0x07, sp)
 	incw	x
-	ldw	(0x0a, sp), x
+	ldw	(0x07, sp), x
 	jp	00109$
 00111$:
-;	./libs/ssd1306_lib.c: 113: }
-	ldw	x, (14, sp)
-	addw	sp, #19
+;	./libs/ssd1306_lib.c: 93: }
+	ldw	x, (11, sp)
+	addw	sp, #16
 	jp	(x)
-;	./libs/ssd1306_lib.c: 115: void ssd1306_clean(void)
+;	./libs/ssd1306_lib.c: 95: void ssd1306_clean(void)
 ;	-----------------------------------------
 ;	 function ssd1306_clean
 ;	-----------------------------------------
 _ssd1306_clean:
-;	./libs/ssd1306_lib.c: 117: ssd1306_buffer_clean();
+;	./libs/ssd1306_lib.c: 97: ssd1306_buffer_clean();
 	call	_ssd1306_buffer_clean
-;	./libs/ssd1306_lib.c: 118: ssd1306_send_buffer();
-;	./libs/ssd1306_lib.c: 119: }
+;	./libs/ssd1306_lib.c: 98: ssd1306_send_buffer();
+;	./libs/ssd1306_lib.c: 99: }
 	jp	_ssd1306_send_buffer
+;	./libs/tmr2_lib.c: 3: void tmr2_irq(void) __interrupt(TIM2_vector)
+;	-----------------------------------------
+;	 function tmr2_irq
+;	-----------------------------------------
+_tmr2_irq:
+	clr	a
+	div	x, a
+;	./libs/tmr2_lib.c: 5: TIM2_CR1->CEN = 0;
+	ldw	x, #0x5300
+	ld	a, (x)
+	and	a, #0xfe
+	ld	(x), a
+;	./libs/tmr2_lib.c: 6: disableInterrupts();
+	sim
+;	./libs/tmr2_lib.c: 7: TIM2_IRQ.all = 0;//обнуление флагов регистров
+	mov	_TIM2_IRQ+0, #0x00
+;	./libs/tmr2_lib.c: 9: if(TIM2_SR1 -> UIF)//прерывание таймера
+	ldw	x, #0x5304
+	ld	a, (x)
+	and	a, #0x01
+	jreq	00102$
+;	./libs/tmr2_lib.c: 11: TIM2_IRQ.UIF = 1;
+	bset	_TIM2_IRQ+0, #7
+;	./libs/tmr2_lib.c: 12: TIM2_IER -> UIE = 0;
+	ldw	x, #0x5303
+	ld	a, (x)
+	and	a, #0xfe
+	ld	(x), a
+00102$:
+;	./libs/tmr2_lib.c: 14: enableInterrupts();
+	rim
+;	./libs/tmr2_lib.c: 15: }
+	iret
+;	./libs/tmr2_lib.c: 16: void delay_s(uint8_t ticks)
+;	-----------------------------------------
+;	 function delay_s
+;	-----------------------------------------
+_delay_s:
+	sub	sp, #5
+	ld	(0x03, sp), a
+;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks;i++)
+	clrw	x
+	ldw	(0x04, sp), x
+00106$:
+	ld	a, (0x03, sp)
+	ld	(0x02, sp), a
+	clr	(0x01, sp)
+	ldw	x, (0x04, sp)
+	cpw	x, (0x01, sp)
+	jrsge	00108$
+;	./libs/tmr2_lib.c: 20: TIM2_ARRH->ARR = 0x00;
+	mov	0x530f+0, #0x00
+;	./libs/tmr2_lib.c: 21: TIM2_ARRL->ARR = 0x01;
+	mov	0x5310+0, #0x01
+;	./libs/tmr2_lib.c: 22: TIM2_PSCR -> PSC = 0x0E;
+	ld	a, 0x530e
+	and	a, #0xf0
+	or	a, #0x0e
+	ld	0x530e, a
+;	./libs/tmr2_lib.c: 23: TIM2_IER -> UIE = 1;
+	bset	0x5303, #0
+;	./libs/tmr2_lib.c: 24: TIM2_CR1-> CEN = 1;
+	bset	0x5300, #0
+;	./libs/tmr2_lib.c: 25: while(TIM2_IER -> UIE);
+00101$:
+	btjt	0x5303, #0, 00101$
+;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks;i++)
+	ldw	x, (0x04, sp)
+	incw	x
+	ldw	(0x04, sp), x
+	jra	00106$
+00108$:
+;	./libs/tmr2_lib.c: 28: }
+	addw	sp, #5
+	ret
 ;	main.c: 3: void setup(void)
 ;	-----------------------------------------
 ;	 function setup
@@ -1565,8 +1641,13 @@ _gg:
 ;	main.c: 16: ssd1306_init();
 	call	_ssd1306_init
 ;	main.c: 17: ssd1306_send_buffer();
+	call	_ssd1306_send_buffer
+;	main.c: 18: delay_s(0x01);
+	ld	a, #0x01
+	call	_delay_s
+;	main.c: 19: ssd1306_clean();
 ;	main.c: 21: }
-	jp	_ssd1306_send_buffer
+	jp	_ssd1306_clean
 ;	main.c: 23: int main(void)
 ;	-----------------------------------------
 ;	 function main
@@ -2495,4 +2576,6 @@ __xinit__main_buffer:
 	.db #0x80	; 128
 	.db #0x80	; 128
 	.db #0xff	; 255
+__xinit__TIM2_IRQ:
+	.db #0x00	; 0
 	.area CABS (ABS)

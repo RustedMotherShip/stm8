@@ -15,8 +15,8 @@ void gg(void)
 {
     ssd1306_init();
     ssd1306_send_buffer();
-    //ssd1306_clean();
-    
+    delay_s(0x01);
+    ssd1306_clean();
     
 }
  
@@ -35,3 +35,5 @@ int main(void)
 |_|  |_| |_| |_| |_| \_\
                     Inc. 
 */
+
+
