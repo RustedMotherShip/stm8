@@ -88,7 +88,7 @@ void ssd1306_buffer_write(int x, int y, const uint8_t *data)
     {
         for (int width = 0; width < 8; width++)
             if(data[height + width / 8] & (128 >> (width & 7)))
-            ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(data[height + width], 7 - (width % 8)));
+            ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(data[height], 7 - (width % 8)));
     }
 }
 

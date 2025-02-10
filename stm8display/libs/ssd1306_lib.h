@@ -9,13 +9,6 @@
 #define SSD1306_LCDHEIGHT 32
 #define I2C_DISPLAY_ADDR 0x3C
 
-void ssd1306_init(void);
-void ssd1306_set_params_to_write(void);
-void ssd1306_draw_pixel(uint8_t *buffer,uint8_t x, uint8_t y, uint8_t color);
-void ssd1306_buffer_splash(void);
-void ssd1306_buffer_write(int x, int y, const uint8_t *data);
-void ssd1306_clean(void);
-
 //Список всех команд
 
 #define COMMAND 0x00 
@@ -59,6 +52,18 @@ void ssd1306_clean(void);
 //   | |   | | | |_   
 //   | |   | | |  _|  
 //   |_|   |_| |_|   
+
+uint8_t ttf_eng_void[8] =
+{
+     0b00000000,
+     0b00000000,
+     0b00000000,
+     0b00000000,
+     0b00000000,
+     0b00000000,
+     0b00000000,
+     0b00000000,
+};
 
 uint8_t ttf_eng_a[8] =
 {
@@ -586,5 +591,12 @@ uint8_t main_buffer[512] =
 0x80, 0xBF, 0xBF, 0x83, 0x83, 0xBF, 0xBE, 0x80, 0x80, 0xBF, 0xBF, 0xB3, 0xB3, 0xB3, 0xB3, 0x80, 
 0x80, 0x80, 0x80, 0xB0, 0xB0, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xFF,
 };
+
+void ssd1306_init(void);
+void ssd1306_set_params_to_write(void);
+void ssd1306_draw_pixel(uint8_t *buffer,uint8_t x, uint8_t y, uint8_t color);
+void ssd1306_buffer_splash(void);
+void ssd1306_buffer_write(int x, int y, const uint8_t *data);
+void ssd1306_clean(void);
 
 #endif 

@@ -1,5 +1,4 @@
-    #include "main.h"
-//#include "pics/splash.h"
+#include "main.h"
 
 void setup(void)
 {
@@ -7,21 +6,35 @@ void setup(void)
     CLK_CKDIVR = 0;
     
     uart_init(9600,0);
-    //i2c_init();
+    i2c_init();
 
     enableInterrupts();
 }
 
-
-
 void gg(void)
 {
-    //display_init();
-    //display_clean();
-    //display_buffer_fill_entire(splash);
-    uart_write_byte(0xAA);
-}
+    ssd1306_init();
+    ssd1306_send_buffer();
+    delay_s(1);
 
+    menu_set_paragraph(menu);
+    delay_s(1);
+
+    //menu_set_paragraph(color);
+    // delay_s(1);
+
+    //menu_set_paragraph(segment);
+    // delay_s(1);
+
+    // menu_set_paragraph(settings);
+    // delay_s(1);
+
+    // menu_set_paragraph(menu);
+    // delay_s(1);
+    
+    
+}
+ 
 int main(void)
 {
     setup();
@@ -37,3 +50,5 @@ int main(void)
 |_|  |_| |_| |_| |_| \_\
                     Inc. 
 */
+
+

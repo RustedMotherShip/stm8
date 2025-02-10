@@ -12,6 +12,10 @@
 	.globl _gg
 	.globl _setup
 	.globl _tmr2_irq
+	.globl _menu_set_paragraph
+	.globl _menu_set_item_menu
+	.globl _menu_border_splash
+	.globl _menu_border
 	.globl _ssd1306_send_buffer
 	.globl _ssd1306_buffer_clean
 	.globl _set_bit
@@ -19,6 +23,8 @@
 	.globl _i2c_irq
 	.globl _memset
 	.globl _TIM2_IRQ
+	.globl _paragraph_item
+	.globl _current_item
 	.globl _main_buffer
 	.globl _ttf_eng_line_down
 	.globl _ttf_eng_line_up
@@ -64,6 +70,7 @@
 	.globl _ttf_eng_c
 	.globl _ttf_eng_b
 	.globl _ttf_eng_a
+	.globl _ttf_eng_void
 	.globl _I2C_IRQ
 	.globl _buf_size
 	.globl _buf_pos
@@ -95,6 +102,7 @@
 	.globl _ssd1306_buffer_write
 	.globl _ssd1306_clean
 	.globl _delay_s
+	.globl _delay_ms
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
@@ -113,6 +121,8 @@ _buf_size::
 	.area INITIALIZED
 _I2C_IRQ::
 	.ds 1
+_ttf_eng_void::
+	.ds 8
 _ttf_eng_a::
 	.ds 8
 _ttf_eng_b::
@@ -203,6 +213,10 @@ _ttf_eng_line_down::
 	.ds 8
 _main_buffer::
 	.ds 512
+_current_item::
+	.ds 1
+_paragraph_item::
+	.ds 1
 _TIM2_IRQ::
 	.ds 1
 ;--------------------------------------------------------
@@ -1441,95 +1455,96 @@ _ssd1306_send_buffer:
 ;	 function ssd1306_buffer_write
 ;	-----------------------------------------
 _ssd1306_buffer_write:
-	sub	sp, #10
-	ldw	(0x05, sp), x
+	sub	sp, #13
+	ldw	(0x08, sp), x
 ;	./libs/ssd1306_lib.c: 87: for (int height = 0; height < 8; height++)
 	clrw	x
-	ldw	(0x07, sp), x
+	ldw	(0x0a, sp), x
 00109$:
-	ldw	x, (0x07, sp)
+	ldw	x, (0x0a, sp)
 	cpw	x, #0x0008
 	jrslt	00150$
 	jp	00111$
 00150$:
 ;	./libs/ssd1306_lib.c: 89: for (int width = 0; width < 8; width++)
+	ldw	x, (0x12, sp)
+	addw	x, (0x0a, sp)
+	ldw	(0x05, sp), x
 	clrw	x
-	ldw	(0x09, sp), x
+	ldw	(0x0c, sp), x
 00106$:
-	ldw	x, (0x09, sp)
+	ldw	x, (0x0c, sp)
 	cpw	x, #0x0008
 	jrsge	00110$
 ;	./libs/ssd1306_lib.c: 90: if(data[height + width / 8] & (128 >> (width & 7)))
-	ldw	x, (0x07, sp)
-	addw	x, (0x0f, sp)
+	ldw	x, (0x0a, sp)
+	addw	x, (0x12, sp)
 	ld	a, (x)
-	ld	xl, a
-	ld	a, (0x0a, sp)
+	ld	(0x07, sp), a
+	ld	a, (0x0d, sp)
 	and	a, #0x07
-	ldw	y, #0x0080
+	ldw	x, #0x0080
 	tnz	a
 	jreq	00153$
 00152$:
-	sraw	y
+	sraw	x
 	dec	a
 	jrne	00152$
 00153$:
-	ldw	(0x01, sp), y
-	ld	a, xl
+	ldw	(0x01, sp), x
+	ld	a, (0x07, sp)
 	and	a, (0x02, sp)
 	ld	(0x04, sp), a
 	clr	(0x03, sp)
 	ldw	x, (0x03, sp)
 	jreq	00107$
-;	./libs/ssd1306_lib.c: 91: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(data[height + width], 7 - (width % 8)));
+;	./libs/ssd1306_lib.c: 91: ssd1306_draw_pixel(main_buffer, x + width, y + height, get_bit(data[height], 7 - (width % 8)));
 	push	#0x08
 	push	#0x00
-	ldw	x, (0x0b, sp)
+	ldw	x, (0x0e, sp)
 	call	__modsint
 	ldw	(0x03, sp), x
 	ldw	y, #0x0007
 	subw	y, (0x03, sp)
-	ldw	x, (0x07, sp)
-	addw	x, (0x09, sp)
-	addw	x, (0x0f, sp)
+	ldw	x, (0x05, sp)
 	ld	a, (x)
 	clrw	x
 	pushw	y
 	ld	xl, a
 	call	_get_bit
-	ld	a, (0x0e, sp)
-	ld	(0x04, sp), a
-	ld	a, (0x08, sp)
-	add	a, (0x04, sp)
+	ld	a, (0x11, sp)
+	ld	(0x07, sp), a
+	ld	a, (0x0b, sp)
+	add	a, (0x07, sp)
 	ld	xh, a
-	ld	a, (0x06, sp)
-	ld	(0x04, sp), a
-	ld	a, (0x0a, sp)
-	add	a, (0x04, sp)
-	ld	(0x04, sp), a
+	ld	a, (0x09, sp)
+	ld	(0x07, sp), a
+	ld	a, (0x0d, sp)
+	add	a, (0x07, sp)
+	ld	(0x07, sp), a
 	ld	a, xl
 	push	a
 	ld	a, xh
 	push	a
-	ld	a, (0x06, sp)
+	ld	a, (0x09, sp)
 	ldw	x, #(_main_buffer+0)
 	call	_ssd1306_draw_pixel
 00107$:
 ;	./libs/ssd1306_lib.c: 89: for (int width = 0; width < 8; width++)
-	ldw	x, (0x09, sp)
+	ldw	x, (0x0c, sp)
 	incw	x
-	ldw	(0x09, sp), x
+	ldw	(0x0c, sp), x
 	jra	00106$
 00110$:
 ;	./libs/ssd1306_lib.c: 87: for (int height = 0; height < 8; height++)
-	ldw	x, (0x07, sp)
+	ldw	x, (0x0a, sp)
 	incw	x
-	ldw	(0x07, sp), x
+	ldw	(0x0a, sp), x
 	jp	00109$
 00111$:
 ;	./libs/ssd1306_lib.c: 93: }
-	ldw	x, (11, sp)
-	addw	sp, #16
+	ldw	x, (14, sp)
+	addw	sp, #19
 	jp	(x)
 ;	./libs/ssd1306_lib.c: 95: void ssd1306_clean(void)
 ;	-----------------------------------------
@@ -1541,6 +1556,678 @@ _ssd1306_clean:
 ;	./libs/ssd1306_lib.c: 98: ssd1306_send_buffer();
 ;	./libs/ssd1306_lib.c: 99: }
 	jp	_ssd1306_send_buffer
+;	./libs/menu_lib.c: 3: void menu_border(void)
+;	-----------------------------------------
+;	 function menu_border
+;	-----------------------------------------
+_menu_border:
+	sub	sp, #4
+;	./libs/menu_lib.c: 5: ssd1306_buffer_write(0,0,ttf_eng_corner_left_up);
+	push	#<(_ttf_eng_corner_left_up+0)
+	push	#((_ttf_eng_corner_left_up+0) >> 8)
+	clrw	x
+	pushw	x
+	clrw	x
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 6: for(int x = 1;x<15;x++)
+	clrw	x
+	incw	x
+	ldw	(0x03, sp), x
+00104$:
+	ldw	x, (0x03, sp)
+	cpw	x, #0x000f
+	jrsge	00101$
+;	./libs/menu_lib.c: 7: ssd1306_buffer_write(x*8,0,ttf_eng_line_up);
+	ldw	x, (0x03, sp)
+	sllw	x
+	sllw	x
+	sllw	x
+	ldw	(0x01, sp), x
+	push	#<(_ttf_eng_line_up+0)
+	push	#((_ttf_eng_line_up+0) >> 8)
+	clrw	x
+	pushw	x
+	ldw	x, (0x05, sp)
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 6: for(int x = 1;x<15;x++)
+	ldw	x, (0x03, sp)
+	incw	x
+	ldw	(0x03, sp), x
+	jra	00104$
+00101$:
+;	./libs/menu_lib.c: 8: ssd1306_buffer_write(120,0,ttf_eng_corner_right_up);
+	push	#<(_ttf_eng_corner_right_up+0)
+	push	#((_ttf_eng_corner_right_up+0) >> 8)
+	clrw	x
+	pushw	x
+	ldw	x, #0x0078
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 10: ssd1306_buffer_write(0,8,ttf_eng_line_left);
+	push	#<(_ttf_eng_line_left+0)
+	push	#((_ttf_eng_line_left+0) >> 8)
+	push	#0x08
+	push	#0x00
+	clrw	x
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 11: ssd1306_buffer_write(0,16,ttf_eng_line_left);
+	push	#<(_ttf_eng_line_left+0)
+	push	#((_ttf_eng_line_left+0) >> 8)
+	push	#0x10
+	push	#0x00
+	clrw	x
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 13: ssd1306_buffer_write(120,8,ttf_eng_line_right);
+	push	#<(_ttf_eng_line_right+0)
+	push	#((_ttf_eng_line_right+0) >> 8)
+	push	#0x08
+	push	#0x00
+	ldw	x, #0x0078
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 14: ssd1306_buffer_write(120,16,ttf_eng_line_right);
+	push	#<(_ttf_eng_line_right+0)
+	push	#((_ttf_eng_line_right+0) >> 8)
+	push	#0x10
+	push	#0x00
+	ldw	x, #0x0078
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 16: ssd1306_buffer_write(0,24,ttf_eng_corner_left_down);
+	push	#<(_ttf_eng_corner_left_down+0)
+	push	#((_ttf_eng_corner_left_down+0) >> 8)
+	push	#0x18
+	push	#0x00
+	clrw	x
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 17: for(int x = 1;x<15;x++)
+	clrw	x
+	incw	x
+00107$:
+	cpw	x, #0x000f
+	jrsge	00102$
+;	./libs/menu_lib.c: 18: ssd1306_buffer_write(x*8,24,ttf_eng_line_down);
+	ldw	y, x
+	sllw	y
+	sllw	y
+	sllw	y
+	pushw	x
+	push	#<(_ttf_eng_line_down+0)
+	push	#((_ttf_eng_line_down+0) >> 8)
+	push	#0x18
+	push	#0x00
+	ldw	x, y
+	call	_ssd1306_buffer_write
+	popw	x
+;	./libs/menu_lib.c: 17: for(int x = 1;x<15;x++)
+	incw	x
+	jra	00107$
+00102$:
+;	./libs/menu_lib.c: 19: ssd1306_buffer_write(120,24,ttf_eng_corner_right_down);
+	push	#<(_ttf_eng_corner_right_down+0)
+	push	#((_ttf_eng_corner_right_down+0) >> 8)
+	push	#0x18
+	push	#0x00
+	ldw	x, #0x0078
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 21: }
+	addw	sp, #4
+	ret
+;	./libs/menu_lib.c: 23: void menu_border_splash(uint8_t number_of_letters)
+;	-----------------------------------------
+;	 function menu_border_splash
+;	-----------------------------------------
+_menu_border_splash:
+	sub	sp, #7
+	ld	(0x07, sp), a
+;	./libs/menu_lib.c: 25: ssd1306_buffer_write(6,8,ttf_eng_corner_left_up);
+	push	#<(_ttf_eng_corner_left_up+0)
+	push	#((_ttf_eng_corner_left_up+0) >> 8)
+	push	#0x08
+	push	#0x00
+	ldw	x, #0x0006
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 26: ssd1306_buffer_write(6,16,ttf_eng_corner_left_down);
+	push	#<(_ttf_eng_corner_left_down+0)
+	push	#((_ttf_eng_corner_left_down+0) >> 8)
+	push	#0x10
+	push	#0x00
+	ldw	x, #0x0006
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 27: for(int x = 1;x<number_of_letters+1;x++)
+	clrw	x
+	incw	x
+	ldw	(0x05, sp), x
+00104$:
+	clrw	y
+	ld	a, (0x07, sp)
+	ld	yl, a
+	ldw	x, y
+	incw	x
+	ldw	(0x01, sp), x
+	ldw	x, (0x05, sp)
+	cpw	x, (0x01, sp)
+	jrsge	00101$
+;	./libs/menu_lib.c: 28: ssd1306_buffer_write(6+x*8,8,ttf_eng_line_up);
+	ldw	x, (0x05, sp)
+	sllw	x
+	sllw	x
+	sllw	x
+	ldw	(0x01, sp), x
+	addw	x, #0x0006
+	ldw	(0x03, sp), x
+	push	#<(_ttf_eng_line_up+0)
+	push	#((_ttf_eng_line_up+0) >> 8)
+	push	#0x08
+	push	#0x00
+	ldw	x, (0x07, sp)
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 27: for(int x = 1;x<number_of_letters+1;x++)
+	ldw	x, (0x05, sp)
+	incw	x
+	ldw	(0x05, sp), x
+	jra	00104$
+00101$:
+;	./libs/menu_lib.c: 29: ssd1306_buffer_write(6+number_of_letters*8,8,ttf_eng_corner_right_up);
+	ldw	x, y
+	sllw	x
+	sllw	x
+	sllw	x
+	ld	a, xl
+	add	a, #0x06
+	ld	(0x04, sp), a
+	ld	a, xh
+	adc	a, #0x00
+	ld	(0x03, sp), a
+	pushw	x
+	push	#<(_ttf_eng_corner_right_up+0)
+	push	#((_ttf_eng_corner_right_up+0) >> 8)
+	push	#0x08
+	push	#0x00
+	ldw	x, (0x09, sp)
+	call	_ssd1306_buffer_write
+	popw	x
+;	./libs/menu_lib.c: 30: ssd1306_buffer_write(12+number_of_letters*8,0,ttf_eng_line_left);
+	addw	x, #0x000c
+	ldw	(0x05, sp), x
+	push	#<(_ttf_eng_line_left+0)
+	push	#((_ttf_eng_line_left+0) >> 8)
+	clrw	x
+	pushw	x
+	ldw	x, (0x09, sp)
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 33: ssd1306_buffer_write(6,16,ttf_eng_corner_left_down);
+	push	#<(_ttf_eng_corner_left_down+0)
+	push	#((_ttf_eng_corner_left_down+0) >> 8)
+	push	#0x10
+	push	#0x00
+	ldw	x, #0x0006
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 34: for(int x = 1;x<number_of_letters+1;x++)
+	clrw	x
+	incw	x
+00107$:
+	cpw	x, (0x01, sp)
+	jrsge	00102$
+;	./libs/menu_lib.c: 35: ssd1306_buffer_write(6+x*8,16,ttf_eng_line_down);
+	ldw	y, x
+	sllw	y
+	sllw	y
+	sllw	y
+	addw	y, #0x0006
+	pushw	x
+	push	#<(_ttf_eng_line_down+0)
+	push	#((_ttf_eng_line_down+0) >> 8)
+	push	#0x10
+	push	#0x00
+	ldw	x, y
+	call	_ssd1306_buffer_write
+	popw	x
+;	./libs/menu_lib.c: 34: for(int x = 1;x<number_of_letters+1;x++)
+	incw	x
+	jra	00107$
+00102$:
+;	./libs/menu_lib.c: 36: ssd1306_buffer_write(6+number_of_letters*8,16,ttf_eng_corner_right_down);
+	push	#<(_ttf_eng_corner_right_down+0)
+	push	#((_ttf_eng_corner_right_down+0) >> 8)
+	push	#0x10
+	push	#0x00
+	ldw	x, (0x07, sp)
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 37: ssd1306_buffer_write(12+number_of_letters*8,24,ttf_eng_line_left);
+	push	#<(_ttf_eng_line_left+0)
+	push	#((_ttf_eng_line_left+0) >> 8)
+	push	#0x18
+	push	#0x00
+	ldw	x, (0x09, sp)
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 41: }
+	addw	sp, #7
+	ret
+;	./libs/menu_lib.c: 42: void menu_set_item_menu(uint8_t item)
+;	-----------------------------------------
+;	 function menu_set_item_menu
+;	-----------------------------------------
+_menu_set_item_menu:
+;	./libs/menu_lib.c: 45: switch(item)
+	cp	a, #0x07
+	jrule	00118$
+	ret
+00118$:
+	clrw	x
+	ld	xl, a
+	sllw	x
+	ldw	x, (#00119$, x)
+	jp	(x)
+00119$:
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+	.dw	#00109$
+;	./libs/menu_lib.c: 68: }
+00109$:
+;	./libs/menu_lib.c: 70: }
+	ret
+;	./libs/menu_lib.c: 71: void menu_set_paragraph(uint8_t paragraph)
+;	-----------------------------------------
+;	 function menu_set_paragraph
+;	-----------------------------------------
+_menu_set_paragraph:
+;	./libs/menu_lib.c: 73: switch(paragraph)
+	cp	a, #0x00
+	jreq	00101$
+	cp	a, #0x01
+	jrne	00140$
+	jp	00102$
+00140$:
+	cp	a, #0x02
+	jrne	00143$
+	jp	00103$
+00143$:
+	cp	a, #0x03
+	jrne	00146$
+	jp	00104$
+00146$:
+	ret
+;	./libs/menu_lib.c: 75: case menu:
+00101$:
+;	./libs/menu_lib.c: 76: ssd1306_buffer_clean();
+	call	_ssd1306_buffer_clean
+;	./libs/menu_lib.c: 77: menu_border();
+	call	_menu_border
+;	./libs/menu_lib.c: 78: menu_border_splash(4);
+	ld	a, #0x04
+	call	_menu_border_splash
+;	./libs/menu_lib.c: 80: ssd1306_buffer_write(10,12,ttf_eng_m);
+	push	#<(_ttf_eng_m+0)
+	push	#((_ttf_eng_m+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x000a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 81: ssd1306_buffer_write(18,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0012
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 82: ssd1306_buffer_write(26,12,ttf_eng_n);
+	push	#<(_ttf_eng_n+0)
+	push	#((_ttf_eng_n+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x001a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 83: ssd1306_buffer_write(34,12,ttf_eng_u);
+	push	#<(_ttf_eng_u+0)
+	push	#((_ttf_eng_u+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0022
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 85: ssd1306_buffer_write(48,4,ttf_eng_c);
+	push	#<(_ttf_eng_c+0)
+	push	#((_ttf_eng_c+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0030
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 86: ssd1306_buffer_write(56,4,ttf_eng_o);
+	push	#<(_ttf_eng_o+0)
+	push	#((_ttf_eng_o+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0038
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 87: ssd1306_buffer_write(64,4,ttf_eng_l);
+	push	#<(_ttf_eng_l+0)
+	push	#((_ttf_eng_l+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0040
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 88: ssd1306_buffer_write(72,4,ttf_eng_o);
+	push	#<(_ttf_eng_o+0)
+	push	#((_ttf_eng_o+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0048
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 89: ssd1306_buffer_write(80,4,ttf_eng_r);
+	push	#<(_ttf_eng_r+0)
+	push	#((_ttf_eng_r+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0050
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 90: ssd1306_buffer_write(114,4,ttf_eng_line_left);
+	push	#<(_ttf_eng_line_left+0)
+	push	#((_ttf_eng_line_left+0) >> 8)
+	push	#0x04
+	push	#0x00
+	ldw	x, #0x0072
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 92: ssd1306_buffer_write(48,12,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0030
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 93: ssd1306_buffer_write(56,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0038
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 94: ssd1306_buffer_write(64,12,ttf_eng_g);
+	push	#<(_ttf_eng_g+0)
+	push	#((_ttf_eng_g+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0040
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 95: ssd1306_buffer_write(72,12,ttf_eng_m);
+	push	#<(_ttf_eng_m+0)
+	push	#((_ttf_eng_m+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0048
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 96: ssd1306_buffer_write(80,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0050
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 97: ssd1306_buffer_write(88,12,ttf_eng_n);
+	push	#<(_ttf_eng_n+0)
+	push	#((_ttf_eng_n+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0058
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 98: ssd1306_buffer_write(96,12,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0060
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 99: ssd1306_buffer_write(114,12,ttf_eng_void);
+	push	#<(_ttf_eng_void+0)
+	push	#((_ttf_eng_void+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0072
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 101: ssd1306_buffer_write(48,20,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0030
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 102: ssd1306_buffer_write(56,20,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0038
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 103: ssd1306_buffer_write(64,20,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0040
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 104: ssd1306_buffer_write(72,20,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0048
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 105: ssd1306_buffer_write(80,20,ttf_eng_i);
+	push	#<(_ttf_eng_i+0)
+	push	#((_ttf_eng_i+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0050
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 106: ssd1306_buffer_write(88,20,ttf_eng_n);
+	push	#<(_ttf_eng_n+0)
+	push	#((_ttf_eng_n+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0058
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 107: ssd1306_buffer_write(96,20,ttf_eng_g);
+	push	#<(_ttf_eng_g+0)
+	push	#((_ttf_eng_g+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0060
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 108: ssd1306_buffer_write(104,20,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0068
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 109: ssd1306_buffer_write(114,20,ttf_eng_void);
+	push	#<(_ttf_eng_void+0)
+	push	#((_ttf_eng_void+0) >> 8)
+	push	#0x14
+	push	#0x00
+	ldw	x, #0x0072
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 111: ssd1306_send_buffer();
+;	./libs/menu_lib.c: 112: break;
+	jp	_ssd1306_send_buffer
+;	./libs/menu_lib.c: 113: case color:
+00102$:
+;	./libs/menu_lib.c: 114: ssd1306_buffer_clean();
+	call	_ssd1306_buffer_clean
+;	./libs/menu_lib.c: 115: menu_border();
+	call	_menu_border
+;	./libs/menu_lib.c: 116: menu_border_splash(5);
+	ld	a, #0x05
+	call	_menu_border_splash
+;	./libs/menu_lib.c: 118: ssd1306_buffer_write(10,12,ttf_eng_c);
+	push	#<(_ttf_eng_c+0)
+	push	#((_ttf_eng_c+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x000a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 119: ssd1306_buffer_write(18,12,ttf_eng_o);
+	push	#<(_ttf_eng_o+0)
+	push	#((_ttf_eng_o+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0012
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 120: ssd1306_buffer_write(26,12,ttf_eng_l);
+	push	#<(_ttf_eng_l+0)
+	push	#((_ttf_eng_l+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x001a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 121: ssd1306_buffer_write(34,12,ttf_eng_o);
+	push	#<(_ttf_eng_o+0)
+	push	#((_ttf_eng_o+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0022
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 122: ssd1306_buffer_write(42,12,ttf_eng_r);
+	push	#<(_ttf_eng_r+0)
+	push	#((_ttf_eng_r+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x002a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 124: ssd1306_send_buffer();
+;	./libs/menu_lib.c: 125: break;
+	jp	_ssd1306_send_buffer
+;	./libs/menu_lib.c: 126: case segment:
+00103$:
+;	./libs/menu_lib.c: 127: ssd1306_buffer_clean();
+	call	_ssd1306_buffer_clean
+;	./libs/menu_lib.c: 128: menu_border();
+	call	_menu_border
+;	./libs/menu_lib.c: 129: menu_border_splash(7);
+	ld	a, #0x07
+	call	_menu_border_splash
+;	./libs/menu_lib.c: 131: ssd1306_buffer_write(10,12,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x000a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 132: ssd1306_buffer_write(18,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0012
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 133: ssd1306_buffer_write(26,12,ttf_eng_g);
+	push	#<(_ttf_eng_g+0)
+	push	#((_ttf_eng_g+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x001a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 134: ssd1306_buffer_write(34,12,ttf_eng_m);
+	push	#<(_ttf_eng_m+0)
+	push	#((_ttf_eng_m+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0022
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 135: ssd1306_buffer_write(42,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x002a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 136: ssd1306_buffer_write(50,12,ttf_eng_n);
+	push	#<(_ttf_eng_n+0)
+	push	#((_ttf_eng_n+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0032
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 137: ssd1306_buffer_write(58,12,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x003a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 139: ssd1306_send_buffer();
+;	./libs/menu_lib.c: 142: break;
+	jp	_ssd1306_send_buffer
+;	./libs/menu_lib.c: 143: case settings:
+00104$:
+;	./libs/menu_lib.c: 144: ssd1306_buffer_clean();
+	call	_ssd1306_buffer_clean
+;	./libs/menu_lib.c: 145: menu_border();
+	call	_menu_border
+;	./libs/menu_lib.c: 146: menu_border_splash(8);
+	ld	a, #0x08
+	call	_menu_border_splash
+;	./libs/menu_lib.c: 148: ssd1306_buffer_write(10,12,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x000a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 149: ssd1306_buffer_write(18,12,ttf_eng_e);
+	push	#<(_ttf_eng_e+0)
+	push	#((_ttf_eng_e+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0012
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 150: ssd1306_buffer_write(26,12,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x001a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 151: ssd1306_buffer_write(34,12,ttf_eng_t);
+	push	#<(_ttf_eng_t+0)
+	push	#((_ttf_eng_t+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0022
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 152: ssd1306_buffer_write(42,12,ttf_eng_i);
+	push	#<(_ttf_eng_i+0)
+	push	#((_ttf_eng_i+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x002a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 153: ssd1306_buffer_write(50,12,ttf_eng_n);
+	push	#<(_ttf_eng_n+0)
+	push	#((_ttf_eng_n+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0032
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 154: ssd1306_buffer_write(58,12,ttf_eng_g);
+	push	#<(_ttf_eng_g+0)
+	push	#((_ttf_eng_g+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x003a
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 155: ssd1306_buffer_write(66,12,ttf_eng_s);
+	push	#<(_ttf_eng_s+0)
+	push	#((_ttf_eng_s+0) >> 8)
+	push	#0x0c
+	push	#0x00
+	ldw	x, #0x0042
+	call	_ssd1306_buffer_write
+;	./libs/menu_lib.c: 157: ssd1306_send_buffer();
+;	./libs/menu_lib.c: 159: }
+;	./libs/menu_lib.c: 160: }
+	jp	_ssd1306_send_buffer
 ;	./libs/tmr2_lib.c: 3: void tmr2_irq(void) __interrupt(TIM2_vector)
 ;	-----------------------------------------
 ;	 function tmr2_irq
@@ -1548,11 +2235,6 @@ _ssd1306_clean:
 _tmr2_irq:
 	clr	a
 	div	x, a
-;	./libs/tmr2_lib.c: 5: TIM2_CR1->CEN = 0;
-	ldw	x, #0x5300
-	ld	a, (x)
-	and	a, #0xfe
-	ld	(x), a
 ;	./libs/tmr2_lib.c: 6: disableInterrupts();
 	sim
 ;	./libs/tmr2_lib.c: 7: TIM2_IRQ.all = 0;//обнуление флагов регистров
@@ -1579,42 +2261,98 @@ _tmr2_irq:
 ;	 function delay_s
 ;	-----------------------------------------
 _delay_s:
-	sub	sp, #5
-	ld	(0x03, sp), a
-;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks;i++)
+	sub	sp, #7
+	ld	(0x05, sp), a
+;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks+1;i++)//блять в душе не ебу почему так сработало, но почему-то если на один больше, то таймер нормально работает
 	clrw	x
-	ldw	(0x04, sp), x
+	ldw	(0x06, sp), x
 00106$:
-	ld	a, (0x03, sp)
+	ld	a, (0x05, sp)
 	ld	(0x02, sp), a
 	clr	(0x01, sp)
-	ldw	x, (0x04, sp)
-	cpw	x, (0x01, sp)
-	jrsge	00108$
-;	./libs/tmr2_lib.c: 20: TIM2_ARRH->ARR = 0x00;
-	mov	0x530f+0, #0x00
-;	./libs/tmr2_lib.c: 21: TIM2_ARRL->ARR = 0x01;
-	mov	0x5310+0, #0x01
-;	./libs/tmr2_lib.c: 22: TIM2_PSCR -> PSC = 0x0E;
+	ldw	x, (0x01, sp)
+	incw	x
+	ldw	(0x03, sp), x
+	ldw	x, (0x06, sp)
+	cpw	x, (0x03, sp)
+	jrsge	00104$
+;	./libs/tmr2_lib.c: 20: TIM2_SR1 -> UIF = 0;
+	bres	0x5304, #0
+;	./libs/tmr2_lib.c: 21: TIM2_ARRH->ARR = 0x03;
+	mov	0x530f+0, #0x03
+;	./libs/tmr2_lib.c: 22: TIM2_ARRL->ARR = 0xD1;
+	mov	0x5310+0, #0xd1
+;	./libs/tmr2_lib.c: 23: TIM2_PSCR -> PSC = 0x0E;
 	ld	a, 0x530e
 	and	a, #0xf0
 	or	a, #0x0e
 	ld	0x530e, a
-;	./libs/tmr2_lib.c: 23: TIM2_IER -> UIE = 1;
+;	./libs/tmr2_lib.c: 24: TIM2_IER -> UIE = 1;
 	bset	0x5303, #0
-;	./libs/tmr2_lib.c: 24: TIM2_CR1-> CEN = 1;
+;	./libs/tmr2_lib.c: 25: TIM2_CR1-> CEN = 1;
 	bset	0x5300, #0
-;	./libs/tmr2_lib.c: 25: while(TIM2_IER -> UIE);
+;	./libs/tmr2_lib.c: 26: while(TIM2_IER -> UIE);	
 00101$:
 	btjt	0x5303, #0, 00101$
-;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks;i++)
-	ldw	x, (0x04, sp)
+;	./libs/tmr2_lib.c: 18: for(int i = 0;i<ticks+1;i++)//блять в душе не ебу почему так сработало, но почему-то если на один больше, то таймер нормально работает
+	ldw	x, (0x06, sp)
 	incw	x
-	ldw	(0x04, sp), x
+	ldw	(0x06, sp), x
 	jra	00106$
-00108$:
-;	./libs/tmr2_lib.c: 28: }
-	addw	sp, #5
+00104$:
+;	./libs/tmr2_lib.c: 28: TIM2_CR1-> CEN = 0;
+	bres	0x5300, #0
+;	./libs/tmr2_lib.c: 29: }
+	addw	sp, #7
+	ret
+;	./libs/tmr2_lib.c: 30: void delay_ms(uint8_t ticks)
+;	-----------------------------------------
+;	 function delay_ms
+;	-----------------------------------------
+_delay_ms:
+	sub	sp, #7
+	ld	(0x05, sp), a
+;	./libs/tmr2_lib.c: 32: for(int i = 0;i<ticks+1;i++)
+	clrw	x
+	ldw	(0x06, sp), x
+00106$:
+	ld	a, (0x05, sp)
+	ld	(0x02, sp), a
+	clr	(0x01, sp)
+	ldw	x, (0x01, sp)
+	incw	x
+	ldw	(0x03, sp), x
+	ldw	x, (0x06, sp)
+	cpw	x, (0x03, sp)
+	jrsge	00104$
+;	./libs/tmr2_lib.c: 34: TIM2_SR1 -> UIF = 0;
+	bres	0x5304, #0
+;	./libs/tmr2_lib.c: 35: TIM2_ARRH->ARR = 0x03;
+	mov	0x530f+0, #0x03
+;	./libs/tmr2_lib.c: 36: TIM2_ARRL->ARR = 0xD1;
+	mov	0x5310+0, #0xd1
+;	./libs/tmr2_lib.c: 37: TIM2_PSCR -> PSC = 0x0E;
+	ld	a, 0x530e
+	and	a, #0xf0
+	or	a, #0x0e
+	ld	0x530e, a
+;	./libs/tmr2_lib.c: 38: TIM2_IER -> UIE = 1;
+	bset	0x5303, #0
+;	./libs/tmr2_lib.c: 39: TIM2_CR1-> CEN = 1;
+	bset	0x5300, #0
+;	./libs/tmr2_lib.c: 40: while(TIM2_IER -> UIE);	
+00101$:
+	btjt	0x5303, #0, 00101$
+;	./libs/tmr2_lib.c: 32: for(int i = 0;i<ticks+1;i++)
+	ldw	x, (0x06, sp)
+	incw	x
+	ldw	(0x06, sp), x
+	jra	00106$
+00104$:
+;	./libs/tmr2_lib.c: 42: TIM2_CR1-> CEN = 0;
+	bres	0x5300, #0
+;	./libs/tmr2_lib.c: 43: }
+	addw	sp, #7
 	ret
 ;	main.c: 3: void setup(void)
 ;	-----------------------------------------
@@ -1642,30 +2380,43 @@ _gg:
 	call	_ssd1306_init
 ;	main.c: 17: ssd1306_send_buffer();
 	call	_ssd1306_send_buffer
-;	main.c: 18: delay_s(0x01);
+;	main.c: 18: delay_s(1);
 	ld	a, #0x01
 	call	_delay_s
-;	main.c: 19: ssd1306_clean();
-;	main.c: 21: }
-	jp	_ssd1306_clean
-;	main.c: 23: int main(void)
+;	main.c: 20: menu_set_paragraph(menu);
+	clr	a
+	call	_menu_set_paragraph
+;	main.c: 21: delay_s(1);
+	ld	a, #0x01
+;	main.c: 36: }
+	jp	_delay_s
+;	main.c: 38: int main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	main.c: 25: setup();
+;	main.c: 40: setup();
 	call	_setup
-;	main.c: 26: gg();
+;	main.c: 41: gg();
 	call	_gg
-;	main.c: 27: while(1);
+;	main.c: 42: while(1);
 00102$:
 	jra	00102$
-;	main.c: 28: }
+;	main.c: 43: }
 	ret
 	.area CODE
 	.area CONST
 	.area INITIALIZER
 __xinit__I2C_IRQ:
+	.db #0x00	; 0
+__xinit__ttf_eng_void:
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
 	.db #0x00	; 0
 __xinit__ttf_eng_a:
 	.db #0x00	; 0
@@ -2576,6 +3327,10 @@ __xinit__main_buffer:
 	.db #0x80	; 128
 	.db #0x80	; 128
 	.db #0xff	; 255
+__xinit__current_item:
+	.db #0x00	; 0
+__xinit__paragraph_item:
+	.db #0x00	; 0
 __xinit__TIM2_IRQ:
 	.db #0x00	; 0
 	.area CABS (ABS)
