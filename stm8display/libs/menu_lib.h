@@ -3,10 +3,10 @@
 
 //static uint8_t *word_menu[] = {&ttf_eng_m[0],&ttf_eng_e[0],&ttf_eng_n[0],&ttf_eng_u[0]};
 
-#define menu 0
-#define color 1
-#define segment 2
-#define settings 3
+#define menu 4
+#define color 5
+#define segment 7
+#define settings 6
 
 #define red 1
 #define green 2
@@ -18,7 +18,27 @@
 #define sens 6
 #define vers 7
 
-uint8_t current_item = 0;
-uint8_t paragraph_item = 0;
+struct params_
+{
+	union
+	{
+		uint8_t all;
+		struct {
+			uint8_t current_item;
+			uint8_t paragraph_item;
+
+			uint8_t current_red;
+			uint8_t current_green;
+			uint8_t current_blue;
+			uint8_t current_first:4;
+			uint8_t current_second:4;
+			uint8_t current_sens;
+			uint8_t current_vers;
+		};
+	};
+	
+} typedef params_t;
+
+params_t params_value;
 
 #endif

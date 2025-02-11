@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "fonts/eng.h"
 
 #include "libs/libs.c"
 
