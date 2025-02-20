@@ -22,16 +22,16 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000023  s_INITIALIZED                   
      0000005B  l_HOME                          
      0000005F  l_GSINIT                        
-     0000036A  l_INITIALIZED                   
-     0000036A  l_INITIALIZER                   
-     0000038D  s_SSEG                          
-     00000F1D  l_CODE                          
+     0000033A  l_INITIALIZED                   
+     0000033A  l_INITIALIZER                   
+     0000035D  s_SSEG                          
+     00000E6F  l_CODE                          
      00008000  s_HOME                          
      0000805B  s_GSINIT                        
      000080BA  s_GSFINAL                       
      000080BD  s_CONST                         
      000080BD  s_INITIALIZER                   
-     00008427  s_CODE                          
+     000083F7  s_CODE                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -53,64 +53,58 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZED                         00000023    0000036A =         874. bytes (REL,CON)
+INITIALIZED                         00000023    0000033A =         826. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000023  _ttf_eng_a                         main
-     0000002B  _ttf_eng_b                         main
-     00000033  _ttf_eng_c                         main
-     0000003B  _ttf_eng_d                         main
-     00000043  _ttf_eng_e                         main
-     0000004B  _ttf_eng_f                         main
-     00000053  _ttf_eng_g                         main
-     0000005B  _ttf_eng_h                         main
-     00000063  _ttf_eng_i                         main
-     0000006B  _ttf_eng_j                         main
-     00000073  _ttf_eng_k                         main
-     0000007B  _ttf_eng_l                         main
-     00000083  _ttf_eng_m                         main
-     0000008B  _ttf_eng_n                         main
-     00000093  _ttf_eng_o                         main
-     0000009B  _ttf_eng_p                         main
-     000000A3  _ttf_eng_q                         main
-     000000AB  _ttf_eng_r                         main
-     000000B3  _ttf_eng_s                         main
-     000000BB  _ttf_eng_t                         main
-     000000C3  _ttf_eng_u                         main
-     000000CB  _ttf_eng_v                         main
-     000000D3  _ttf_eng_w                         main
-     000000DB  _ttf_eng_x                         main
-     000000E3  _ttf_eng_y                         main
-     000000EB  _ttf_eng_z                         main
-     000000F3  _I2C_IRQ                           main
-     000000F4  _ttf_void                          main
-     000000FC  _ttf_num_1                         main
-     00000104  _ttf_num_2                         main
-     0000010C  _ttf_num_3                         main
-     00000114  _ttf_num_4                         main
-     0000011C  _ttf_num_5                         main
-     00000124  _ttf_num_6                         main
-     0000012C  _ttf_num_7                         main
-     00000134  _ttf_num_8                         main
-     0000013C  _ttf_num_9                         main
-     00000144  _ttf_num_0                         main
-     0000014C  _ttf_corner_left_up                main
-     00000154  _ttf_corner_right_up               main
-     0000015C  _ttf_corner_left_down              main
-     00000164  _ttf_corner_right_down             main
-     0000016C  _ttf_line_right                    main
-     00000174  _ttf_line_left                     main
-     0000017C  _ttf_line_up                       main
-     00000184  _ttf_line_down                     main
-     0000018C  _main_buffer                       main
-     0000038C  _TIM2_IRQ                          main
+     00000023  _ttf_rus_1                         main
+     0000002B  _ttf_rus_2                         main
+     00000033  _ttf_rus_3                         main
+     0000003B  _ttf_rus_4                         main
+     00000043  _ttf_rus_5                         main
+     0000004B  _ttf_rus_6                         main
+     00000053  _ttf_rus_7                         main
+     0000005B  _ttf_rus_8                         main
+     00000063  _ttf_rus_9                         main
+     0000006B  _ttf_rus_10                        main
+     00000073  _ttf_rus_11                        main
+     0000007B  _ttf_rus_12                        main
+     00000083  _ttf_rus_13                        main
+     0000008B  _ttf_rus_14                        main
+     00000093  _ttf_rus_15                        main
+     0000009B  _ttf_rus_16                        main
+     000000A3  _ttf_rus_17                        main
+     000000AB  _ttf_rus_18                        main
+     000000B3  _ttf_rus_19                        main
+     000000BB  _ttf_rus_20                        main
+     000000C3  _TIM2_IRQ                          main
+     000000C4  _I2C_IRQ                           main
+     000000C5  _ttf_void                          main
+     000000CD  _ttf_num_1                         main
+     000000D5  _ttf_num_2                         main
+     000000DD  _ttf_num_3                         main
+     000000E5  _ttf_num_4                         main
+     000000ED  _ttf_num_5                         main
+     000000F5  _ttf_num_6                         main
+     000000FD  _ttf_num_7                         main
+     00000105  _ttf_num_8                         main
+     0000010D  _ttf_num_9                         main
+     00000115  _ttf_num_0                         main
+     0000011D  _ttf_corner_left_up                main
+     00000125  _ttf_corner_right_up               main
+     0000012D  _ttf_corner_left_down              main
+     00000135  _ttf_corner_right_down             main
+     0000013D  _ttf_line_right                    main
+     00000145  _ttf_line_left                     main
+     0000014D  _ttf_line_up                       main
+     00000155  _ttf_line_down                     main
+     0000015D  _main_buffer                       main
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                0000038D    00000001 =           1. bytes (REL,CON)
+SSEG                                0000035D    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -146,7 +140,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-INITIALIZER                         000080BD    0000036A =         874. bytes (REL,CON)
+INITIALIZER                         000080BD    0000033A =         826. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -155,57 +149,59 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008427    00000F1D =        3869. bytes (REL,CON)
+CODE                                000083F7    00000E6F =        3695. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008427  _uart_transmission_irq             main
-     00008463  _uart_reciever_irq                 main
-     00008496  _uart_write_irq                    main
-     000084C0  _uart_read_irq                     main
-     000084DE  _uart_init                         main
-     000085E0  _uart_read_byte                    main
-     000085E8  _uart_write_byte                   main
-     000085F3  _uart_write                        main
-     00008617  _uart_read                         main
-     00008645  _i2c_irq                           main
-     000086FF  _i2c_init                          main
-     0000872A  _i2c_start                         main
-     00008734  _i2c_stop                          main
-     00008739  _i2c_send_address                  main
-     00008768  _i2c_read_byte                     main
-     00008771  _i2c_read                          main
-     000087C0  _i2c_send_byte                     main
-     000087D2  _i2c_write                         main
-     00008802  _i2c_scan                          main
-     00008835  _i2c_start_irq                     main
-     00008845  _i2c_stop_irq                      main
-     0000884A  _get_bit                           main
-     0000885F  _set_bit                           main
-     00008892  _ssd1306_init                      main
-     00008906  _ssd1306_set_params_to_write       main
-     0000892A  _ssd1306_draw_pixel                main
-     00008975  _ssd1306_buffer_clean              main
-     00008982  _ssd1306_send_buffer               main
-     000089D7  _ssd1306_buffer_write              main
-     00008A6C  _ssd1306_clean                     main
-     00008A72  _menu_border                       main
-     00008B1F  _menu_border_paragraph             main
-     00008BEE  _menu_border_item                  main
-     00008C8F  _menu_set_params_value             main
-     00008CD0  _menu_set_item_menu                main
-     00008EF3  _menu_set_paragraph                main
-     000091E6  _tmr2_irq                          main
-     00009202  _delay_s                           main
-     0000924B  _delay_ms                          main
-     00009294  _params_default_conf               main
-     000092B3  _setup                             main
-     000092D4  _gg                                main
-     000092E8  _main                              main
-     000092F1  _memset                            _memset
-     00009313  ___sdcc_external_startup           _startup
-     00009315  __modsint                          
-     0000932D  __divsint                          
+     000083F7  _uart_transmission_irq             main
+     00008433  _uart_reciever_irq                 main
+     00008466  _uart_write_irq                    main
+     00008490  _uart_read_irq                     main
+     000084AE  _uart_init                         main
+     000085B0  _uart_read_byte                    main
+     000085B8  _uart_write_byte                   main
+     000085C3  _uart_write                        main
+     000085E7  _uart_read                         main
+     00008615  _tmr2_irq                          main
+     00008631  _delay_s                           main
+     00008675  _delay_ms                          main
+     000086B7  _i2c_irq                           main
+     00008771  _i2c_init                          main
+     0000879C  _i2c_start                         main
+     000087A6  _i2c_stop                          main
+     000087AB  _i2c_send_address                  main
+     000087DA  _i2c_read_byte                     main
+     000087E3  _i2c_read                          main
+     00008832  _i2c_send_byte                     main
+     00008844  _i2c_write                         main
+     00008874  _i2c_scan                          main
+     000088A7  _i2c_start_irq                     main
+     000088B7  _i2c_stop_irq                      main
+     000088BC  _get_bit                           main
+     000088D1  _set_bit                           main
+     00008904  _ssd1306_init                      main
+     00008978  _ssd1306_set_params_to_write       main
+     0000899C  _ssd1306_draw_pixel                main
+     000089E7  _ssd1306_buffer_clean              main
+     000089F4  _ssd1306_send_buffer               main
+     00008A49  _ssd1306_buffer_write              main
+     00008ADE  _ssd1306_clean                     main
+     00008AE4  _menu_border                       main
+     00008B91  _menu_border_paragraph             main
+     00008C60  _menu_border_item                  main
+     00008D01  _menu_set_params_value             main
+     00008D42  _menu_set_item_menu                main
+     00008EBD  _menu_set_paragraph                main
+     00009140  _adc_init                          main
+     0000915A  _adc_read                          main
+     00009185  _params_default_conf               main
+     000091A4  _setup                             main
+     000091CD  _gg                                main
+     000091FE  _main                              main
+     00009213  _memset                            _memset
+     00009235  ___sdcc_external_startup           _startup
+     00009237  __modsint                          
+     0000924F  __divsint                          
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 

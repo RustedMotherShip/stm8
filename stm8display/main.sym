@@ -7,8 +7,8 @@ Symbol Table
     .__.ABS.                                                    =  000000 G
     .__.CPU.                                                    =  000000 L
     .__.H$L.                                                    =  000001 L
-  2 _I2C_IRQ                                                       0000D0 GR
-  2 _TIM2_IRQ                                                      000369 GR
+  2 _I2C_IRQ                                                       0000A1 GR
+  2 _TIM2_IRQ                                                      0000A0 GR
     ___sdcc_external_startup                                       ****** GX
     __divsint                                                      ****** GX
   5 __interrupt_vect                                               000000 R
@@ -16,150 +16,140 @@ Symbol Table
   6 __sdcc_init_data                                               000009 R
   5 __sdcc_program_startup                                         000058 R
   3 __start__stack                                                 000000 R
-  9 __xinit__I2C_IRQ                                               0000D0 R
-  9 __xinit__TIM2_IRQ                                              000369 R
-  9 __xinit__main_buffer                                           000169 R
-  9 __xinit__ttf_corner_left_down                                  000139 R
-  9 __xinit__ttf_corner_left_up                                    000129 R
-  9 __xinit__ttf_corner_right_down                                 000141 R
-  9 __xinit__ttf_corner_right_up                                   000131 R
-  9 __xinit__ttf_eng_a                                             000000 R
-  9 __xinit__ttf_eng_b                                             000008 R
-  9 __xinit__ttf_eng_c                                             000010 R
-  9 __xinit__ttf_eng_d                                             000018 R
-  9 __xinit__ttf_eng_e                                             000020 R
-  9 __xinit__ttf_eng_f                                             000028 R
-  9 __xinit__ttf_eng_g                                             000030 R
-  9 __xinit__ttf_eng_h                                             000038 R
-  9 __xinit__ttf_eng_i                                             000040 R
-  9 __xinit__ttf_eng_j                                             000048 R
-  9 __xinit__ttf_eng_k                                             000050 R
-  9 __xinit__ttf_eng_l                                             000058 R
-  9 __xinit__ttf_eng_m                                             000060 R
-  9 __xinit__ttf_eng_n                                             000068 R
-  9 __xinit__ttf_eng_o                                             000070 R
-  9 __xinit__ttf_eng_p                                             000078 R
-  9 __xinit__ttf_eng_q                                             000080 R
-  9 __xinit__ttf_eng_r                                             000088 R
-  9 __xinit__ttf_eng_s                                             000090 R
-  9 __xinit__ttf_eng_t                                             000098 R
-  9 __xinit__ttf_eng_u                                             0000A0 R
-  9 __xinit__ttf_eng_v                                             0000A8 R
-  9 __xinit__ttf_eng_w                                             0000B0 R
-  9 __xinit__ttf_eng_x                                             0000B8 R
-  9 __xinit__ttf_eng_y                                             0000C0 R
-  9 __xinit__ttf_eng_z                                             0000C8 R
-  9 __xinit__ttf_line_down                                         000161 R
-  9 __xinit__ttf_line_left                                         000151 R
-  9 __xinit__ttf_line_right                                        000149 R
-  9 __xinit__ttf_line_up                                           000159 R
-  9 __xinit__ttf_num_0                                             000121 R
-  9 __xinit__ttf_num_1                                             0000D9 R
-  9 __xinit__ttf_num_2                                             0000E1 R
-  9 __xinit__ttf_num_3                                             0000E9 R
-  9 __xinit__ttf_num_4                                             0000F1 R
+  9 __xinit__I2C_IRQ                                               0000A1 R
+  9 __xinit__TIM2_IRQ                                              0000A0 R
+  9 __xinit__main_buffer                                           00013A R
+  9 __xinit__ttf_corner_left_down                                  00010A R
+  9 __xinit__ttf_corner_left_up                                    0000FA R
+  9 __xinit__ttf_corner_right_down                                 000112 R
+  9 __xinit__ttf_corner_right_up                                   000102 R
+  9 __xinit__ttf_line_down                                         000132 R
+  9 __xinit__ttf_line_left                                         000122 R
+  9 __xinit__ttf_line_right                                        00011A R
+  9 __xinit__ttf_line_up                                           00012A R
+  9 __xinit__ttf_num_0                                             0000F2 R
+  9 __xinit__ttf_num_1                                             0000AA R
+  9 __xinit__ttf_num_2                                             0000B2 R
+  9 __xinit__ttf_num_3                                             0000BA R
+  9 __xinit__ttf_num_4                                             0000C2 R
+  9 __xinit__ttf_num_5                                             0000CA R
+  9 __xinit__ttf_num_6                                             0000D2 R
+  9 __xinit__ttf_num_7                                             0000DA R
+  9 __xinit__ttf_num_8                                             0000E2 R
+  9 __xinit__ttf_num_9                                             0000EA R
+  9 __xinit__ttf_rus_1                                             000000 R
+  9 __xinit__ttf_rus_10                                            000048 R
+  9 __xinit__ttf_rus_11                                            000050 R
+  9 __xinit__ttf_rus_12                                            000058 R
+  9 __xinit__ttf_rus_13                                            000060 R
+  9 __xinit__ttf_rus_14                                            000068 R
+  9 __xinit__ttf_rus_15                                            000070 R
+  9 __xinit__ttf_rus_16                                            000078 R
+  9 __xinit__ttf_rus_17                                            000080 R
+  9 __xinit__ttf_rus_18                                            000088 R
+  9 __xinit__ttf_rus_19                                            000090 R
+  9 __xinit__ttf_rus_2                                             000008 R
+  9 __xinit__ttf_rus_20                                            000098 R
+  9 __xinit__ttf_rus_3                                             000010 R
+  9 __xinit__ttf_rus_4                                             000018 R
+  9 __xinit__ttf_rus_5                                             000020 R
+  9 __xinit__ttf_rus_6                                             000028 R
+  9 __xinit__ttf_rus_7                                             000030 R
+  9 __xinit__ttf_rus_8                                             000038 R
+  9 __xinit__ttf_rus_9                                             000040 R
+  9 __xinit__ttf_void                                              0000A2 R
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 2
 Hexadecimal [24-Bits]
 
 Symbol Table
 
-  9 __xinit__ttf_num_5                                             0000F9 R
-  9 __xinit__ttf_num_6                                             000101 R
-  9 __xinit__ttf_num_7                                             000109 R
-  9 __xinit__ttf_num_8                                             000111 R
-  9 __xinit__ttf_num_9                                             000119 R
-  9 __xinit__ttf_void                                              0000D1 R
+  A _adc_init                                                      000D49 GR
+  A _adc_read                                                      000D63 GR
   1 _buf_pos                                                       000004 GR
   1 _buf_size                                                      000005 GR
-  A _delay_ms                                                      000E24 GR
-  A _delay_s                                                       000DDB GR
-  A _get_bit                                                       000423 GR
-  A _gg                                                            000EAD GR
-  A _i2c_init                                                      0002D8 GR
-  A _i2c_irq                                                       00021E GR
-  A _i2c_read                                                      00034A GR
-  A _i2c_read_byte                                                 000341 GR
-  A _i2c_scan                                                      0003DB GR
-  A _i2c_send_address                                              000312 GR
-  A _i2c_send_byte                                                 000399 GR
-  A _i2c_start                                                     000303 GR
-  A _i2c_start_irq                                                 00040E GR
-  A _i2c_stop                                                      00030D GR
-  A _i2c_stop_irq                                                  00041E GR
-  A _i2c_write                                                     0003AB GR
-  A _main                                                          000EC1 GR
-  2 _main_buffer                                                   000169 GR
+  A _delay_ms                                                      00027E GR
+  A _delay_s                                                       00023A GR
+  A _get_bit                                                       0004C5 GR
+  A _gg                                                            000DD6 GR
+  A _i2c_init                                                      00037A GR
+  A _i2c_irq                                                       0002C0 GR
+  A _i2c_read                                                      0003EC GR
+  A _i2c_read_byte                                                 0003E3 GR
+  A _i2c_scan                                                      00047D GR
+  A _i2c_send_address                                              0003B4 GR
+  A _i2c_send_byte                                                 00043B GR
+  A _i2c_start                                                     0003A5 GR
+  A _i2c_start_irq                                                 0004B0 GR
+  A _i2c_stop                                                      0003AF GR
+  A _i2c_stop_irq                                                  0004C0 GR
+  A _i2c_write                                                     00044D GR
+  A _main                                                          000E07 GR
+  2 _main_buffer                                                   00013A GR
     _memset                                                        ****** GX
-  A _menu_border                                                   00064B GR
-  A _menu_border_item                                              0007C7 GR
-  A _menu_border_paragraph                                         0006F8 GR
-  A _menu_set_item_menu                                            0008A9 GR
-  A _menu_set_paragraph                                            000ACC GR
-  A _menu_set_params_value                                         000868 GR
-  1 _menu_set_params_value_numbers_10000_171                       00000E R
-  A _params_default_conf                                           000E6D GR
+  A _menu_border                                                   0006ED GR
+  A _menu_border_item                                              000869 GR
+  A _menu_border_paragraph                                         00079A GR
+  A _menu_set_item_menu                                            00094B GR
+  A _menu_set_paragraph                                            000AC6 GR
+  A _menu_set_params_value                                         00090A GR
+  1 _menu_set_params_value_numbers_10000_186                       00000E R
+  A _params_default_conf                                           000D8E GR
   1 _params_value                                                  000006 GR
   1 _rx_buf_pointer                                                000002 GR
-  A _set_bit                                                       000438 GR
-  A _setup                                                         000E8C GR
-  A _ssd1306_buffer_clean                                          00054E GR
-  A _ssd1306_buffer_write                                          0005B0 GR
-  A _ssd1306_clean                                                 000645 GR
-  A _ssd1306_draw_pixel                                            000503 GR
-  A _ssd1306_init                                                  00046B GR
-  A _ssd1306_send_buffer                                           00055B GR
-  A _ssd1306_set_params_to_write                                   0004DF GR
-  A _tmr2_irq                                                      000DBF GR
-  2 _ttf_corner_left_down                                          000139 GR
-  2 _ttf_corner_left_up                                            000129 GR
-  2 _ttf_corner_right_down                                         000141 GR
-  2 _ttf_corner_right_up                                           000131 GR
-  2 _ttf_eng_a                                                     000000 GR
-  2 _ttf_eng_b                                                     000008 GR
-  2 _ttf_eng_c                                                     000010 GR
-  2 _ttf_eng_d                                                     000018 GR
+  A _set_bit                                                       0004DA GR
+  A _setup                                                         000DAD GR
+  A _ssd1306_buffer_clean                                          0005F0 GR
+  A _ssd1306_buffer_write                                          000652 GR
+  A _ssd1306_clean                                                 0006E7 GR
+  A _ssd1306_draw_pixel                                            0005A5 GR
+  A _ssd1306_init                                                  00050D GR
+  A _ssd1306_send_buffer                                           0005FD GR
+  A _ssd1306_set_params_to_write                                   000581 GR
+  A _tmr2_irq                                                      00021E GR
+  2 _ttf_corner_left_down                                          00010A GR
+  2 _ttf_corner_left_up                                            0000FA GR
+  2 _ttf_corner_right_down                                         000112 GR
+  2 _ttf_corner_right_up                                           000102 GR
+  2 _ttf_line_down                                                 000132 GR
+  2 _ttf_line_left                                                 000122 GR
+  2 _ttf_line_right                                                00011A GR
+  2 _ttf_line_up                                                   00012A GR
+  2 _ttf_num_0                                                     0000F2 GR
+  2 _ttf_num_1                                                     0000AA GR
+  2 _ttf_num_2                                                     0000B2 GR
+  2 _ttf_num_3                                                     0000BA GR
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 3
 Hexadecimal [24-Bits]
 
 Symbol Table
 
-  2 _ttf_eng_e                                                     000020 GR
-  2 _ttf_eng_f                                                     000028 GR
-  2 _ttf_eng_g                                                     000030 GR
-  2 _ttf_eng_h                                                     000038 GR
-  2 _ttf_eng_i                                                     000040 GR
-  2 _ttf_eng_j                                                     000048 GR
-  2 _ttf_eng_k                                                     000050 GR
-  2 _ttf_eng_l                                                     000058 GR
-  2 _ttf_eng_m                                                     000060 GR
-  2 _ttf_eng_n                                                     000068 GR
-  2 _ttf_eng_o                                                     000070 GR
-  2 _ttf_eng_p                                                     000078 GR
-  2 _ttf_eng_q                                                     000080 GR
-  2 _ttf_eng_r                                                     000088 GR
-  2 _ttf_eng_s                                                     000090 GR
-  2 _ttf_eng_t                                                     000098 GR
-  2 _ttf_eng_u                                                     0000A0 GR
-  2 _ttf_eng_v                                                     0000A8 GR
-  2 _ttf_eng_w                                                     0000B0 GR
-  2 _ttf_eng_x                                                     0000B8 GR
-  2 _ttf_eng_y                                                     0000C0 GR
-  2 _ttf_eng_z                                                     0000C8 GR
-  2 _ttf_line_down                                                 000161 GR
-  2 _ttf_line_left                                                 000151 GR
-  2 _ttf_line_right                                                000149 GR
-  2 _ttf_line_up                                                   000159 GR
-  2 _ttf_num_0                                                     000121 GR
-  2 _ttf_num_1                                                     0000D9 GR
-  2 _ttf_num_2                                                     0000E1 GR
-  2 _ttf_num_3                                                     0000E9 GR
-  2 _ttf_num_4                                                     0000F1 GR
-  2 _ttf_num_5                                                     0000F9 GR
-  2 _ttf_num_6                                                     000101 GR
-  2 _ttf_num_7                                                     000109 GR
-  2 _ttf_num_8                                                     000111 GR
-  2 _ttf_num_9                                                     000119 GR
-  2 _ttf_void                                                      0000D1 GR
+  2 _ttf_num_4                                                     0000C2 GR
+  2 _ttf_num_5                                                     0000CA GR
+  2 _ttf_num_6                                                     0000D2 GR
+  2 _ttf_num_7                                                     0000DA GR
+  2 _ttf_num_8                                                     0000E2 GR
+  2 _ttf_num_9                                                     0000EA GR
+  2 _ttf_rus_1                                                     000000 GR
+  2 _ttf_rus_10                                                    000048 GR
+  2 _ttf_rus_11                                                    000050 GR
+  2 _ttf_rus_12                                                    000058 GR
+  2 _ttf_rus_13                                                    000060 GR
+  2 _ttf_rus_14                                                    000068 GR
+  2 _ttf_rus_15                                                    000070 GR
+  2 _ttf_rus_16                                                    000078 GR
+  2 _ttf_rus_17                                                    000080 GR
+  2 _ttf_rus_18                                                    000088 GR
+  2 _ttf_rus_19                                                    000090 GR
+  2 _ttf_rus_2                                                     000008 GR
+  2 _ttf_rus_20                                                    000098 GR
+  2 _ttf_rus_3                                                     000010 GR
+  2 _ttf_rus_4                                                     000018 GR
+  2 _ttf_rus_5                                                     000020 GR
+  2 _ttf_rus_6                                                     000028 GR
+  2 _ttf_rus_7                                                     000030 GR
+  2 _ttf_rus_8                                                     000038 GR
+  2 _ttf_rus_9                                                     000040 GR
+  2 _ttf_void                                                      0000A2 GR
   1 _tx_buf_pointer                                                000000 GR
   A _uart_init                                                     0000B7 GR
   A _uart_read                                                     0001F0 GR
@@ -177,7 +167,6 @@ Symbol Table
     s_INITIALIZED                                                  ****** GX
     s_INITIALIZER                                                  ****** GX
 
-
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8)  Page 4
 Hexadecimal [24-Bits]
 
@@ -185,14 +174,14 @@ Area Table
 
    0 _CODE                                      size      0   flags    0
    1 DATA                                       size     22   flags    0
-   2 INITIALIZED                                size    36A   flags    0
+   2 INITIALIZED                                size    33A   flags    0
    3 SSEG                                       size      1   flags    0
    4 DABS                                       size      0   flags    8
    5 HOME                                       size     5B   flags    0
    6 GSINIT                                     size     5F   flags    0
    7 GSFINAL                                    size      3   flags    0
    8 CONST                                      size      0   flags    0
-   9 INITIALIZER                                size    36A   flags    0
-   A CODE                                       size    ECA   flags    0
+   9 INITIALIZER                                size    33A   flags    0
+   A CODE                                       size    E1C   flags    0
    B CABS                                       size      0   flags    8
 

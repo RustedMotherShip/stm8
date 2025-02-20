@@ -15,7 +15,7 @@ void tmr2_irq(void) __interrupt(TIM2_vector)
 }
 void delay_s(uint8_t ticks)
 {
-	for(int i = 0;i<ticks+1;i++)//блять в душе не ебу почему так сработало, но почему-то если на один больше, то таймер нормально работает
+	for(int i = 0;i<ticks;i++)
 	{
 		TIM2_SR1 -> UIF = 0;
 		TIM2_ARRH->ARR = 0x03;
@@ -29,12 +29,12 @@ void delay_s(uint8_t ticks)
 }
 void delay_ms(uint8_t ticks)
 {
-	for(int i = 0;i<ticks+1;i++)
+	for(int i = 0;i<ticks;i++)
 	{
 		TIM2_SR1 -> UIF = 0;
-		TIM2_ARRH->ARR = 0x03;
-		TIM2_ARRL->ARR = 0xD1;
-		TIM2_PSCR -> PSC = 0x0E;
+		TIM2_ARRH->ARR = 0x00;
+		TIM2_ARRL->ARR = 0x7D;
+		TIM2_PSCR -> PSC = 0x0F;
 		TIM2_IER -> UIE = 1;
 		TIM2_CR1-> CEN = 1;
 		while(TIM2_IER -> UIE);	

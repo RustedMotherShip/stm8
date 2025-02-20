@@ -7,10 +7,13 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "fonts/eng.h"
+//#include "fonts/eng.h"
+#include "fonts/rus.h"
+
+#include "stm8.h"
 
 #include "libs/libs.c"
 
-#include "stm8.h"
+
 
 #endif

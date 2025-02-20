@@ -74,10 +74,14 @@ void menu_set_item_menu(uint8_t item)
 	{
 		case red:
 			menu_border_item(color);
-			
-			ssd1306_buffer_write(15+color*8,4,ttf_eng_r);
-			ssd1306_buffer_write(15+color*8+8,4,ttf_eng_e);
-			ssd1306_buffer_write(15+color*8+16,4,ttf_eng_d);
+
+			ssd1306_buffer_write(15+color*8,4,ttf_rus_13);
+			ssd1306_buffer_write(15+color*8+8,4,ttf_rus_14);
+			ssd1306_buffer_write(15+color*8+16,4,ttf_rus_5);
+			ssd1306_buffer_write(15+color*8+24,4,ttf_rus_6);
+			ssd1306_buffer_write(15+color*8+32,4,ttf_rus_9);
+			ssd1306_buffer_write(15+color*8+40,4,ttf_rus_15);
+			ssd1306_buffer_write(15+color*8+48,4,ttf_rus_16);
 
 			menu_set_params_value(params_value.current_red);
 
@@ -85,11 +89,13 @@ void menu_set_item_menu(uint8_t item)
 		case green:
 			menu_border_item(color);
 			
-			ssd1306_buffer_write(15+color*8,4,ttf_eng_g);
-			ssd1306_buffer_write(15+color*8+8,4,ttf_eng_r);
-			ssd1306_buffer_write(15+color*8+16,4,ttf_eng_e);
-			ssd1306_buffer_write(15+color*8+24,4,ttf_eng_e);
-			ssd1306_buffer_write(15+color*8+32,4,ttf_eng_n);
+			ssd1306_buffer_write(15+color*8,4,ttf_rus_17);
+			ssd1306_buffer_write(15+color*8+8,4,ttf_rus_3);
+			ssd1306_buffer_write(15+color*8+16,4,ttf_rus_18);
+			ssd1306_buffer_write(15+color*8+24,4,ttf_rus_3);
+			ssd1306_buffer_write(15+color*8+32,4,ttf_rus_9);
+			ssd1306_buffer_write(15+color*8+40,4,ttf_rus_15);
+			ssd1306_buffer_write(15+color*8+48,4,ttf_rus_16);
 
 			menu_set_params_value(params_value.current_green);
 
@@ -98,53 +104,54 @@ void menu_set_item_menu(uint8_t item)
 		case blue:
 			menu_border_item(color);
 			
-			ssd1306_buffer_write(15+color*8,4,ttf_eng_b);
-			ssd1306_buffer_write(15+color*8+8,4,ttf_eng_l);
-			ssd1306_buffer_write(15+color*8+16,4,ttf_eng_u);
-			ssd1306_buffer_write(15+color*8+24,4,ttf_eng_e);
+			ssd1306_buffer_write(15+color*8,4,ttf_rus_6);
+			ssd1306_buffer_write(15+color*8+8,4,ttf_rus_12);
+			ssd1306_buffer_write(15+color*8+16,4,ttf_rus_9);
+			ssd1306_buffer_write(15+color*8+24,4,ttf_rus_12);
+			ssd1306_buffer_write(15+color*8+32,4,ttf_rus_16);
 
 			menu_set_params_value(params_value.current_blue);
 		break;
 		case first:
 			menu_border_item(segment);
 			
-			ssd1306_buffer_write(15+segment*8,4,ttf_eng_f);
-			ssd1306_buffer_write(15+segment*8+8,4,ttf_eng_i);
-			ssd1306_buffer_write(15+segment*8+16,4,ttf_eng_r);
-			ssd1306_buffer_write(15+segment*8+24,4,ttf_eng_s);
-			ssd1306_buffer_write(15+segment*8+32,4,ttf_eng_t);
+			// ssd1306_buffer_write(15+segment*8,4,ttf_eng_f);
+			// ssd1306_buffer_write(15+segment*8+8,4,ttf_eng_i);
+			// ssd1306_buffer_write(15+segment*8+16,4,ttf_eng_r);
+			// ssd1306_buffer_write(15+segment*8+24,4,ttf_eng_s);
+			// ssd1306_buffer_write(15+segment*8+32,4,ttf_eng_t);
 
 			menu_set_params_value(params_value.current_first);
 		break;
 		case second:
 			menu_border_item(segment);
 			
-			ssd1306_buffer_write(15+segment*8,4,ttf_eng_s);
-			ssd1306_buffer_write(15+segment*8+8,4,ttf_eng_e);
-			ssd1306_buffer_write(15+segment*8+16,4,ttf_eng_c);
-			ssd1306_buffer_write(15+segment*8+24,4,ttf_eng_o);
-			ssd1306_buffer_write(15+segment*8+32,4,ttf_eng_n);
-			ssd1306_buffer_write(15+segment*8+40,4,ttf_eng_d);
+			// ssd1306_buffer_write(15+segment*8,4,ttf_eng_s);
+			// ssd1306_buffer_write(15+segment*8+8,4,ttf_eng_e);
+			// ssd1306_buffer_write(15+segment*8+16,4,ttf_eng_c);
+			// ssd1306_buffer_write(15+segment*8+24,4,ttf_eng_o);
+			// ssd1306_buffer_write(15+segment*8+32,4,ttf_eng_n);
+			// ssd1306_buffer_write(15+segment*8+40,4,ttf_eng_d);
 
 			menu_set_params_value(params_value.current_second);
 		break;
 		case sens:
 			menu_border_item(settings);
 			
-			ssd1306_buffer_write(15+settings*8,4,ttf_eng_s);
-			ssd1306_buffer_write(15+settings*8+8,4,ttf_eng_e);
-			ssd1306_buffer_write(15+settings*8+16,4,ttf_eng_n);
-			ssd1306_buffer_write(15+settings*8+24,4,ttf_eng_s);
+			// ssd1306_buffer_write(15+settings*8,4,ttf_eng_s);
+			// ssd1306_buffer_write(15+settings*8+8,4,ttf_eng_e);
+			// ssd1306_buffer_write(15+settings*8+16,4,ttf_eng_n);
+			// ssd1306_buffer_write(15+settings*8+24,4,ttf_eng_s);
 
 			menu_set_params_value(params_value.current_sens);
 		break;
 		case vers:
 			menu_border_item(settings);
 			
-			ssd1306_buffer_write(15+settings*8,4,ttf_eng_v);
-			ssd1306_buffer_write(15+settings*8+8,4,ttf_eng_e);
-			ssd1306_buffer_write(15+settings*8+16,4,ttf_eng_r);
-			ssd1306_buffer_write(15+settings*8+24,4,ttf_eng_s);
+			// ssd1306_buffer_write(15+settings*8,4,ttf_eng_v);
+			// ssd1306_buffer_write(15+settings*8+8,4,ttf_eng_e);
+			// ssd1306_buffer_write(15+settings*8+16,4,ttf_eng_r);
+			// ssd1306_buffer_write(15+settings*8+24,4,ttf_eng_s);
 
 			menu_set_params_value(params_value.current_vers);
 		break;
@@ -162,38 +169,34 @@ void menu_set_paragraph(uint8_t paragraph)
 		case menu:
 			ssd1306_buffer_clean();
 			menu_border();
-			menu_border_paragraph(menu);
+			menu_border_paragraph(4);
 
-			ssd1306_buffer_write(10,12,ttf_eng_m);
-	    	ssd1306_buffer_write(18,12,ttf_eng_e);
-	    	ssd1306_buffer_write(26,12,ttf_eng_n);
-	    	ssd1306_buffer_write(34,12,ttf_eng_u);
+			ssd1306_buffer_write(10,12,ttf_rus_8);
+	    	ssd1306_buffer_write(18,12,ttf_rus_3);
+	    	ssd1306_buffer_write(26,12,ttf_rus_9);
+	    	ssd1306_buffer_write(34,12,ttf_rus_20);
 
-	    	ssd1306_buffer_write(48,4,ttf_eng_c);
-	    	ssd1306_buffer_write(56,4,ttf_eng_o);
-	    	ssd1306_buffer_write(64,4,ttf_eng_l);
-	    	ssd1306_buffer_write(72,4,ttf_eng_o);
-	    	ssd1306_buffer_write(80,4,ttf_eng_r);
+	    	ssd1306_buffer_write(48,4,ttf_rus_1);
+	    	ssd1306_buffer_write(56,4,ttf_rus_2);
+	    	ssd1306_buffer_write(64,4,ttf_rus_3);
+	    	ssd1306_buffer_write(72,4,ttf_rus_4);
 	    	ssd1306_buffer_write(114,4,ttf_line_left);
 
-	    	ssd1306_buffer_write(48,12,ttf_eng_s);
-	    	ssd1306_buffer_write(56,12,ttf_eng_e);
-	    	ssd1306_buffer_write(64,12,ttf_eng_g);
-	    	ssd1306_buffer_write(72,12,ttf_eng_m);
-	    	ssd1306_buffer_write(80,12,ttf_eng_e);
-	    	ssd1306_buffer_write(88,12,ttf_eng_n);
-	    	ssd1306_buffer_write(96,12,ttf_eng_t);
-	    	ssd1306_buffer_write(114,12,ttf_void);
+	    	ssd1306_buffer_write(48,12,ttf_rus_6);
+	    	ssd1306_buffer_write(56,12,ttf_rus_3);
+	    	ssd1306_buffer_write(64,12,ttf_rus_7);
+	    	ssd1306_buffer_write(72,12,ttf_rus_8);
+	    	ssd1306_buffer_write(80,12,ttf_rus_3);
+	    	ssd1306_buffer_write(88,12,ttf_rus_9);
+	    	ssd1306_buffer_write(96,12,ttf_rus_4);
+	    	ssd1306_buffer_write(106,12,ttf_void);
 
-	    	ssd1306_buffer_write(48,20,ttf_eng_s);
-	    	ssd1306_buffer_write(56,20,ttf_eng_e);
-	    	ssd1306_buffer_write(64,20,ttf_eng_t);
-	    	ssd1306_buffer_write(72,20,ttf_eng_t);
-	    	ssd1306_buffer_write(80,20,ttf_eng_i);
-	    	ssd1306_buffer_write(88,20,ttf_eng_n);
-	    	ssd1306_buffer_write(96,20,ttf_eng_g);
-	    	ssd1306_buffer_write(104,20,ttf_eng_s);
-	    	ssd1306_buffer_write(114,20,ttf_void);
+	    	ssd1306_buffer_write(48,20,ttf_rus_10);
+	    	ssd1306_buffer_write(56,20,ttf_rus_11);
+	    	ssd1306_buffer_write(64,20,ttf_rus_1);
+	    	ssd1306_buffer_write(72,20,ttf_rus_12);
+	    	ssd1306_buffer_write(80,20,ttf_rus_12);
+	    	ssd1306_buffer_write(106,20,ttf_void);
 
 	    	ssd1306_send_buffer();
 		break;
@@ -202,11 +205,10 @@ void menu_set_paragraph(uint8_t paragraph)
 			menu_border();
 			menu_border_paragraph(color);
 
-			ssd1306_buffer_write(10,12,ttf_eng_c);
-	    	ssd1306_buffer_write(18,12,ttf_eng_o);
-	    	ssd1306_buffer_write(26,12,ttf_eng_l);
-	    	ssd1306_buffer_write(34,12,ttf_eng_o);
-	    	ssd1306_buffer_write(42,12,ttf_eng_r);
+			ssd1306_buffer_write(10,12,ttf_rus_1);
+	    	ssd1306_buffer_write(18,12,ttf_rus_2);
+	    	ssd1306_buffer_write(26,12,ttf_rus_3);
+	    	ssd1306_buffer_write(34,12,ttf_rus_4);
 
 	    	menu_set_item_menu(red);
 
@@ -217,13 +219,13 @@ void menu_set_paragraph(uint8_t paragraph)
 			menu_border();
 			menu_border_paragraph(segment);
 
-			ssd1306_buffer_write(10,12,ttf_eng_s);
-	    	ssd1306_buffer_write(18,12,ttf_eng_e);
-	    	ssd1306_buffer_write(26,12,ttf_eng_g);
-	    	ssd1306_buffer_write(34,12,ttf_eng_m);
-	    	ssd1306_buffer_write(42,12,ttf_eng_e);
-	    	ssd1306_buffer_write(50,12,ttf_eng_n);
-	    	ssd1306_buffer_write(58,12,ttf_eng_t);
+			ssd1306_buffer_write(10,12,ttf_rus_6);
+	    	ssd1306_buffer_write(18,12,ttf_rus_3);
+	    	ssd1306_buffer_write(26,12,ttf_rus_7);
+	    	ssd1306_buffer_write(34,12,ttf_rus_8);
+	    	ssd1306_buffer_write(42,12,ttf_rus_3);
+	    	ssd1306_buffer_write(50,12,ttf_rus_9);
+	    	ssd1306_buffer_write(58,12,ttf_rus_4);
 
 	    	menu_set_item_menu(first);
 
@@ -236,14 +238,11 @@ void menu_set_paragraph(uint8_t paragraph)
 			menu_border();
 			menu_border_paragraph(settings);
 
-			ssd1306_buffer_write(10,12,ttf_eng_s);
-	    	ssd1306_buffer_write(18,12,ttf_eng_e);
-	    	ssd1306_buffer_write(26,12,ttf_eng_t);
-	    	ssd1306_buffer_write(34,12,ttf_eng_t);
-	    	ssd1306_buffer_write(42,12,ttf_eng_i);
-	    	ssd1306_buffer_write(50,12,ttf_eng_n);
-	    	ssd1306_buffer_write(58,12,ttf_eng_g);
-	    	ssd1306_buffer_write(66,12,ttf_eng_s);
+	    	ssd1306_buffer_write(10,12,ttf_rus_10);
+	    	ssd1306_buffer_write(18,12,ttf_rus_11);
+	    	ssd1306_buffer_write(26,12,ttf_rus_1);
+	    	ssd1306_buffer_write(34,12,ttf_rus_12);
+	    	ssd1306_buffer_write(42,12,ttf_rus_12);
 
 	    	menu_set_item_menu(sens);
 

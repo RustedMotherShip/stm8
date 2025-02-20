@@ -3,10 +3,10 @@
 
 //static uint8_t *word_menu[] = {&ttf_eng_m[0],&ttf_eng_e[0],&ttf_eng_n[0],&ttf_eng_u[0]};
 
-#define menu 4
-#define color 5
+#define menu 0
+#define color 4
 #define segment 7
-#define settings 6
+#define settings 5
 
 #define red 1
 #define green 2

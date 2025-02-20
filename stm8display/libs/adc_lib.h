@@ -7,41 +7,41 @@ struct ADC_DBxR_
 
 struct ADC_CSR_
 {
-	uint8_t EOC:1;
-	uint8_t AWD:1;
-	uint8_t EOCIE:1;
-	uint8_t AWDIE:1;
 	uint8_t CH:4;
+	uint8_t AWDIE:1;
+	uint8_t EOCIE:1;
+	uint8_t AWD:1;
+	uint8_t EOC:1;
 
 } typedef ADC_CSR_t;
 
 struct ADC_CR1_
 {
-	uint8_t reserve:1;
-	uint8_t SPSEL:3;
-	uint8_t reserve1:2;
-	uint8_t CONT:1;
 	uint8_t ADON:1;
+	uint8_t CONT:1;
+	uint8_t reserve:2;
+	uint8_t SPSEL:3;
+	uint8_t reserve1:1;
 
 } typedef ADC_CR1_t;
 
 struct ADC_CR2_
 {
 	uint8_t reserve:1;
-	uint8_t EXTTRIG:1;
-	uint8_t EXTSEL:2;
-	uint8_t ALIGN:1;
-	uint8_t reserve1:1;
 	uint8_t SCAN:1;
+	uint8_t reserve1:1;
+	uint8_t ALIGN:1;
+	uint8_t EXTSEL:2;
+	uint8_t EXTTRIG:1;
 	uint8_t reserve2:1;
 
 } typedef ADC_CR2_t;
 
 struct ADC_CR3_
 {
-	uint8_t DBUF:1;
-	uint8_t OVR:1;
 	uint8_t reserve:6;
+	uint8_t OVR:1;
+	uint8_t DBUF:1;
 
 } typedef ADC_CR3_t;
 
@@ -86,19 +86,19 @@ struct ADC_LTRH_
 {
 	uint8_t HT;
 
-} typedef ADC_HTRH_t;
+} typedef ADC_LTRH_t;
 
 struct ADC_LTRL_
 {
-	uint8_t reserve:6;
 	uint8_t HT:2;
+	uint8_t reserve:6;
 
-} typedef ADC_HTRL_t;
+} typedef ADC_LTRL_t;
 
 struct ADC_AWSRH_
 {
-	uint8_t reserve:6;
 	uint8_t AWS:2;
+	uint8_t reserve:6;
 
 } typedef ADC_AWSRH_t;
 
@@ -110,8 +110,8 @@ struct ADC_AWSRL_
 
 struct ADC_AWCRH_
 {
-	uint8_t reserve:6;
 	uint8_t AWEN:2;
+	uint8_t reserve:6;
 
 } typedef ADC_AWCRH_t;
 
@@ -138,3 +138,6 @@ struct ADC_AWCRL_
 #define ADC_AWSRL ((volatile ADC_AWSRL_t *)0x540D)
 #define ADC_AWCRH ((volatile ADC_AWCRH_t *)0x540E)
 #define ADC_AWCRL ((volatile ADC_AWCRL_t *)0x540F)
+
+uint16_t adc_read(void);
+void adc_init(void);
